@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation'
 import type { Metadata } from 'next'
+import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -96,7 +97,7 @@ export default function PrivacyPage() {
               Since we do not collect personal data, there is nothing 
               to access, correct or delete. If you have questions 
               about our privacy practices please contact us at 
-              hello@agentcodex.dev
+              info@agentcodex.dev
             </p>
           </section>
 
@@ -123,6 +124,7 @@ export default function PrivacyPage() {
 
         </div>
       </div>
+      <Footer/>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation'
 import type { Metadata } from 'next'
+import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -118,12 +119,13 @@ export default function TermsPage() {
             </h2>
             <p>
               Questions about these terms? 
-              Email us at hello@agentcodex.dev
+              Email us at info@agentcodex.dev
             </p>
           </section>
 
         </div>
       </div>
+      <Footer/>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation'
 import type { Metadata } from 'next'
+import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -31,10 +32,10 @@ export default function ContactPage() {
                   General Enquiries
                 </h3>
                 <a 
-                  href="mailto:hello@agentcodex.dev"
+                  href="mailto:info@agentcodex.dev"
                   className="text-blue-600 hover:text-blue-700"
                 >
-                  hello@agentcodex.dev
+                  info@agentcodex.dev
                 </a>
               </div>
             </div>
@@ -50,7 +51,7 @@ export default function ContactPage() {
                   Email us with the name and a brief description.
                 </p>
                 <a 
-                  href="mailto:hello@agentcodex.dev?subject=Agent Suggestion"
+                  href="mailto:info@agentcodex.dev?subject=Agent Suggestion"
                   className="text-green-600 hover:text-green-700 text-sm font-medium"
                 >
                   Suggest an agent →
@@ -69,7 +70,7 @@ export default function ContactPage() {
                   Let us know and we will fix it quickly.
                 </p>
                 <a 
-                  href="mailto:hello@agentcodex.dev?subject=Incorrect Information"
+                  href="mailto:info@agentcodex.dev?subject=Incorrect Information"
                   className="text-orange-600 hover:text-orange-700 text-sm font-medium"
                 >
                   Report an issue →
@@ -101,6 +102,7 @@ export default function ContactPage() {
 
         </div>
       </div>
+      <Footer/>
     </div>
   )
 }
