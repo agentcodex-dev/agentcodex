@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
+import Footer from '@/components/Footer'
 
 const CATEGORIES = [
   {
@@ -96,6 +97,7 @@ export default function CategoriesPage() {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

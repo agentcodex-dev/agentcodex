@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation'
 import { supabase } from '@/lib/supabase'
 import { Agent } from '@/lib/types'
 import Link from 'next/link'
+import Footer from '@/components/Footer'
 
 async function getAgents() {
   const { data, error } = await supabase
@@ -92,6 +93,7 @@ export default async function ComparePage() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   )
 }

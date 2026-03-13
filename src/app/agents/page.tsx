@@ -3,6 +3,7 @@ import { Agent } from '@/lib/types'
 import Navigation from '@/components/Navigation'
 import AgentCard from '@/components/AgentCard'
 import Link from 'next/link'
+import Footer from '@/components/Footer'
 
 async function getAgents(search?: string) {
   let query = supabase
@@ -163,6 +164,7 @@ export default async function AgentsPage({
 
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

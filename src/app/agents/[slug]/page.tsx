@@ -6,6 +6,7 @@ import VersionTimeline from '@/components/VersionTimeline'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import Footer from '@/components/Footer'
 
 async function getAgent(slug: string) {
   const { data, error } = await supabase
@@ -279,6 +280,7 @@ export default async function AgentPage({
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }
