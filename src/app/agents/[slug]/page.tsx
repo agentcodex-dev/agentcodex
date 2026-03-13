@@ -5,6 +5,7 @@ import CapabilityScore from '@/components/CapabilityScore'
 import VersionTimeline from '@/components/VersionTimeline'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 
 async function getAgent(slug: string) {
   const { data, error } = await supabase
@@ -26,6 +27,48 @@ async function getAgentVersions(agentId: string) {
 
   if (error || !data) return []
   return data as AgentVersion[]
+}
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const agent = await getAgent(slug)
+
+  if (!agent) {
+    return {
+      title: 'Agent Not Found | AgentCodex',
+    }
+  }
+
+  return {
+    title: `${agent.name} - Version History & Capabilities | AgentCodex`,
+    description: `Track ${agent.name} by ${agent.provider}. Full version history, capability scores and changelog. ${agent.description}`,
+    keywords: [
+      agent.name,
+      agent.provider,
+      'AI agent',
+      'version history',
+      'capabilities',
+      ...agent.category
+    ],
+    openGraph: {
+      title: `${agent.name} | AgentCodex`,
+      description: `${agent.description}`,
+      url: `https://agentcodex.dev/agents/${agent.slug}`,
+      siteName: 'AgentCodex',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${agent.name} - AI Agent History | AgentCodex`,
+      description: `${agent.description}`,
+    },
+    alternates: {
+      canonical: `https://agentcodex.dev/agents/${agent.slug}`,
+    }
+  }
 }
 
 export default async function AgentPage({

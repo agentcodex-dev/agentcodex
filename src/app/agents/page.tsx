@@ -28,6 +28,16 @@ const ALL_CATEGORIES = [
   'Multimodal',
 ]
 
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'All AI Agents - Directory & Comparison',
+  description: 'Browse all AI agents including Claude, ChatGPT, GitHub Copilot, Cursor, Gemini and more. Filter by category and compare capabilities.',
+  alternates: {
+    canonical: 'https://agentcodex.dev/agents',
+  }
+}
+
 export default async function AgentsPage({
   searchParams,
 }: {

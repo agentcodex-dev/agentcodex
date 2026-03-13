@@ -28,6 +28,16 @@ const CATEGORIES = [
   },
 ]
 
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'AI Agent Categories - Coding, Research, General',
+  description: 'Browse AI agents by category. Find coding agents like Cursor and Copilot, research agents like Perplexity, and general purpose agents like Claude and ChatGPT.',
+  alternates: {
+    canonical: 'https://agentcodex.dev/categories',
+  }
+}
+
 export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
