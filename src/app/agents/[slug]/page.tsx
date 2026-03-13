@@ -24,6 +24,7 @@ async function getAgentVersions(agentId: string) {
     .from('agent_versions')
     .select('*')
     .eq('agent_id', agentId)
+    .eq('status', 'published')
     .order('release_date', { ascending: false })
 
   if (error || !data) return []
