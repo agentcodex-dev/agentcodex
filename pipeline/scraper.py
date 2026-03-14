@@ -45,7 +45,7 @@ def fetch_jina(source: dict) -> list[dict]:
                     'agent_slugs': source['agent_slugs'],
                     'title': f"{source['name']} - Latest Updates",
                     'url': source['url'],
-                    'content': response.text[:8000],
+                    'content': response.text[:4000],
                     'published': datetime.now(timezone.utc).isoformat(),
                     'method': 'jina'
                 })

@@ -4,10 +4,34 @@ import time
 from typing import Optional
 from anthropic import Anthropic
 from dotenv import load_dotenv
+from deduplicator import is_seen, mark_seen
 
 load_dotenv()
 
 client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
+
+
+VERSION_KEYWORDS = [
+    'version', 'release', 'update', 'launch',
+    'new', 'introducing', 'announce', 'available',
+    'upgrade', 'improved', 'changelog', 'v1', 'v2',
+    'v3', 'v4', 'v5', 'model', 'feature', 'capability'
+]
+
+def is_potentially_version_related(article: dict) -> bool:
+    """
+    Quick pre-filter before sending to Claude
+    Checks if article likely contains version info
+    Reduces unnecessary API calls
+    """
+    text = (
+        article.get('title', '') + ' ' +
+        article.get('content', '')
+    ).lower()
+
+    matches = sum(1 for kw in VERSION_KEYWORDS if kw in text)
+    return matches >= 2
+
 
 EXTRACTION_PROMPT = """
 You are an AI agent version tracker.
@@ -110,7 +134,7 @@ def extract_version(article: dict) -> Optional[dict]:
         except Exception as e:
             error_str = str(e)
             if '429' in error_str and attempt < 2:
-                wait_time = (attempt + 1) * 15
+                wait_time = (attempt + 1) * 60
                 print(f"  ⏳ Rate limited - waiting {wait_time}s...")
                 time.sleep(wait_time)
                 continue
@@ -125,24 +149,48 @@ def extract_version(article: dict) -> Optional[dict]:
     
 def extract_all(articles: list) -> list:
     versions_found = []
-    
-    print(f"\nExtracting versions from {len(articles)} articles...\n")
-    
-    for index, article in enumerate(articles):
-        print(f"[{index + 1}/{len(articles)}] Analyzing {article['source_name']}: {article['title'][:50]}...")
-        
+
+    # Step 1 - Keyword pre-filter
+    keyword_filtered = [
+        a for a in articles
+        if is_potentially_version_related(a)
+    ]
+
+    # Step 2 - Deduplication filter
+    relevant = [
+        a for a in keyword_filtered
+        if not is_seen(a)
+    ]
+
+    print(f"\nPre-filtering results")
+    print(f"─────────────────────")
+    print(f"Total scraped:     {len(articles)}")
+    print(f"Keyword match:     {len(keyword_filtered)}")
+    print(f"Already seen:      {len(keyword_filtered) - len(relevant)}")
+    print(f"To process:        {len(relevant)}\n")
+
+    if not relevant:
+        print("All articles already seen - nothing new to process")
+        return []
+
+    for index, article in enumerate(relevant):
+        print(f"[{index + 1}/{len(relevant)}] Analyzing {article['source_name']}: {article['title'][:50]}...")
+
         result = extract_version(article)
-        
+
         if result:
             result['pipeline_source'] = article['url']
             versions_found.append(result)
 
-        # Wait 3 seconds between each call
-        # Stays well within 30k tokens/minute limit
-        if index < len(articles) - 1:
-            print(f"  ⏳ Waiting 3s before next call...")
-            time.sleep(3)
-    
+        # Mark as seen regardless of result
+        # Even if no version found
+        # We do not want to reprocess same article
+        mark_seen(article)
+
+        if index < len(relevant) - 1:
+            print(f"  ⏳ Waiting 6s before next call...")
+            time.sleep(6)
+
     print(f"\nVersions found: {len(versions_found)}")
     return versions_found
 

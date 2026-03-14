@@ -1,13 +1,13 @@
 import feedparser
 
 FEEDS = {
-    'Anthropic': 'https://www.anthropic.com/rss.xml',
     'OpenAI': 'https://openai.com/blog/rss.xml',
     'GitHub': 'https://github.blog/feed/',
     'Google DeepMind': 'https://deepmind.google/blog/rss.xml',
-    'Perplexity': 'https://blog.perplexity.ai/feed',
-    'Meta AI': 'https://ai.meta.com/blog/feed/',
-    'Codeium': 'https://codeium.com/blog/feed',
+    'Meta AI': 'https://engineering.fb.com/feed/',
+    'Codeium': 'https://codeium.com/feed.xml',
+    'AWS': 'https://aws.amazon.com/blogs/aws/feed/',
+    'Replit': 'https://blog.replit.com/feed.xml',
 }
 
 def test_feeds():
