@@ -56,7 +56,7 @@ export default async function Home() {
               <div className="text-sm text-gray-500 mt-1">Agents Tracked</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">10+</div>
+              <div className="text-3xl font-bold text-gray-900">15+</div>
               <div className="text-sm text-gray-500 mt-1">Providers</div>
             </div>
             <div className="text-center">
