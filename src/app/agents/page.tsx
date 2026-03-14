@@ -2,10 +2,19 @@ import { supabase } from '@/lib/supabase'
 import { Agent } from '@/lib/types'
 import Navigation from '@/components/Navigation'
 import AgentCard from '@/components/AgentCard'
-import Link from 'next/link'
 import Footer from '@/components/Footer'
+import Link from 'next/link'
+import type { Metadata } from 'next'
 
-async function getAgents(search?: string) {
+export const metadata: Metadata = {
+  title: 'All AI Agents - Directory & Comparison',
+  description: 'Browse all AI agents including Claude, ChatGPT, GitHub Copilot, Cursor, Gemini and more. Filter by category and compare capabilities.',
+  alternates: {
+    canonical: 'https://agentcodex.dev/agents',
+  }
+}
+
+async function getAgents(search?: string, category?: string) {
   let query = supabase
     .from('agents')
     .select('*')
@@ -17,6 +26,10 @@ async function getAgents(search?: string) {
     )
   }
 
+  if (category) {
+    query = query.contains('category', [category])
+  }
+
   const { data, error } = await query
   if (error) return []
   return data as Agent[]
@@ -24,20 +37,10 @@ async function getAgents(search?: string) {
 
 const ALL_CATEGORIES = [
   'Coding',
-  'Research', 
+  'Research',
   'General',
   'Multimodal',
 ]
-
-import type { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'All AI Agents - Directory & Comparison',
-  description: 'Browse all AI agents including Claude, ChatGPT, GitHub Copilot, Cursor, Gemini and more. Filter by category and compare capabilities.',
-  alternates: {
-    canonical: 'https://agentcodex.dev/agents',
-  }
-}
 
 export default async function AgentsPage({
   searchParams,
@@ -45,14 +48,7 @@ export default async function AgentsPage({
   searchParams: Promise<{ search?: string; category?: string }>
 }) {
   const { search, category } = await searchParams
-  
-  let agents = await getAgents(search)
-
-  if (category) {
-    agents = agents.filter(agent =>
-      agent.category.includes(category)
-    )
-  }
+  const agents = await getAgents(search, category)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,21 +56,24 @@ export default async function AgentsPage({
 
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             All AI Agents
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">
             {agents.length} agents documented and growing daily
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
-          {/* Sidebar Filters */}
-          <div className="w-56 shrink-0 space-y-6">
+        {/* Mobile - Filters on top */}
+        {/* Desktop - Sidebar left, grid right */}
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+
+          {/* Filters */}
+          <div className="w-full lg:w-56 lg:shrink-0 space-y-4 lg:space-y-6">
 
             {/* Search */}
             <div>
@@ -101,12 +100,41 @@ export default async function AgentsPage({
               </form>
             </div>
 
-            {/* Categories */}
+            {/* Categories - horizontal scroll on mobile */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3">
                 Category
               </h3>
-              <div className="space-y-1">
+
+              {/* Mobile - horizontal scroll */}
+              <div className="flex lg:hidden gap-2 overflow-x-auto pb-2">
+                <Link
+                  href="/agents"
+                  className={`shrink-0 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    !category
+                      ? 'bg-blue-50 text-blue-700 font-medium'
+                      : 'bg-white border border-gray-200 text-gray-600'
+                  }`}
+                >
+                  All
+                </Link>
+                {ALL_CATEGORIES.map((cat) => (
+                  <Link
+                    key={cat}
+                    href={`/agents?category=${cat}${search ? `&search=${search}` : ''}`}
+                    className={`shrink-0 px-3 py-2 rounded-lg text-sm transition-colors ${
+                      category === cat
+                        ? 'bg-blue-50 text-blue-700 font-medium'
+                        : 'bg-white border border-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {cat}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Desktop - vertical list */}
+              <div className="hidden lg:flex flex-col space-y-1">
                 <Link
                   href="/agents"
                   className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
@@ -154,7 +182,7 @@ export default async function AgentsPage({
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {agents.map((agent) => (
                   <AgentCard key={agent.id} agent={agent} />
                 ))}

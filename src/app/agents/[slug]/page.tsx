@@ -101,14 +101,14 @@ export default async function AgentPage({
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-8">
 
             {/* Agent Header */}
             <div className="bg-white rounded-xl border border-gray-200 p-8">
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
                   <span className="text-blue-600 font-bold text-2xl">
                     {agent.name.charAt(0)}
@@ -141,7 +141,7 @@ export default async function AgentPage({
                   href={agent.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shrink-0"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors sm:shrink-0 w-full sm:w-auto text-center"
                 >
                   Visit Site →
                 </a>

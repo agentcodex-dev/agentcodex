@@ -111,7 +111,7 @@ export default function CompareView({
     <div className="space-y-8">
 
       {/* Agent Headers */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {/* Agent A */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-3">
@@ -214,7 +214,7 @@ export default function CompareView({
         <div className="divide-y divide-gray-100">
 
           {/* Latest Version */}
-          <div className="grid grid-cols-3 px-6 py-4">
+          <div className="grid grid-cols-3 px-4 sm:px-6 py-3 sm:py-4">
             <span className="text-sm text-gray-500 self-center">
               Latest Version
             </span>
@@ -227,7 +227,7 @@ export default function CompareView({
           </div>
 
           {/* Context Window */}
-          <div className="grid grid-cols-3 px-6 py-4">
+          <div className="grid grid-cols-3 px-4 sm:px-6 py-3 sm:py-4">
             <span className="text-sm text-gray-500 self-center">
               Context Window
             </span>
@@ -252,7 +252,7 @@ export default function CompareView({
           </div>
 
           {/* Pricing */}
-          <div className="grid grid-cols-3 px-6 py-4">
+          <div className="grid grid-cols-3 px-4 sm:px-6 py-3 sm:py-4">
             <span className="text-sm text-gray-500 self-center">
               Pricing
             </span>
@@ -265,7 +265,7 @@ export default function CompareView({
           </div>
 
           {/* Versions Documented */}
-          <div className="grid grid-cols-3 px-6 py-4">
+          <div className="grid grid-cols-3 px-4 sm:px-6 py-3 sm:py-4">
             <span className="text-sm text-gray-500 self-center">
               Versions Documented
             </span>
@@ -285,11 +285,13 @@ export default function CompareView({
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
             <div className="grid grid-cols-3">
-              <h3 className="font-semibold text-gray-900">Capabilities</h3>
-              <span className="text-sm font-medium text-blue-600 text-center">
+              <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                Capabilities
+              </h3>
+              <span className="text-xs sm:text-sm font-medium text-blue-600 text-center truncate px-1">
                 {agentA.name}
               </span>
-              <span className="text-sm font-medium text-purple-600 text-center">
+              <span className="text-xs sm:text-sm font-medium text-purple-600 text-center truncate px-1">
                 {agentB.name}
               </span>
             </div>
@@ -308,7 +310,7 @@ export default function CompareView({
       )}
 
       {/* Version History Comparison */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {/* Agent A History */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="bg-blue-50 px-6 py-4 border-b border-blue-100">
