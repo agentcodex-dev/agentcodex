@@ -15,6 +15,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
+  const comparePairs = [
+    'claude-vs-chatgpt',
+    'cursor-vs-windsurf',
+    'cursor-vs-github-copilot',
+    'claude-vs-gemini',
+    'chatgpt-vs-gemini',
+    'devin-vs-cursor',
+    'perplexity-vs-chatgpt',
+    'llama-vs-claude',
+    'bolt-new-vs-cursor',
+    'github-copilot-vs-windsurf',
+  ].map(pair => ({
+    url: `https://agentcodex.dev/compare/${pair}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
   return [
     {
       url: 'https://agentcodex.dev',
@@ -41,5 +59,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     ...agentUrls,
+    ...comparePairs,
   ]
 }

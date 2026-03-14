@@ -32,6 +32,7 @@ export type Capability = {
   tool_use: number
   memory: number
   speed: number
+  [key: string]: number
 }
 
 export type NewsSource = {
