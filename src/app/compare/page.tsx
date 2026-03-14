@@ -47,6 +47,10 @@ const POPULAR_PAIRS = [
   { a: 'claude', b: 'gemini', label: 'Claude vs Gemini' },
   { a: 'chatgpt', b: 'gemini', label: 'ChatGPT vs Gemini' },
   { a: 'devin', b: 'cursor', label: 'Devin vs Cursor' },
+  { a: 'claude', b: 'mistral', label: 'Claude vs Mistral' },
+  { a: 'midjourney', b: 'stable-diffusion', label: 'Midjourney vs Stable Diffusion' },
+  { a: 'cursor', b: 'replit-agent', label: 'Cursor vs Replit Agent' },
+  { a: 'cursor', b: 'cline', label: 'Cursor vs Cline' },
 ]
 
 export default async function ComparePage({

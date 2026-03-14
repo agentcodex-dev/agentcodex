@@ -67,6 +67,11 @@ export async function generateStaticParams() {
     { pair: 'llama-vs-claude' },
     { pair: 'bolt-new-vs-cursor' },
     { pair: 'github-copilot-vs-windsurf' },
+    { pair: 'claude-vs-mistral' },
+    { pair: 'midjourney-vs-stable-diffusion' },
+    { pair: 'cursor-vs-replit-agent' },
+    { pair: 'cursor-vs-cline' },
+    { pair: 'grok-vs-chatgpt' },
   ]
 }
 
