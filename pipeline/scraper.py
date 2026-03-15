@@ -16,7 +16,7 @@ def fetch_rss(source: dict) -> list[dict]:
                 'agent_slugs': source['agent_slugs'],
                 'title': entry.get('title', ''),
                 'url': entry.get('link', ''),
-                'content': entry.get('summary', ''),
+                'content': entry.get('summary', '')[:2000],
                 'published': entry.get('published', ''),
                 'method': 'rss'
             })
@@ -45,7 +45,7 @@ def fetch_jina(source: dict) -> list[dict]:
                     'agent_slugs': source['agent_slugs'],
                     'title': f"{source['name']} - Latest Updates",
                     'url': source['url'],
-                    'content': response.text[:4000],
+                    'content': response.text[:2000],
                     'published': datetime.now(timezone.utc).isoformat(),
                     'method': 'jina'
                 })
