@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 from supabase import create_client
 from dotenv import load_dotenv
@@ -10,6 +10,19 @@ supabase = create_client(
     os.getenv('SUPABASE_URL'),
     os.getenv('SUPABASE_SERVICE_KEY')
 )
+
+MAX_RELEASE_AGE_DAYS = 30
+
+
+def _is_recent_enough(release_date_str: str) -> bool:
+    """Return False if the release date is older than MAX_RELEASE_AGE_DAYS."""
+    try:
+        release_date = datetime.strptime(release_date_str, '%Y-%m-%d').date()
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=MAX_RELEASE_AGE_DAYS)).date()
+        return release_date >= cutoff
+    except Exception:
+        return True  # Unparseable date — let it through
+
 
 def version_exists(agent_slug: str, version_number: str) -> bool:
     """
@@ -70,6 +83,12 @@ def save_draft(extraction: dict) -> bool:
             print(f"  ⏭️  Already exists: {agent_name} {version_number}")
             return False
 
+        # Reject stale releases (old articles re-surfaced by the pipeline)
+        release_date = extraction.get('release_date')
+        if release_date and not _is_recent_enough(release_date):
+            print(f"  ⏭️  Stale release skipped: {agent_name} {version_number} ({release_date})")
+            return False
+
         # Clean capabilities
         # Remove null values
         capabilities = extraction.get('capabilities', {})
@@ -78,8 +97,7 @@ def save_draft(extraction: dict) -> bool:
             if v is not None
         }
 
-        # Parse release date
-        release_date = extraction.get('release_date')
+        # Parse release date (recency already validated above)
         if not release_date:
             release_date = datetime.now(timezone.utc).date().isoformat()
 

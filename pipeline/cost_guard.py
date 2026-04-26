@@ -1,5 +1,5 @@
 import os
-from anthropic import Anthropic
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,10 +19,11 @@ def check_cost_safe() -> bool:
         os.getenv('SUPABASE_SERVICE_KEY')
     )
     
+    today_iso = datetime.now(timezone.utc).date().isoformat()
+
     result = supabase.table('pipeline_seen_articles')\
         .select('id')\
-        .gte('first_seen_at', 
-             'today')\
+        .gte('first_seen_at', today_iso)\
         .execute()
     
     articles_today = len(result.data)

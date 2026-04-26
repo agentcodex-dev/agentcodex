@@ -1,6 +1,7 @@
 import os
 import json
 import time
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 from anthropic import Anthropic
 from dotenv import load_dotenv
@@ -20,8 +21,11 @@ Answer with just YES or NO. Nothing else.
 Title: {title}
 Content: {content}"""
 
-EXTRACTION_PROMPT = """You are an AI agent version tracker.
+EXTRACTION_PROMPT = """You are an AI agent version tracker. Today's date is {today}.
+
 Analyze this content from {source_name} and determine if it mentions a NEW version, release or significant update to any of these AI agents: {agent_slugs}
+
+If the content mentions multiple versions, extract only the most recently announced one.
 
 Content:
 {content}
@@ -123,10 +127,12 @@ def extract_version(article: dict, sonnet_model: str) -> Optional[dict]:
     Use Sonnet to extract full version details
     Only called after Haiku confirms relevance
     """
+    today = datetime.now(timezone.utc).date().isoformat()
     prompt = EXTRACTION_PROMPT.format(
+        today=today,
         source_name=article['source_name'],
         agent_slugs=article['agent_slugs'],
-        content=article['content'][:2000]
+        content=article['content'][:5000]
     )
 
     for attempt in range(3):

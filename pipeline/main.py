@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from scraper import scrape_all
 from extractor import extract_all
 from writer import save_all_drafts
+from cost_guard import check_cost_safe
 
 load_dotenv()
 
@@ -22,6 +23,11 @@ def run_pipeline():
     print(f"Time: {start_time.strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 50)
     print()
+
+    # Guard: stop if daily article budget is exhausted
+    if not check_cost_safe():
+        print("⚠️  Daily article limit reached — exiting to stay under budget")
+        return
 
     # Step 1 - Scrape all sources
     print("STEP 1 - Scraping Sources")
