@@ -131,6 +131,10 @@ PIPELINE_MAX_SONNET_CALLS_PER_DAY=50
 Admin/testing helpers:
 
 ```bash
+# Seed onboarding candidate agents:
+# claude-code, codex, aider, roo-code, continue
+python3 pipeline/admin_tools.py seed-onboarding-agents
+
 # Create a test draft for an existing agent (default: claude)
 python3 pipeline/admin_tools.py create-test-draft --agent-slug claude
 
