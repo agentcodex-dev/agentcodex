@@ -3,6 +3,7 @@ import feedparser
 import requests
 import calendar
 from datetime import datetime, timezone, timedelta
+from typing import Optional, Set
 from urllib.parse import urlparse
 from sources import SOURCES
 from deduplicator import is_url_seen
@@ -254,7 +255,7 @@ def fetch_jina(
 
 def scrape_all(
     run_logger=None,
-    target_agent_slugs: set[str] | None = None,
+    target_agent_slugs: Optional[Set[str]] = None,
     max_links: int = 5,
     max_article_age_days: int = MAX_ARTICLE_AGE_DAYS,
     skip_url_dedupe: bool = False,
