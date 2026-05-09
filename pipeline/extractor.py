@@ -228,6 +228,8 @@ def extract_all(
     haiku_model: str = "claude-haiku-4-5",
     sonnet_model: str = "claude-sonnet-4-6",
     run_logger=None,
+    skip_content_dedupe: bool = False,
+    max_release_age_days: int = 30,
 ) -> list:
     """
     Three stage pipeline
@@ -252,7 +254,7 @@ def extract_all(
     # ── Stage 2: Deduplication ──
     not_seen = []
     for article in keyword_filtered:
-        if is_content_seen(article):
+        if not skip_content_dedupe and is_content_seen(article):
             if run_logger:
                 run_logger.increment('content_duplicates')
                 run_logger.event(article, 'filter', 'content_duplicate')
@@ -314,7 +316,11 @@ def extract_all(
         result = extract_version(article, sonnet_model)
 
         if result:
-            clean_result, errors = validate_extraction(result, article)
+            clean_result, errors = validate_extraction(
+                result,
+                article,
+                max_release_age_days=max_release_age_days,
+            )
             if clean_result:
                 clean_result['pipeline_source'] = article['url']
                 versions_found.append(clean_result)

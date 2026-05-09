@@ -16,15 +16,21 @@ JINA_LIMITER = RateLimiter(env_interval('PIPELINE_JINA_INTERVAL_SECONDS', 0.5))
 # RSS
 # ─────────────────────────────────────
 
-def fetch_rss(source: dict, run_logger=None) -> list[dict]:
+def fetch_rss(
+    source: dict,
+    run_logger=None,
+    max_links: int = 5,
+    max_article_age_days: int = MAX_ARTICLE_AGE_DAYS,
+    skip_url_dedupe: bool = False,
+) -> list[dict]:
     """Fetch recent articles from an RSS feed, skipping entries older than MAX_ARTICLE_AGE_DAYS."""
     articles = []
-    cutoff = datetime.now(timezone.utc) - timedelta(days=MAX_ARTICLE_AGE_DAYS)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max_article_age_days)
 
     try:
         feed = feedparser.parse(source['url'])
 
-        for entry in feed.entries[:10]:  # Check up to 10, filter by date
+        for entry in feed.entries[:max(10, max_links)]:
             # Parse published date if available
             published_parsed = entry.get('published_parsed') or entry.get('updated_parsed')
             if published_parsed:
@@ -38,7 +44,7 @@ def fetch_rss(source: dict, run_logger=None) -> list[dict]:
                     pass  # Unknown date format — include it
 
             article_url = entry.get('link', '')
-            if is_url_seen(article_url):
+            if not skip_url_dedupe and is_url_seen(article_url):
                 print(f"  ⏭️  URL already seen: {article_url[:70]}")
                 if run_logger:
                     run_logger.increment('url_duplicates')
@@ -63,7 +69,7 @@ def fetch_rss(source: dict, run_logger=None) -> list[dict]:
                 'method': 'rss'
             })
 
-            if len(articles) >= 5:
+            if len(articles) >= max_links:
                 break
 
     except Exception as e:
@@ -158,7 +164,12 @@ def _title_from_markdown(text: str) -> str:
 # JINA
 # ─────────────────────────────────────
 
-def fetch_jina(source: dict, run_logger=None) -> list[dict]:
+def fetch_jina(
+    source: dict,
+    run_logger=None,
+    max_links: int = 5,
+    skip_url_dedupe: bool = False,
+) -> list[dict]:
     """
     Fetch a news/changelog listing via Jina Reader.
     Extracts individual article URLs from the listing and fetches each one,
@@ -173,12 +184,12 @@ def fetch_jina(source: dict, run_logger=None) -> list[dict]:
     if not listing_text:
         return articles
 
-    article_urls = _extract_article_urls(listing_text, listing_url, limit=5)
+    article_urls = _extract_article_urls(listing_text, listing_url, limit=max_links)
 
     if article_urls:
         print(f"  Found {len(article_urls)} article links — fetching individually")
         for url in article_urls:
-            if is_url_seen(url):
+            if not skip_url_dedupe and is_url_seen(url):
                 print(f"  ⏭️  URL already seen: {url[:70]}")
                 if run_logger:
                     run_logger.increment('url_duplicates')
@@ -208,7 +219,7 @@ def fetch_jina(source: dict, run_logger=None) -> list[dict]:
             })
     else:
         # Fallback for single-page changelogs (e.g. cursor.com/changelog, v0.dev/changelog)
-        if is_url_seen(listing_url):
+        if not skip_url_dedupe and is_url_seen(listing_url):
             print(f"  ⏭️  Listing URL already seen: {listing_url[:70]}")
             if run_logger:
                 run_logger.increment('url_duplicates')
@@ -241,19 +252,40 @@ def fetch_jina(source: dict, run_logger=None) -> list[dict]:
 # SCRAPE ALL
 # ─────────────────────────────────────
 
-def scrape_all(run_logger=None) -> list[dict]:
+def scrape_all(
+    run_logger=None,
+    target_agent_slugs: set[str] | None = None,
+    max_links: int = 5,
+    max_article_age_days: int = MAX_ARTICLE_AGE_DAYS,
+    skip_url_dedupe: bool = False,
+) -> list[dict]:
     """Scrape all sources and return articles."""
     all_articles = []
 
     print(f"Starting scrape of {len(SOURCES)} sources...\n")
 
     for source in SOURCES:
+        if target_agent_slugs:
+            if not any(slug in target_agent_slugs for slug in source['agent_slugs']):
+                continue
+
         print(f"Fetching {source['name']} via {source['method']}...")
 
         if source['method'] == 'rss':
-            articles = fetch_rss(source, run_logger=run_logger)
+            articles = fetch_rss(
+                source,
+                run_logger=run_logger,
+                max_links=max_links,
+                max_article_age_days=max_article_age_days,
+                skip_url_dedupe=skip_url_dedupe,
+            )
         else:
-            articles = fetch_jina(source, run_logger=run_logger)
+            articles = fetch_jina(
+                source,
+                run_logger=run_logger,
+                max_links=max_links,
+                skip_url_dedupe=skip_url_dedupe,
+            )
 
         print(f"  Got {len(articles)} articles")
         all_articles.extend(articles)

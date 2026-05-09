@@ -1,4 +1,5 @@
 import os
+import argparse
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 
@@ -11,6 +12,30 @@ from run_logger import PipelineRunLogger
 load_dotenv()
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Run AgentCodex pipeline')
+    parser.add_argument('--backfill', action='store_true')
+    parser.add_argument(
+        '--agents',
+        default='',
+        help='Comma-separated slugs to limit sources, e.g. codex,claude-code',
+    )
+    parser.add_argument(
+        '--max-links',
+        type=int,
+        default=5,
+        help='Max entries per source/listing',
+    )
+    parser.add_argument(
+        '--max-age-days',
+        type=int,
+        default=30,
+        help='Max release/article age window for validation and RSS date cutoff',
+    )
+    parser.add_argument('--dry-run', action='store_true')
+    return parser.parse_args()
+
+
 def run_pipeline():
     """
     Main pipeline orchestrator
@@ -18,6 +43,12 @@ def run_pipeline():
     Check drafts in Supabase after run
     """
     start_time = datetime.now(timezone.utc)
+    args = parse_args()
+    target_agent_slugs = {
+        slug.strip() for slug in args.agents.split(',') if slug.strip()
+    } or None
+    is_backfill = args.backfill
+
     run_logger = PipelineRunLogger()
     run_logger.start()
 
@@ -31,7 +62,7 @@ def run_pipeline():
         ensure_anthropic_api_key()
 
         # Guard: stop if daily article budget is exhausted
-        if not check_cost_safe():
+        if (not is_backfill) and (not check_cost_safe()):
             print("⚠️  Daily article limit reached — exiting to stay under budget")
             run_logger.finish(status='skipped', metadata={'reason': 'daily_limit'})
             return
@@ -39,7 +70,13 @@ def run_pipeline():
         # Step 1 - Scrape all sources
         print("STEP 1 - Scraping Sources")
         print("-" * 30)
-        articles = scrape_all(run_logger=run_logger)
+        articles = scrape_all(
+            run_logger=run_logger,
+            target_agent_slugs=target_agent_slugs,
+            max_links=max(1, args.max_links),
+            max_article_age_days=max(1, args.max_age_days),
+            skip_url_dedupe=is_backfill,
+        )
         run_logger.increment('articles_scraped', len(articles))
 
         if not articles:
@@ -52,7 +89,12 @@ def run_pipeline():
         # Step 2 - Extract versions using Claude
         print("\nSTEP 2 - Extracting Versions with Claude")
         print("-" * 30)
-        versions_found = extract_all(articles, run_logger=run_logger)
+        versions_found = extract_all(
+            articles,
+            run_logger=run_logger,
+            skip_content_dedupe=is_backfill,
+            max_release_age_days=max(1, args.max_age_days),
+        )
 
         if not versions_found:
             print("\nNo new versions found today")
@@ -66,7 +108,12 @@ def run_pipeline():
         # Step 3 - Save to Supabase as drafts
         print("\nSTEP 3 - Saving Drafts to Supabase")
         print("-" * 30)
-        results = save_all_drafts(versions_found, run_logger=run_logger)
+        results = save_all_drafts(
+            versions_found,
+            run_logger=run_logger,
+            max_release_age_days=max(1, args.max_age_days),
+            dry_run=args.dry_run,
+        )
 
         # Final summary
         end_time = datetime.now(timezone.utc)
@@ -87,10 +134,15 @@ def run_pipeline():
             status='completed',
             metadata={
                 'duration_seconds': duration,
+                'backfill': is_backfill,
+                'target_agents': sorted(target_agent_slugs) if target_agent_slugs else [],
+                'max_links': max(1, args.max_links),
+                'max_age_days': max(1, args.max_age_days),
+                'dry_run': args.dry_run,
             }
         )
 
-        if results['saved'] > 0:
+        if results['saved'] > 0 and not args.dry_run:
             print()
             print("Review drafts in Supabase")
             print("─" * 30)

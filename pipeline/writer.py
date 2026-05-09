@@ -14,11 +14,11 @@ supabase = create_client(
 MAX_RELEASE_AGE_DAYS = 30
 
 
-def _is_recent_enough(release_date_str: str) -> bool:
-    """Return False if the release date is older than MAX_RELEASE_AGE_DAYS."""
+def _is_recent_enough(release_date_str: str, max_release_age_days: int) -> bool:
+    """Return False if the release date is older than max_release_age_days."""
     try:
         release_date = datetime.strptime(release_date_str, '%Y-%m-%d').date()
-        cutoff = (datetime.now(timezone.utc) - timedelta(days=MAX_RELEASE_AGE_DAYS)).date()
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=max_release_age_days)).date()
         return release_date >= cutoff
     except Exception:
         return True  # Unparseable date — let it through
@@ -55,7 +55,7 @@ def version_exists(agent_slug: str, version_number: str) -> bool:
         return False
 
 
-def save_draft(extraction: dict) -> bool:
+def save_draft(extraction: dict, max_release_age_days: int = MAX_RELEASE_AGE_DAYS) -> bool:
     """
     Save extracted version as draft to Supabase
     Returns True if saved successfully
@@ -85,7 +85,7 @@ def save_draft(extraction: dict) -> bool:
 
         # Reject stale releases (old articles re-surfaced by the pipeline)
         release_date = extraction.get('release_date')
-        if release_date and not _is_recent_enough(release_date):
+        if release_date and not _is_recent_enough(release_date, max_release_age_days):
             print(f"  ⏭️  Stale release skipped: {agent_name} {version_number} ({release_date})")
             return False
 
@@ -134,7 +134,12 @@ def save_draft(extraction: dict) -> bool:
         return False
 
 
-def save_all_drafts(extractions: list, run_logger=None) -> dict:
+def save_all_drafts(
+    extractions: list,
+    run_logger=None,
+    max_release_age_days: int = MAX_RELEASE_AGE_DAYS,
+    dry_run: bool = False,
+) -> dict:
     """
     Save all extractions to Supabase
     Returns summary of results
@@ -148,7 +153,15 @@ def save_all_drafts(extractions: list, run_logger=None) -> dict:
     print(f"\nSaving {len(extractions)} extractions to Supabase...\n")
 
     for extraction in extractions:
-        success = save_draft(extraction)
+        if dry_run:
+            print(
+                "  🧪 DRY-RUN "
+                f"{extraction.get('agent_slug')} {extraction.get('version_number')}"
+            )
+            results['saved'] += 1
+            continue
+
+        success = save_draft(extraction, max_release_age_days=max_release_age_days)
         if success:
             results['saved'] += 1
             if run_logger:

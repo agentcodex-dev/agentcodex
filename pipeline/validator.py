@@ -11,15 +11,15 @@ REQUIRED_CAPABILITIES = {
 }
 
 MAX_FUTURE_DAYS = 7
-MAX_RELEASE_AGE_DAYS = 30
+DEFAULT_MAX_RELEASE_AGE_DAYS = 30
 
 
-def _valid_date(value: str) -> bool:
+def _valid_date(value: str, max_release_age_days: int) -> bool:
     try:
         release_date = datetime.strptime(value, '%Y-%m-%d').date()
         today = datetime.now(timezone.utc).date()
         return (
-            release_date >= (today - timedelta(days=MAX_RELEASE_AGE_DAYS))
+            release_date >= (today - timedelta(days=max_release_age_days))
             and release_date <= (today + timedelta(days=MAX_FUTURE_DAYS))
         )
     except Exception:
@@ -44,7 +44,11 @@ def _clean_capabilities(raw: object) -> dict:
     return clean
 
 
-def validate_extraction(extraction: dict, article: dict) -> tuple[Optional[dict], list[str]]:
+def validate_extraction(
+    extraction: dict,
+    article: dict,
+    max_release_age_days: int = DEFAULT_MAX_RELEASE_AGE_DAYS,
+) -> tuple[Optional[dict], list[str]]:
     """
     Validate and normalize model output before writing drafts.
     Returns (clean_extraction, errors).
@@ -61,8 +65,8 @@ def validate_extraction(extraction: dict, article: dict) -> tuple[Optional[dict]
         errors.append('version_number is required')
 
     release_date = str(extraction.get('release_date') or '').strip()
-    if not release_date or not _valid_date(release_date):
-        errors.append('release_date must be recent YYYY-MM-DD')
+    if not release_date or not _valid_date(release_date, max_release_age_days):
+        errors.append(f'release_date must be within {max_release_age_days} days (YYYY-MM-DD)')
 
     what_changed = str(extraction.get('what_changed') or '').strip()
     if len(what_changed) < 25:
