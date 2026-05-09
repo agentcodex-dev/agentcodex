@@ -5,10 +5,14 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional
 from anthropic import Anthropic
 from dotenv import load_dotenv
+from rate_limiter import RateLimiter, env_interval
+from validator import validate_extraction
 
 load_dotenv()
 
 client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
+HAIKU_LIMITER = RateLimiter(env_interval('PIPELINE_HAIKU_INTERVAL_SECONDS', 0.5))
+SONNET_LIMITER = RateLimiter(env_interval('PIPELINE_SONNET_INTERVAL_SECONDS', 6.0))
 
 # ─────────────────────────────────────
 # PROMPTS
@@ -91,6 +95,7 @@ def haiku_is_version_related(article: dict, haiku_model: str) -> bool:
     50x cheaper
     """
     try:
+        HAIKU_LIMITER.wait()
         message = client.messages.create(
             model=haiku_model,
             max_tokens=5,
@@ -137,6 +142,7 @@ def extract_version(article: dict, sonnet_model: str) -> Optional[dict]:
 
     for attempt in range(3):
         try:
+            SONNET_LIMITER.wait()
             message = client.messages.create(
                 model=sonnet_model,
                 max_tokens=1024,
@@ -192,7 +198,8 @@ def extract_version(article: dict, sonnet_model: str) -> Optional[dict]:
 def extract_all(
     articles: list,
     haiku_model: str = "claude-haiku-4-5",
-    sonnet_model: str = "claude-sonnet-4-6"
+    sonnet_model: str = "claude-sonnet-4-6",
+    run_logger=None,
 ) -> list:
     """
     Three stage pipeline
@@ -200,7 +207,7 @@ def extract_all(
     Stage 2 - Haiku filter    (cheap)
     Stage 3 - Sonnet extract  (only what matters)
     """
-    from deduplicator import is_seen, mark_seen
+    from deduplicator import is_content_seen, mark_seen
 
     versions_found = []
 
@@ -209,12 +216,18 @@ def extract_all(
         a for a in articles
         if is_potentially_version_related(a)
     ]
+    if run_logger:
+        run_logger.increment('keyword_matched', len(keyword_filtered))
 
     # ── Stage 2: Deduplication ──
-    not_seen = [
-        a for a in keyword_filtered
-        if not is_seen(a)
-    ]
+    not_seen = []
+    for article in keyword_filtered:
+        if is_content_seen(article):
+            if run_logger:
+                run_logger.increment('content_duplicates')
+                run_logger.event(article, 'filter', 'content_duplicate')
+            continue
+        not_seen.append(article)
 
     print(f"\nFiltering pipeline")
     print(f"──────────────────")
@@ -236,14 +249,19 @@ def extract_all(
 
     for article in not_seen:
         print(f"\nChecking: {article['source_name']} - {article['title'][:50]}...")
-        
+        if run_logger:
+            run_logger.increment('haiku_checked')
+
         if haiku_is_version_related(article, haiku_model):
             sonnet_queue.append(article)
+            if run_logger:
+                run_logger.event(article, 'haiku', 'accepted')
         else:
             haiku_rejected += 1
+            if run_logger:
+                run_logger.increment('haiku_rejected')
+                run_logger.event(article, 'haiku', 'rejected')
             mark_seen(article)  # Mark seen so not reprocessed tomorrow
-        
-        time.sleep(0.5)  # Small delay between Haiku calls
 
     print(f"\nHaiku results")
     print(f"─────────────")
@@ -260,18 +278,39 @@ def extract_all(
 
     for index, article in enumerate(sonnet_queue):
         print(f"\n[{index + 1}/{len(sonnet_queue)}] {article['source_name']}: {article['title'][:50]}...")
+        if run_logger:
+            run_logger.increment('sonnet_checked')
 
         result = extract_version(article, sonnet_model)
 
         if result:
-            result['pipeline_source'] = article['url']
-            versions_found.append(result)
+            clean_result, errors = validate_extraction(result, article)
+            if clean_result:
+                clean_result['pipeline_source'] = article['url']
+                versions_found.append(clean_result)
+                if run_logger:
+                    run_logger.increment('extracted')
+                    run_logger.event(
+                        article,
+                        'sonnet',
+                        'extracted',
+                        {
+                            'agent_slug': clean_result.get('agent_slug'),
+                            'version_number': clean_result.get('version_number'),
+                            'warnings': clean_result.get('validation_warnings', []),
+                        }
+                    )
+            else:
+                print(f"  ❌ Validation rejected extraction: {'; '.join(errors)}")
+                if run_logger:
+                    run_logger.event(
+                        article,
+                        'validation',
+                        'rejected',
+                        {'errors': errors}
+                    )
 
         mark_seen(article)
-
-        if index < len(sonnet_queue) - 1:
-            print(f"  ⏳ Waiting 6s...")
-            time.sleep(6)
 
     print(f"\nVersions found: {len(versions_found)}")
     return versions_found

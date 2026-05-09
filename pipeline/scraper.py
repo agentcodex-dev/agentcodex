@@ -1,20 +1,22 @@
 import re
-import time
 import feedparser
 import requests
 import calendar
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse
 from sources import SOURCES
+from deduplicator import is_url_seen
+from rate_limiter import RateLimiter, env_interval
 
 MAX_ARTICLE_AGE_DAYS = 30
+JINA_LIMITER = RateLimiter(env_interval('PIPELINE_JINA_INTERVAL_SECONDS', 0.5))
 
 
 # ─────────────────────────────────────
 # RSS
 # ─────────────────────────────────────
 
-def fetch_rss(source: dict) -> list[dict]:
+def fetch_rss(source: dict, run_logger=None) -> list[dict]:
     """Fetch recent articles from an RSS feed, skipping entries older than MAX_ARTICLE_AGE_DAYS."""
     articles = []
     cutoff = datetime.now(timezone.utc) - timedelta(days=MAX_ARTICLE_AGE_DAYS)
@@ -35,11 +37,27 @@ def fetch_rss(source: dict) -> list[dict]:
                 except Exception:
                     pass  # Unknown date format — include it
 
+            article_url = entry.get('link', '')
+            if is_url_seen(article_url):
+                print(f"  ⏭️  URL already seen: {article_url[:70]}")
+                if run_logger:
+                    run_logger.increment('url_duplicates')
+                    run_logger.event(
+                        {
+                            'source_name': source['name'],
+                            'url': article_url,
+                            'title': entry.get('title', ''),
+                        },
+                        'scrape',
+                        'url_duplicate',
+                    )
+                continue
+
             articles.append({
                 'source_name': source['name'],
                 'agent_slugs': source['agent_slugs'],
                 'title': entry.get('title', ''),
-                'url': entry.get('link', ''),
+                'url': article_url,
                 'content': entry.get('summary', '')[:5000],
                 'published': entry.get('published', ''),
                 'method': 'rss'
@@ -62,6 +80,7 @@ def _jina_get(url: str) -> str:
     """Fetch a URL via Jina Reader, return plaintext or empty string."""
     for attempt in range(2):
         try:
+            JINA_LIMITER.wait()
             response = requests.get(
                 f"https://r.jina.ai/{url}",
                 timeout=45,
@@ -139,7 +158,7 @@ def _title_from_markdown(text: str) -> str:
 # JINA
 # ─────────────────────────────────────
 
-def fetch_jina(source: dict) -> list[dict]:
+def fetch_jina(source: dict, run_logger=None) -> list[dict]:
     """
     Fetch a news/changelog listing via Jina Reader.
     Extracts individual article URLs from the listing and fetches each one,
@@ -159,6 +178,21 @@ def fetch_jina(source: dict) -> list[dict]:
     if article_urls:
         print(f"  Found {len(article_urls)} article links — fetching individually")
         for url in article_urls:
+            if is_url_seen(url):
+                print(f"  ⏭️  URL already seen: {url[:70]}")
+                if run_logger:
+                    run_logger.increment('url_duplicates')
+                    run_logger.event(
+                        {
+                            'source_name': source['name'],
+                            'url': url,
+                            'title': source['name'],
+                        },
+                        'scrape',
+                        'url_duplicate',
+                    )
+                continue
+
             content = _jina_get(url)
             if not content:
                 continue
@@ -172,9 +206,23 @@ def fetch_jina(source: dict) -> list[dict]:
                 'published': datetime.now(timezone.utc).isoformat(),
                 'method': 'jina'
             })
-            time.sleep(0.5)  # Avoid hammering Jina
     else:
         # Fallback for single-page changelogs (e.g. cursor.com/changelog, v0.dev/changelog)
+        if is_url_seen(listing_url):
+            print(f"  ⏭️  Listing URL already seen: {listing_url[:70]}")
+            if run_logger:
+                run_logger.increment('url_duplicates')
+                run_logger.event(
+                    {
+                        'source_name': source['name'],
+                        'url': listing_url,
+                        'title': f"{source['name']} - Latest Updates",
+                    },
+                    'scrape',
+                    'url_duplicate',
+                )
+            return articles
+
         print(f"  No article links found — using listing page content")
         articles.append({
             'source_name': source['name'],
@@ -193,7 +241,7 @@ def fetch_jina(source: dict) -> list[dict]:
 # SCRAPE ALL
 # ─────────────────────────────────────
 
-def scrape_all() -> list[dict]:
+def scrape_all(run_logger=None) -> list[dict]:
     """Scrape all sources and return articles."""
     all_articles = []
 
@@ -203,9 +251,9 @@ def scrape_all() -> list[dict]:
         print(f"Fetching {source['name']} via {source['method']}...")
 
         if source['method'] == 'rss':
-            articles = fetch_rss(source)
+            articles = fetch_rss(source, run_logger=run_logger)
         else:
-            articles = fetch_jina(source)
+            articles = fetch_jina(source, run_logger=run_logger)
 
         print(f"  Got {len(articles)} articles")
         all_articles.extend(articles)

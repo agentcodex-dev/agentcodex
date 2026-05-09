@@ -83,6 +83,8 @@ Core tables:
 - `agent_versions`
 - `news_sources`
 - `pipeline_seen_articles`
+- `pipeline_runs`
+- `pipeline_article_events`
 
 Public pages only show `agent_versions` where `status = 'published'`. The pipeline writes new extracted updates as `draft`; the admin dashboard moves them to `published` or `rejected`.
 
@@ -108,10 +110,23 @@ The production pipeline runs daily through `.github/workflows/pipeline.yml`.
 Pipeline flow:
 
 1. Scrape RSS/Jina sources from `pipeline/sources.py`
-2. Deduplicate already-seen articles
-3. Filter likely release/version updates
-4. Use Anthropic extraction to produce structured version data
-5. Save new findings as Supabase drafts
+2. Skip already-seen normalized URLs before expensive article fetches
+3. Deduplicate fetched content by content hash
+4. Filter likely release/version updates
+5. Use Anthropic extraction to produce structured version data
+6. Validate extracted agent slug, date, version, summary, scores, and context window
+7. Save new findings as Supabase drafts
+8. Record run counters and article-level events for debugging
+
+Pipeline tuning variables:
+
+```bash
+PIPELINE_JINA_INTERVAL_SECONDS=0.5
+PIPELINE_HAIKU_INTERVAL_SECONDS=0.5
+PIPELINE_SONNET_INTERVAL_SECONDS=6
+PIPELINE_MAX_ARTICLES_PER_DAY=100
+PIPELINE_MAX_SONNET_CALLS_PER_DAY=50
+```
 
 ## Verification
 

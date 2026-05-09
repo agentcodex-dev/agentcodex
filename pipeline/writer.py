@@ -134,7 +134,7 @@ def save_draft(extraction: dict) -> bool:
         return False
 
 
-def save_all_drafts(extractions: list) -> dict:
+def save_all_drafts(extractions: list, run_logger=None) -> dict:
     """
     Save all extractions to Supabase
     Returns summary of results
@@ -151,13 +151,19 @@ def save_all_drafts(extractions: list) -> dict:
         success = save_draft(extraction)
         if success:
             results['saved'] += 1
+            if run_logger:
+                run_logger.increment('saved')
         elif version_exists(
             extraction.get('agent_slug', ''),
             extraction.get('version_number', '')
         ):
             results['skipped'] += 1
+            if run_logger:
+                run_logger.increment('skipped')
         else:
             results['failed'] += 1
+            if run_logger:
+                run_logger.increment('failed')
 
     return results
 
