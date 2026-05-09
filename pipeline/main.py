@@ -32,6 +32,12 @@ def parse_args():
         default=30,
         help='Max release/article age window for validation and RSS date cutoff',
     )
+    parser.add_argument(
+        '--max-versions-per-article',
+        type=int,
+        default=8,
+        help='Backfill mode: max versions to extract from one article/listing page',
+    )
     parser.add_argument('--dry-run', action='store_true')
     return parser.parse_args()
 
@@ -94,6 +100,8 @@ def run_pipeline():
             run_logger=run_logger,
             skip_content_dedupe=is_backfill,
             max_release_age_days=max(1, args.max_age_days),
+            backfill_mode=is_backfill,
+            max_versions_per_article=max(1, args.max_versions_per_article),
         )
 
         if not versions_found:
@@ -138,6 +146,7 @@ def run_pipeline():
                 'target_agents': sorted(target_agent_slugs) if target_agent_slugs else [],
                 'max_links': max(1, args.max_links),
                 'max_age_days': max(1, args.max_age_days),
+                'max_versions_per_article': max(1, args.max_versions_per_article),
                 'dry_run': args.dry_run,
             }
         )

@@ -114,6 +114,7 @@ python3 pipeline/main.py \
   --agents codex,claude-code,aider,roo-code,continue \
   --max-links 25 \
   --max-age-days 3650 \
+  --max-versions-per-article 20 \
   --dry-run
 
 # Real backfill write
@@ -121,7 +122,8 @@ python3 pipeline/main.py \
   --backfill \
   --agents codex,claude-code,aider,roo-code,continue \
   --max-links 25 \
-  --max-age-days 3650
+  --max-age-days 3650 \
+  --max-versions-per-article 20
 ```
 
 The production pipeline runs daily through `.github/workflows/pipeline.yml`.

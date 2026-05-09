@@ -81,6 +81,49 @@ If NO new version or update is found respond with exactly:
 
 Respond with JSON only. No other text."""
 
+BACKFILL_EXTRACTION_PROMPT = """You are an AI agent version tracker. Today's date is {today}.
+
+Analyze this content from {source_name} and extract up to {max_versions} version/release updates
+for any of these AI agents: {agent_slugs}
+
+Content:
+{content}
+
+Return JSON in this exact format:
+{{
+  "found": true,
+  "versions": [
+    {{
+      "agent_slug": "the-agent-slug",
+      "version_number": "version name or number",
+      "release_date": "YYYY-MM-DD",
+      "what_changed": "2-3 sentences describing what changed",
+      "capabilities": {{
+        "coding": 0,
+        "reasoning": 0,
+        "multimodal": 0,
+        "tool_use": 0,
+        "memory": 0,
+        "speed": 0
+      }},
+      "context_window": null,
+      "pricing_info": null,
+      "source_url": "url of the article"
+    }}
+  ]
+}}
+
+If no version updates are found, respond with exactly:
+{{"found": false, "versions": []}}
+
+Rules:
+- Prefer the most concrete versioned releases.
+- Return newest releases first.
+- Do not include duplicate versions.
+- Keep agent_slug within {agent_slugs}
+- Respond with JSON only.
+"""
+
 # ─────────────────────────────────────
 # VERSION KEYWORDS PRE-FILTER
 # ─────────────────────────────────────
@@ -219,6 +262,74 @@ def extract_version(article: dict, sonnet_model: str) -> Optional[dict]:
     return None
 
 
+def _extract_json_payload(response_text: str):
+    cleaned = response_text.strip()
+    if cleaned.startswith('```'):
+        lines = cleaned.split('\n')
+        cleaned = '\n'.join(lines[1:-1])
+        if cleaned.startswith('json'):
+            cleaned = cleaned[4:]
+    return json.loads(cleaned.strip())
+
+
+def extract_versions_backfill(
+    article: dict,
+    sonnet_model: str,
+    max_versions: int = 8,
+) -> list[dict]:
+    today = datetime.now(timezone.utc).date().isoformat()
+    prompt = BACKFILL_EXTRACTION_PROMPT.format(
+        today=today,
+        source_name=article['source_name'],
+        agent_slugs=article['agent_slugs'],
+        max_versions=max_versions,
+        content=article['content'][:5000],
+    )
+
+    for attempt in range(3):
+        try:
+            SONNET_LIMITER.wait()
+            message = client.messages.create(
+                model=sonnet_model,
+                max_tokens=2048,
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }]
+            )
+
+            payload = _extract_json_payload(message.content[0].text)
+            if not payload.get('found'):
+                return []
+
+            versions = payload.get('versions') or []
+            if not isinstance(versions, list):
+                return []
+
+            return versions
+
+        except json.JSONDecodeError as e:
+            print(f"  ❌ Backfill JSON parse error: {e}")
+            return []
+
+        except Exception as e:
+            if is_auth_error(e):
+                raise PipelineAuthError(
+                    'Anthropic authentication failed. Check the ANTHROPIC_API_KEY secret.'
+                ) from e
+
+            error_str = str(e)
+            if '429' in error_str and attempt < 2:
+                wait_time = (attempt + 1) * 60
+                print(f"  ⏳ Rate limited - waiting {wait_time}s...")
+                time.sleep(wait_time)
+                continue
+            print(f"  ❌ Backfill extraction error: {e}")
+            return []
+
+    return []
+
+
 # ─────────────────────────────────────
 # MAIN EXTRACT ALL FUNCTION
 # ─────────────────────────────────────
@@ -230,6 +341,8 @@ def extract_all(
     run_logger=None,
     skip_content_dedupe: bool = False,
     max_release_age_days: int = 30,
+    backfill_mode: bool = False,
+    max_versions_per_article: int = 8,
 ) -> list:
     """
     Three stage pipeline
@@ -244,10 +357,13 @@ def extract_all(
     versions_found = []
 
     # ── Stage 1: Keyword filter ──
-    keyword_filtered = [
-        a for a in articles
-        if is_potentially_version_related(a)
-    ]
+    if backfill_mode:
+        keyword_filtered = articles[:]
+    else:
+        keyword_filtered = [
+            a for a in articles
+            if is_potentially_version_related(a)
+        ]
     if run_logger:
         run_logger.increment('keyword_matched', len(keyword_filtered))
 
@@ -272,33 +388,37 @@ def extract_all(
         print("Nothing new to send to Claude")
         return []
 
-    # ── Stage 3: Haiku filter ──
-    print(f"\nRunning Haiku filter on {len(not_seen)} articles...")
-    print(f"────────────────────────────────────────")
-
+    # ── Stage 3: Haiku filter (normal mode only) ──
     sonnet_queue = []
-    haiku_rejected = 0
+    if backfill_mode:
+        sonnet_queue = not_seen
+        print(f"\nBackfill mode: sending {len(sonnet_queue)} articles directly to Sonnet")
+    else:
+        print(f"\nRunning Haiku filter on {len(not_seen)} articles...")
+        print(f"────────────────────────────────────────")
 
-    for article in not_seen:
-        print(f"\nChecking: {article['source_name']} - {article['title'][:50]}...")
-        if run_logger:
-            run_logger.increment('haiku_checked')
+        haiku_rejected = 0
 
-        if haiku_is_version_related(article, haiku_model):
-            sonnet_queue.append(article)
+        for article in not_seen:
+            print(f"\nChecking: {article['source_name']} - {article['title'][:50]}...")
             if run_logger:
-                run_logger.event(article, 'haiku', 'accepted')
-        else:
-            haiku_rejected += 1
-            if run_logger:
-                run_logger.increment('haiku_rejected')
-                run_logger.event(article, 'haiku', 'rejected')
-            mark_seen(article)  # Mark seen so not reprocessed tomorrow
+                run_logger.increment('haiku_checked')
 
-    print(f"\nHaiku results")
-    print(f"─────────────")
-    print(f"Rejected by Haiku: {haiku_rejected}")
-    print(f"Sending to Sonnet: {len(sonnet_queue)}")
+            if haiku_is_version_related(article, haiku_model):
+                sonnet_queue.append(article)
+                if run_logger:
+                    run_logger.event(article, 'haiku', 'accepted')
+            else:
+                haiku_rejected += 1
+                if run_logger:
+                    run_logger.increment('haiku_rejected')
+                    run_logger.event(article, 'haiku', 'rejected')
+                mark_seen(article)  # Mark seen so not reprocessed tomorrow
+
+        print(f"\nHaiku results")
+        print(f"─────────────")
+        print(f"Rejected by Haiku: {haiku_rejected}")
+        print(f"Sending to Sonnet: {len(sonnet_queue)}")
 
     if not sonnet_queue:
         print("\nHaiku found nothing version-related today")
@@ -313,9 +433,21 @@ def extract_all(
         if run_logger:
             run_logger.increment('sonnet_checked')
 
-        result = extract_version(article, sonnet_model)
+        candidates = []
+        if backfill_mode:
+            candidates = extract_versions_backfill(
+                article,
+                sonnet_model,
+                max_versions=max_versions_per_article,
+            )
+            if candidates:
+                print(f"  🎯 Backfill extracted {len(candidates)} candidate versions")
+        else:
+            single = extract_version(article, sonnet_model)
+            if single:
+                candidates = [single]
 
-        if result:
+        for result in candidates:
             clean_result, errors = validate_extraction(
                 result,
                 article,
