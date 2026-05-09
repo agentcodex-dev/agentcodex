@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AgentCodex
 
-## Getting Started
+AgentCodex is a public reference site for AI agents. It tracks agent profiles, version history, capability scores, source links, pricing/context details, and side-by-side comparisons.
 
-First, run the development server:
+The current v2 direction is **Agent Change Radar**: a homepage and `/radar` experience that highlights recent releases, capability movement, and the agents shipping fastest.
+
+## Tech Stack
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Supabase
+- Vercel Analytics
+- Python ingestion pipeline with Anthropic extraction
+
+## Main Features
+
+- AI agent directory with search and category filters
+- Agent profile pages with version history and current capabilities
+- Side-by-side agent comparison pages
+- Change Radar for latest releases, capability movers, and release velocity
+- Password-gated admin dashboard for approving/rejecting pipeline drafts
+- Daily GitHub Actions pipeline that scrapes sources and writes draft releases
+
+## Local Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Useful routes:
 
-## Learn More
+- `/` - Radar-led homepage
+- `/radar` - full Agent Change Radar
+- `/agents` - all tracked agents
+- `/agents/[slug]` - agent profile and version history
+- `/compare` - dropdown comparison flow
+- `/compare/[agent-a]-vs-[agent-b]` - SEO comparison page
+- `/admin` - admin login
+- `/admin/dashboard` - draft review dashboard
 
-To learn more about Next.js, take a look at the following resources:
+## Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create `.env.local` for the web app:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_KEY=
+ADMIN_PASSWORD=
+```
 
-## Deploy on Vercel
+Pipeline runs also need:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+ANTHROPIC_API_KEY=
+SUPABASE_URL=
+SUPABASE_SERVICE_KEY=
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Supabase
+
+Database migrations live in `supabase/migrations`.
+
+Core tables:
+
+- `agents`
+- `agent_versions`
+- `news_sources`
+- `pipeline_seen_articles`
+
+Public pages only show `agent_versions` where `status = 'published'`. The pipeline writes new extracted updates as `draft`; the admin dashboard moves them to `published` or `rejected`.
+
+## Pipeline
+
+The Python pipeline lives in `pipeline/`.
+
+Install pipeline dependencies:
+
+```bash
+cd pipeline
+pip install -r requirements.txt
+```
+
+Run locally:
+
+```bash
+python3 main.py
+```
+
+The production pipeline runs daily through `.github/workflows/pipeline.yml`.
+
+Pipeline flow:
+
+1. Scrape RSS/Jina sources from `pipeline/sources.py`
+2. Deduplicate already-seen articles
+3. Filter likely release/version updates
+4. Use Anthropic extraction to produce structured version data
+5. Save new findings as Supabase drafts
+
+## Verification
+
+Before pushing:
+
+```bash
+npm run lint
+npm run build
+```
+
+Current note: `dev` and `build` explicitly use webpack because this workspace can fall back to unsupported WASM bindings when Next.js tries Turbopack without the native SWC optional package.
+
+## Deployment
+
+The app is designed for Vercel deployment with Supabase as the backing database. Ensure Vercel has the web app environment variables configured, and GitHub Actions has the pipeline secrets configured.

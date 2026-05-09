@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { Agent } from '@/lib/types'
+import { Agent, AgentVersion } from '@/lib/types'
 import Navigation from '@/components/Navigation'
 import AgentCard from '@/components/AgentCard'
 import Footer from '@/components/Footer'
@@ -35,6 +35,25 @@ async function getAgents(search?: string, category?: string) {
   return data as Agent[]
 }
 
+async function getLatestVersions() {
+  const { data } = await supabase
+    .from('agent_versions')
+    .select('*')
+    .eq('status', 'published')
+    .order('release_date', { ascending: false })
+
+  const latestByAgent = new Map<string, AgentVersion>()
+  const versions = (data as AgentVersion[]) || []
+
+  versions.forEach((version) => {
+    if (!latestByAgent.has(version.agent_id)) {
+      latestByAgent.set(version.agent_id, version)
+    }
+  })
+
+  return latestByAgent
+}
+
 const ALL_CATEGORIES = [
   'Coding',
   'Research',
@@ -48,7 +67,10 @@ export default async function AgentsPage({
   searchParams: Promise<{ search?: string; category?: string }>
 }) {
   const { search, category } = await searchParams
-  const agents = await getAgents(search, category)
+  const [agents, latestVersions] = await Promise.all([
+    getAgents(search, category),
+    getLatestVersions(),
+  ])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -184,7 +206,11 @@ export default async function AgentsPage({
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {agents.map((agent) => (
-                  <AgentCard key={agent.id} agent={agent} />
+                  <AgentCard
+                    key={agent.id}
+                    agent={agent}
+                    latestVersion={latestVersions.get(agent.id) || null}
+                  />
                 ))}
               </div>
             )}

@@ -21,6 +21,12 @@ export default function Navigation() {
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center space-x-8">
             <Link
+              href="/radar"
+              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              Radar
+            </Link>
+            <Link
               href="/agents"
               className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
             >
@@ -92,6 +98,13 @@ export default function Navigation() {
         {/* Mobile Menu Dropdown */}
         {menuOpen && (
           <div className="md:hidden border-t border-gray-100 py-4 space-y-1">
+            <Link
+              href="/radar"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+            >
+              Radar
+            </Link>
             <Link
               href="/agents"
               onClick={() => setMenuOpen(false)}

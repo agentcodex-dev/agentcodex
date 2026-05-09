@@ -29,7 +29,7 @@ export default function PrivacyPage() {
               Overview
             </h2>
             <p>
-              AgentCodex ("we", "us", "our") operates agentcodex.dev. 
+              AgentCodex (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) operates agentcodex.dev. 
               This policy explains how we handle information when 
               you use our website.
             </p>
