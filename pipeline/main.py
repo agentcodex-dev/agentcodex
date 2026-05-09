@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 
 from scraper import scrape_all
-from extractor import extract_all
+from extractor import PipelineAuthError, ensure_anthropic_api_key, extract_all
 from writer import save_all_drafts
 from cost_guard import check_cost_safe
 from run_logger import PipelineRunLogger
@@ -28,6 +28,8 @@ def run_pipeline():
     print()
 
     try:
+        ensure_anthropic_api_key()
+
         # Guard: stop if daily article budget is exhausted
         if not check_cost_safe():
             print("⚠️  Daily article limit reached — exiting to stay under budget")
@@ -109,6 +111,11 @@ join agents a on a.id = av.agent_id
 where av.status = 'draft'
 order by av.pipeline_run_date desc;
             """)
+
+    except PipelineAuthError as e:
+        print(f"❌ Pipeline authentication error: {e}")
+        run_logger.finish(status='failed', error_message=str(e))
+        raise
 
     except Exception as e:
         run_logger.finish(status='failed', error_message=str(e))

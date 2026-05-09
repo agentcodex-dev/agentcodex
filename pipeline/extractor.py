@@ -14,6 +14,25 @@ client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 HAIKU_LIMITER = RateLimiter(env_interval('PIPELINE_HAIKU_INTERVAL_SECONDS', 0.5))
 SONNET_LIMITER = RateLimiter(env_interval('PIPELINE_SONNET_INTERVAL_SECONDS', 6.0))
 
+
+class PipelineAuthError(RuntimeError):
+    """Raised when model extraction cannot authenticate."""
+
+
+def ensure_anthropic_api_key() -> None:
+    api_key = os.getenv('ANTHROPIC_API_KEY', '').strip()
+    if not api_key:
+        raise PipelineAuthError('ANTHROPIC_API_KEY is missing')
+
+
+def is_auth_error(error: Exception) -> bool:
+    error_text = str(error).lower()
+    return (
+        '401' in error_text
+        or 'authentication_error' in error_text
+        or 'invalid x-api-key' in error_text
+    )
+
 # ─────────────────────────────────────
 # PROMPTS
 # ─────────────────────────────────────
@@ -119,6 +138,10 @@ def haiku_is_version_related(article: dict, haiku_model: str) -> bool:
         return is_relevant
 
     except Exception as e:
+        if is_auth_error(e):
+            raise PipelineAuthError(
+                'Anthropic authentication failed. Check the ANTHROPIC_API_KEY secret.'
+            ) from e
         print(f"  ⚠️  Haiku error: {e} - defaulting to process")
         return True  # If Haiku fails process it anyway
 
@@ -177,6 +200,11 @@ def extract_version(article: dict, sonnet_model: str) -> Optional[dict]:
             return None
 
         except Exception as e:
+            if is_auth_error(e):
+                raise PipelineAuthError(
+                    'Anthropic authentication failed. Check the ANTHROPIC_API_KEY secret.'
+                ) from e
+
             error_str = str(e)
             if '429' in error_str and attempt < 2:
                 wait_time = (attempt + 1) * 60
@@ -208,6 +236,8 @@ def extract_all(
     Stage 3 - Sonnet extract  (only what matters)
     """
     from deduplicator import is_content_seen, mark_seen
+
+    ensure_anthropic_api_key()
 
     versions_found = []
 
