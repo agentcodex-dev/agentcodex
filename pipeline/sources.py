@@ -120,4 +120,38 @@ SOURCES = [
         'method': 'jina',
         'url': 'https://suno.com/blog',
     },
+
+    # ─────────────────────────────
+    # ONBOARDING CANDIDATES
+    # ─────────────────────────────
+    {
+        'name': 'Claude Code',
+        'agent_slugs': ['claude-code'],
+        'method': 'jina',
+        'url': 'https://code.claude.com/docs/en/changelog',
+    },
+    {
+        'name': 'OpenAI Codex',
+        'agent_slugs': ['codex'],
+        'method': 'jina',
+        'url': 'https://help.openai.com/en/articles/11428266-codex-changelog',
+    },
+    {
+        'name': 'Aider',
+        'agent_slugs': ['aider'],
+        'method': 'jina',
+        'url': 'https://github.com/Aider-AI/aider/releases',
+    },
+    {
+        'name': 'Roo Code',
+        'agent_slugs': ['roo-code'],
+        'method': 'jina',
+        'url': 'https://github.com/RooVetGit/Roo-Code/releases',
+    },
+    {
+        'name': 'Continue',
+        'agent_slugs': ['continue'],
+        'method': 'jina',
+        'url': 'https://github.com/continuedev/continue/releases',
+    },
 ]

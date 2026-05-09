@@ -128,6 +128,22 @@ PIPELINE_MAX_ARTICLES_PER_DAY=100
 PIPELINE_MAX_SONNET_CALLS_PER_DAY=50
 ```
 
+Admin/testing helpers:
+
+```bash
+# Create a test draft for an existing agent (default: claude)
+python3 pipeline/admin_tools.py create-test-draft --agent-slug claude
+
+# Remove all test drafts created with the helper
+python3 pipeline/admin_tools.py delete-test-drafts
+
+# Detect likely misclassified versions (claude->claude-code, chatgpt->codex)
+python3 pipeline/admin_tools.py detect-misclassified
+
+# Reassign detected versions to target agents (requires target agent rows)
+python3 pipeline/admin_tools.py reassign-misclassified
+```
+
 ## Verification
 
 Before pushing:
