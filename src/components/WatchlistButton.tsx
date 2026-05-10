@@ -17,6 +17,7 @@ function readWatchlist(): string[] {
 
 function writeWatchlist(slugs: string[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(new Set(slugs))))
+  window.dispatchEvent(new CustomEvent('agentcodex-watchlist-changed'))
 }
 
 type Props = {
@@ -29,8 +30,12 @@ export default function WatchlistButton({ slug }: Props) {
   useEffect(() => {
     const sync = () => setSaved(readWatchlist().includes(slug))
     window.addEventListener('storage', sync)
+    window.addEventListener('agentcodex-watchlist-changed', sync)
     sync()
-    return () => window.removeEventListener('storage', sync)
+    return () => {
+      window.removeEventListener('storage', sync)
+      window.removeEventListener('agentcodex-watchlist-changed', sync)
+    }
   }, [slug])
 
   const toggle = (event: MouseEvent<HTMLButtonElement>) => {
