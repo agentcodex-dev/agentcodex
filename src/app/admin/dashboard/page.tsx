@@ -17,6 +17,8 @@ type Draft = {
   change_type: 'major' | 'minor' | 'patch' | 'noise' | null
   extraction_confidence: number | null
   editor_note: string | null
+  impact_factors: Record<string, unknown> | null
+  quality_flags: string[] | null
   pipeline_run_date: string
   pipeline_source: string
   agent: {
@@ -339,6 +341,9 @@ export default function AdminDashboard() {
             </Link>
             <span className="text-gray-300">|</span>
             <span className="text-gray-600 font-medium">Admin</span>
+            <Link href="/admin/ops" className="text-sm text-blue-600 hover:text-blue-700">
+              Ops
+            </Link>
           </div>
           <button
             onClick={() => {
@@ -357,7 +362,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
             <div className="text-3xl font-bold text-yellow-600">
-              {stats.draft}
+              {drafts.length}
             </div>
             <div className="text-sm text-yellow-700 mt-1">
               Pending Review
@@ -625,6 +630,11 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-3">
+                  {draft.quality_flags && draft.quality_flags.map((flag) => (
+                    <span key={flag} className="text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full">
+                      {flag.replace(/_/g, ' ')}
+                    </span>
+                  ))}
                   {form.source_url && (
                     <a
                       href={form.source_url}
