@@ -115,6 +115,8 @@ def save_draft(extraction: dict, max_release_age_days: int = MAX_RELEASE_AGE_DAY
             'change_type': extraction.get('change_type'),
             'extraction_confidence': extraction.get('extraction_confidence'),
             'editor_note': extraction.get('editor_note'),
+            'impact_factors': extraction.get('impact_factors') or {},
+            'quality_flags': extraction.get('quality_flags') or [],
             'is_auto_generated': True,
             'status': 'draft',
             'pipeline_source': extraction.get('pipeline_source', ''),

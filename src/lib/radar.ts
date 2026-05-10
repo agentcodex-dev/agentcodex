@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { Agent, AgentVersion, Capability } from '@/lib/types'
 import {
   deriveChangeType,
+  deriveImpactBreakdown,
   deriveImportanceScore,
   deriveQualitySignal,
   type ChangeType,
@@ -31,6 +32,8 @@ export type CapabilityMover = {
   changeType: ChangeType
   importanceScore: number
   quality: QualitySignal
+  impactBreakdown: ReturnType<typeof deriveImpactBreakdown>
+  whyMoved: string
 }
 
 export type ReleaseVelocity = {
@@ -167,21 +170,29 @@ export async function getRadarData(): Promise<RadarData> {
         return null
       }
 
+      const totalDelta = changes.reduce((sum, change) => sum + Math.abs(change.delta), 0)
+      const changeType = deriveChangeType(
+        totalDelta,
+        latest.what_changed || ''
+      )
+      const importanceScore = deriveImportanceScore(
+        totalDelta,
+        latest.what_changed || ''
+      )
+      const quality = deriveQualitySignal(agent, latest)
+      const impactBreakdown = deriveImpactBreakdown(totalDelta, changeType, quality)
+
       return {
         agent,
         latest,
         previous,
         changes: changes.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)),
-        totalDelta: changes.reduce((sum, change) => sum + Math.abs(change.delta), 0),
-        changeType: deriveChangeType(
-          changes.reduce((sum, change) => sum + Math.abs(change.delta), 0),
-          latest.what_changed || ''
-        ),
-        importanceScore: deriveImportanceScore(
-          changes.reduce((sum, change) => sum + Math.abs(change.delta), 0),
-          latest.what_changed || ''
-        ),
-        quality: deriveQualitySignal(agent, latest),
+        totalDelta,
+        changeType,
+        importanceScore,
+        quality,
+        impactBreakdown,
+        whyMoved: impactBreakdown.summary,
       }
     })
     .filter((mover): mover is CapabilityMover => mover !== null)

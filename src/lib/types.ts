@@ -27,6 +27,8 @@ export type AgentVersion = {
   change_type?: 'major' | 'minor' | 'patch' | 'noise' | null
   extraction_confidence?: number | null
   editor_note?: string | null
+  impact_factors?: Record<string, number | string> | null
+  quality_flags?: string[] | null
   created_at: string
 }
 

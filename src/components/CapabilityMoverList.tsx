@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowDown, ArrowUp, ArrowUpRight } from 'lucide-react'
 import { CapabilityMover } from '@/lib/radar'
 import { getCompareTarget } from '@/lib/radar'
+import ImpactBreakdown from '@/components/ImpactBreakdown'
 
 type Props = {
   movers: CapabilityMover[]
@@ -55,6 +56,10 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
                   Importance {mover.importanceScore}/10
                 </span>
               </div>
+              <ImpactBreakdown
+                summary={mover.whyMoved}
+                score={mover.impactBreakdown.finalImpact}
+              />
             </div>
             <Link
               href={`/agents/${mover.agent.slug}`}

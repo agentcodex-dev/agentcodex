@@ -32,6 +32,8 @@ export async function GET(request: NextRequest) {
         change_type,
         extraction_confidence,
         editor_note,
+        impact_factors,
+        quality_flags,
         pipeline_run_date,
         pipeline_source,
         agents (

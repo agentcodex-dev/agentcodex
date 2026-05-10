@@ -4,8 +4,18 @@ export type ChangeType = 'major' | 'minor' | 'patch' | 'noise'
 
 export type QualitySignal = {
   sourceOfficial: boolean
+  sourceTier: 'official' | 'partner' | 'secondary' | 'unknown'
   extractionConfidence: number
   confidenceLabel: 'High' | 'Medium' | 'Low'
+}
+
+export type ImpactBreakdown = {
+  capabilityDeltaImpact: number
+  releaseTypeImpact: number
+  trustImpact: number
+  confidenceImpact: number
+  finalImpact: number
+  summary: string
 }
 
 const OFFICIAL_DOMAINS: Record<string, string[]> = {
@@ -88,8 +98,41 @@ export function deriveQualitySignal(agent: Agent, version: AgentVersion): Qualit
   const confidenceLabel = confidence >= 0.8 ? 'High' : confidence >= 0.6 ? 'Medium' : 'Low'
   return {
     sourceOfficial: official,
+    sourceTier: official ? 'official' : version.source_url ? 'secondary' : 'unknown',
     extractionConfidence: Number(confidence.toFixed(2)),
     confidenceLabel,
+  }
+}
+
+function releaseTypeWeight(changeType: ChangeType) {
+  if (changeType === 'major') return 3.2
+  if (changeType === 'minor') return 2.1
+  if (changeType === 'patch') return 1.2
+  return 0.4
+}
+
+export function deriveImpactBreakdown(
+  totalDelta: number,
+  changeType: ChangeType,
+  quality: QualitySignal
+): ImpactBreakdown {
+  const capabilityDeltaImpact = Number((Math.max(0, totalDelta) * 1.25).toFixed(2))
+  const releaseTypeImpact = Number(releaseTypeWeight(changeType).toFixed(2))
+  const trustImpact = quality.sourceOfficial ? 1.1 : 0.85
+  const confidenceImpact = Number((0.8 + quality.extractionConfidence * 0.6).toFixed(2))
+  const finalImpact = Number((
+    (capabilityDeltaImpact + releaseTypeImpact) * trustImpact * confidenceImpact
+  ).toFixed(2))
+  const summary = `${changeType} update with ${quality.confidenceLabel.toLowerCase()} confidence from ${
+    quality.sourceOfficial ? 'official' : 'non-official'
+  } source`
+  return {
+    capabilityDeltaImpact,
+    releaseTypeImpact,
+    trustImpact: Number(trustImpact.toFixed(2)),
+    confidenceImpact,
+    finalImpact,
+    summary,
   }
 }
 

@@ -13,6 +13,15 @@ REQUIRED_CAPABILITIES = {
 MAX_FUTURE_DAYS = 7
 DEFAULT_MAX_RELEASE_AGE_DAYS = 30
 CHANGE_TYPES = {'major', 'minor', 'patch', 'noise'}
+OFFICIAL_DOMAINS = {
+    'chatgpt': ['openai.com', 'help.openai.com'],
+    'codex': ['openai.com', 'help.openai.com'],
+    'claude': ['anthropic.com'],
+    'claude-code': ['claude.com', 'anthropic.com', 'code.claude.com'],
+    'cursor': ['cursor.com'],
+    'github-copilot': ['github.com', 'github.blog'],
+    'gemini': ['google.com', 'deepmind.google'],
+}
 
 
 def _valid_date(value: str, max_release_age_days: int) -> bool:
@@ -54,6 +63,20 @@ def _derive_change_type(what_changed: str) -> str:
     if any(token in text for token in patch_keywords):
         return 'patch'
     return 'minor'
+
+
+def _is_official_source(agent_slug: str, source_url: str) -> bool:
+    if not source_url:
+        return False
+    roots = OFFICIAL_DOMAINS.get(agent_slug, [])
+    if not roots:
+        return False
+    host = source_url.lower()
+    host = host.replace('https://', '').replace('http://', '').split('/')[0]
+    for root in roots:
+        if host == root or host.endswith(f'.{root}'):
+            return True
+    return False
 
 
 def validate_extraction(
@@ -121,6 +144,31 @@ def validate_extraction(
         clean['extraction_confidence'] = 0.7
     else:
         clean['extraction_confidence'] = max(0.0, min(1.0, float(confidence)))
+
+    source_url = str(clean.get('source_url') or '')
+    is_official = _is_official_source(agent_slug, source_url)
+    quality_flags = []
+    if not is_official:
+        quality_flags.append('needs_source_review')
+    if clean['extraction_confidence'] < 0.6:
+        quality_flags.append('low_confidence')
+    if clean['importance_score'] >= 8:
+        quality_flags.append('high_impact')
+    clean['quality_flags'] = quality_flags
+
+    trust_impact = 1.1 if is_official else 0.85
+    confidence_impact = 0.8 + (clean['extraction_confidence'] * 0.6)
+    capability_delta_impact = float(clean['importance_score'])
+    release_type_impact = 3.2 if clean['change_type'] == 'major' else 2.1 if clean['change_type'] == 'minor' else 1.2
+    final_impact = round((capability_delta_impact + release_type_impact) * trust_impact * confidence_impact, 2)
+    clean['impact_factors'] = {
+        'capabilityDeltaImpact': round(capability_delta_impact, 2),
+        'releaseTypeImpact': round(release_type_impact, 2),
+        'trustImpact': round(trust_impact, 2),
+        'confidenceImpact': round(confidence_impact, 2),
+        'finalImpact': final_impact,
+        'summary': f"{clean['change_type']} update with {'official' if is_official else 'non-official'} source and {int(clean['extraction_confidence'] * 100)}% confidence",
+    }
 
     missing_scores = REQUIRED_CAPABILITIES - set(capabilities.keys())
     if missing_scores:

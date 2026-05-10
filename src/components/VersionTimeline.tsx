@@ -1,5 +1,6 @@
 import { AgentVersion } from '@/lib/types'
 import { isOfficialSource } from '@/lib/intelligence'
+import ImpactBreakdown from '@/components/ImpactBreakdown'
 
 type Props = {
   versions: AgentVersion[]
@@ -82,6 +83,23 @@ export default function VersionTimeline({ versions, agentSlug }: Props) {
                 </span>
               )}
             </div>
+            {typeof version.impact_factors?.summary === 'string' && (
+              <ImpactBreakdown
+                summary={version.impact_factors.summary}
+                score={typeof version.impact_factors?.finalImpact === 'number'
+                  ? version.impact_factors.finalImpact
+                  : null}
+              />
+            )}
+            {version.quality_flags && version.quality_flags.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {version.quality_flags.map((flag) => (
+                  <span key={flag} className="text-[11px] px-2 py-1 rounded-full bg-amber-50 text-amber-700">
+                    {flag.replace(/_/g, ' ')}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* Capabilities */}
             {version.capabilities && (

@@ -49,11 +49,13 @@ export type Database = {
           editor_note: string | null
           extraction_confidence: number | null
           id: string
+          impact_factors: Json | null
           importance_score: number | null
           is_auto_generated: boolean | null
           pipeline_run_date: string | null
           pipeline_source: string | null
           pricing_info: string | null
+          quality_flags: string[] | null
           release_date: string
           source_url: string | null
           status: string
@@ -69,11 +71,13 @@ export type Database = {
           editor_note?: string | null
           extraction_confidence?: number | null
           id?: string
+          impact_factors?: Json | null
           importance_score?: number | null
           is_auto_generated?: boolean | null
           pipeline_run_date?: string | null
           pipeline_source?: string | null
           pricing_info?: string | null
+          quality_flags?: string[] | null
           release_date: string
           source_url?: string | null
           status?: string
@@ -89,11 +93,13 @@ export type Database = {
           editor_note?: string | null
           extraction_confidence?: number | null
           id?: string
+          impact_factors?: Json | null
           importance_score?: number | null
           is_auto_generated?: boolean | null
           pipeline_run_date?: string | null
           pipeline_source?: string | null
           pricing_info?: string | null
+          quality_flags?: string[] | null
           release_date?: string
           source_url?: string | null
           status?: string

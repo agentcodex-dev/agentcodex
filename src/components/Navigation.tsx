@@ -44,6 +44,12 @@ export default function Navigation() {
             >
               Compare
             </Link>
+            <Link
+              href="/copilot"
+              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              Copilot
+            </Link>
           </div>
 
           {/* Right side */}
@@ -125,6 +131,13 @@ export default function Navigation() {
               className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
             >
               Compare
+            </Link>
+            <Link
+              href="/copilot"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+            >
+              Copilot
             </Link>
             <div className="pt-2 px-4">
               <Link
