@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Agent, AgentVersion } from '@/lib/types'
+import WatchlistButton from '@/components/WatchlistButton'
 
 type Props = {
   agent: Agent
@@ -51,6 +52,7 @@ export default function AgentCard({ agent, latestVersion }: Props) {
                 Verified
               </span>
             )}
+            <WatchlistButton slug={agent.slug} />
           </div>
         </div>
 

@@ -6,6 +6,7 @@ import RadarStatCards from '@/components/RadarStatCards'
 import LatestReleaseFeed from '@/components/LatestReleaseFeed'
 import CapabilityMoverList from '@/components/CapabilityMoverList'
 import ReleaseVelocityList from '@/components/ReleaseVelocityList'
+import WatchlistFeed from '@/components/WatchlistFeed'
 import { getRadarData } from '@/lib/radar'
 
 export const metadata: Metadata = {
@@ -123,6 +124,13 @@ export default async function RadarPage({
             </section>
           </div>
         </div>
+
+        <section className="mt-10">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Watchlist Digest
+          </h2>
+          <WatchlistFeed releases={radar.latestReleases} />
+        </section>
       </main>
 
       <Footer />

@@ -1,5 +1,12 @@
 import { supabase } from '@/lib/supabase'
 import { Agent, AgentVersion, Capability } from '@/lib/types'
+import {
+  deriveChangeType,
+  deriveImportanceScore,
+  deriveQualitySignal,
+  type ChangeType,
+  type QualitySignal,
+} from '@/lib/intelligence'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -21,6 +28,9 @@ export type CapabilityMover = {
   previous: AgentVersion
   changes: CapabilityChange[]
   totalDelta: number
+  changeType: ChangeType
+  importanceScore: number
+  quality: QualitySignal
 }
 
 export type ReleaseVelocity = {
@@ -28,6 +38,7 @@ export type ReleaseVelocity = {
   latestRelease: AgentVersion | null
   releases30: number
   releases90: number
+  weightedScore: number
   totalVersions: number
 }
 
@@ -162,24 +173,48 @@ export async function getRadarData(): Promise<RadarData> {
         previous,
         changes: changes.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)),
         totalDelta: changes.reduce((sum, change) => sum + Math.abs(change.delta), 0),
+        changeType: deriveChangeType(
+          changes.reduce((sum, change) => sum + Math.abs(change.delta), 0),
+          latest.what_changed || ''
+        ),
+        importanceScore: deriveImportanceScore(
+          changes.reduce((sum, change) => sum + Math.abs(change.delta), 0),
+          latest.what_changed || ''
+        ),
+        quality: deriveQualitySignal(agent, latest),
       }
     })
     .filter((mover): mover is CapabilityMover => mover !== null)
-    .sort((a, b) => b.totalDelta - a.totalDelta)
+    .sort((a, b) => {
+      if (b.importanceScore !== a.importanceScore) return b.importanceScore - a.importanceScore
+      return b.totalDelta - a.totalDelta
+    })
 
   const releaseVelocity = agents
     .map((agent) => {
       const agentVersions = versionsByAgent[agent.id] || []
+      const weightedScore = agentVersions
+        .filter((version) => isWithinDays(version.release_date, 90))
+        .reduce((sum, version) => {
+          if (version.change_type === 'major') return sum + 3
+          if (version.change_type === 'minor') return sum + 2
+          if (version.change_type === 'patch') return sum + 1
+          if (typeof version.importance_score === 'number') return sum + Math.max(1, version.importance_score / 4)
+          return sum + 1
+        }, 0)
+
       return {
         agent,
         latestRelease: agentVersions[0] || null,
         releases30: agentVersions.filter((version) => isWithinDays(version.release_date, 30)).length,
         releases90: agentVersions.filter((version) => isWithinDays(version.release_date, 90)).length,
+        weightedScore: Number(weightedScore.toFixed(2)),
         totalVersions: agentVersions.length,
       }
     })
     .filter((velocity) => velocity.totalVersions > 0)
     .sort((a, b) => {
+      if (b.weightedScore !== a.weightedScore) return b.weightedScore - a.weightedScore
       if (b.releases90 !== a.releases90) return b.releases90 - a.releases90
       if (b.releases30 !== a.releases30) return b.releases30 - a.releases30
       return b.totalVersions - a.totalVersions

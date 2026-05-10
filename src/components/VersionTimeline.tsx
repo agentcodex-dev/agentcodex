@@ -1,10 +1,12 @@
 import { AgentVersion } from '@/lib/types'
+import { isOfficialSource } from '@/lib/intelligence'
 
 type Props = {
   versions: AgentVersion[]
+  agentSlug?: string
 }
 
-export default function VersionTimeline({ versions }: Props) {
+export default function VersionTimeline({ versions, agentSlug }: Props) {
   const sorted = [...versions].sort(
     (a, b) => new Date(b.release_date).getTime() - new Date(a.release_date).getTime()
   )
@@ -54,6 +56,33 @@ export default function VersionTimeline({ versions }: Props) {
               {version.what_changed}
             </p>
 
+            <div className="mt-2 flex flex-wrap gap-2">
+              {version.change_type && (
+                <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-full capitalize">
+                  {version.change_type}
+                </span>
+              )}
+              {typeof version.importance_score === 'number' && (
+                <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                  Importance {version.importance_score}/10
+                </span>
+              )}
+              {typeof version.extraction_confidence === 'number' && (
+                <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                  Confidence {Math.round(version.extraction_confidence * 100)}%
+                </span>
+              )}
+              {agentSlug && (
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  isOfficialSource(agentSlug, version.source_url)
+                    ? 'bg-green-50 text-green-700'
+                    : 'bg-yellow-50 text-yellow-700'
+                }`}>
+                  {isOfficialSource(agentSlug, version.source_url) ? 'Official source' : 'Needs source review'}
+                </span>
+              )}
+            </div>
+
             {/* Capabilities */}
             {version.capabilities && (
               <div className="mt-3 flex flex-wrap gap-2">
@@ -82,6 +111,13 @@ export default function VersionTimeline({ versions }: Props) {
               <div className="mt-2">
                 <span className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full">
                   🪟 {version.context_window.toLocaleString()} token context
+                </span>
+              </div>
+            )}
+            {version.editor_note && (
+              <div className="mt-2">
+                <span className="text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded-full">
+                  Editor note: {version.editor_note}
                 </span>
               </div>
             )}

@@ -43,39 +43,60 @@ export type Database = {
         Row: {
           agent_id: string | null
           capabilities: Json | null
+          change_type: string | null
           context_window: number | null
           created_at: string | null
+          editor_note: string | null
+          extraction_confidence: number | null
           id: string
+          importance_score: number | null
           is_auto_generated: boolean | null
+          pipeline_run_date: string | null
+          pipeline_source: string | null
           pricing_info: string | null
           release_date: string
           source_url: string | null
+          status: string
           version_number: string
           what_changed: string | null
         }
         Insert: {
           agent_id?: string | null
           capabilities?: Json | null
+          change_type?: string | null
           context_window?: number | null
           created_at?: string | null
+          editor_note?: string | null
+          extraction_confidence?: number | null
           id?: string
+          importance_score?: number | null
           is_auto_generated?: boolean | null
+          pipeline_run_date?: string | null
+          pipeline_source?: string | null
           pricing_info?: string | null
           release_date: string
           source_url?: string | null
+          status?: string
           version_number: string
           what_changed?: string | null
         }
         Update: {
           agent_id?: string | null
           capabilities?: Json | null
+          change_type?: string | null
           context_window?: number | null
           created_at?: string | null
+          editor_note?: string | null
+          extraction_confidence?: number | null
           id?: string
+          importance_score?: number | null
           is_auto_generated?: boolean | null
+          pipeline_run_date?: string | null
+          pipeline_source?: string | null
           pricing_info?: string | null
           release_date?: string
           source_url?: string | null
+          status?: string
           version_number?: string
           what_changed?: string | null
         }
@@ -154,6 +175,41 @@ export type Database = {
           url?: string
         }
         Relationships: []
+      }
+      version_editor_audits: {
+        Row: {
+          action: string
+          changes: Json
+          created_at: string | null
+          edited_by: string
+          id: string
+          version_id: string | null
+        }
+        Insert: {
+          action: string
+          changes?: Json
+          created_at?: string | null
+          edited_by?: string
+          id?: string
+          version_id?: string | null
+        }
+        Update: {
+          action?: string
+          changes?: Json
+          created_at?: string | null
+          edited_by?: string
+          id?: string
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "version_editor_audits_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "agent_versions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

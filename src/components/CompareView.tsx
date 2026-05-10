@@ -2,6 +2,7 @@
 
 import { Agent, AgentVersion } from '@/lib/types'
 import Link from 'next/link'
+import { getAvoidIf, getBestFor } from '@/lib/intelligence'
 
 type Props = {
   agentA: Agent
@@ -207,6 +208,19 @@ export default function CompareView({
       </div>
 
       {/* Quick Facts Comparison */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+          <p className="text-sm font-semibold text-green-800">{agentA.name} Best For</p>
+          <p className="text-sm text-green-700 mt-1">{getBestFor(agentA)}</p>
+          <p className="text-xs text-green-700 mt-2">Avoid if: {getAvoidIf(agentA)}</p>
+        </div>
+        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+          <p className="text-sm font-semibold text-purple-800">{agentB.name} Best For</p>
+          <p className="text-sm text-purple-700 mt-1">{getBestFor(agentB)}</p>
+          <p className="text-xs text-purple-700 mt-2">Avoid if: {getAvoidIf(agentB)}</p>
+        </div>
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <h3 className="font-semibold text-gray-900">Quick Facts</h3>

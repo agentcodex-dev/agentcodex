@@ -13,6 +13,10 @@ type Draft = {
   context_window: number | null
   pricing_info: string | null
   source_url: string | null
+  importance_score: number | null
+  change_type: 'major' | 'minor' | 'patch' | 'noise' | null
+  extraction_confidence: number | null
+  editor_note: string | null
   pipeline_run_date: string
   pipeline_source: string
   agent: {
@@ -29,6 +33,10 @@ type DraftForm = {
   context_window: string
   pricing_info: string
   source_url: string
+  importance_score: string
+  change_type: 'major' | 'minor' | 'patch' | 'noise'
+  extraction_confidence: string
+  editor_note: string
 }
 
 const CAPABILITY_FIELDS = [
@@ -49,6 +57,12 @@ function toForm(draft: Draft): DraftForm {
     context_window: draft.context_window ? String(draft.context_window) : '',
     pricing_info: draft.pricing_info || '',
     source_url: draft.source_url || draft.pipeline_source || '',
+    importance_score: draft.importance_score ? String(draft.importance_score) : '',
+    change_type: draft.change_type || 'minor',
+    extraction_confidence: typeof draft.extraction_confidence === 'number'
+      ? String(draft.extraction_confidence)
+      : '',
+    editor_note: draft.editor_note || '',
   }
 }
 
@@ -61,6 +75,12 @@ function toPayload(form: DraftForm) {
     context_window: form.context_window ? Number(form.context_window) : null,
     pricing_info: form.pricing_info || null,
     source_url: form.source_url || null,
+    importance_score: form.importance_score ? Number(form.importance_score) : null,
+    change_type: form.change_type,
+    extraction_confidence: form.extraction_confidence
+      ? Number(form.extraction_confidence)
+      : null,
+    editor_note: form.editor_note || null,
   }
 }
 
@@ -521,6 +541,65 @@ export default function AdminDashboard() {
                     />
                   </label>
                 </div>
+
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <label className="block">
+                    <span className="text-xs font-medium text-gray-500">
+                      Change Type
+                    </span>
+                    <select
+                      value={form.change_type}
+                      onChange={(e) => updateForm(draft.id, {
+                        change_type: e.target.value as DraftForm['change_type']
+                      })}
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="major">major</option>
+                      <option value="minor">minor</option>
+                      <option value="patch">patch</option>
+                      <option value="noise">noise</option>
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-xs font-medium text-gray-500">
+                      Importance (1-10)
+                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={form.importance_score}
+                      onChange={(e) => updateForm(draft.id, { importance_score: e.target.value })}
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-xs font-medium text-gray-500">
+                      Confidence (0-1)
+                    </span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={form.extraction_confidence}
+                      onChange={(e) => updateForm(draft.id, { extraction_confidence: e.target.value })}
+                      className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                    />
+                  </label>
+                </div>
+
+                <label className="block mt-4">
+                  <span className="text-xs font-medium text-gray-500">
+                    Editor Note
+                  </span>
+                  <textarea
+                    value={form.editor_note}
+                    onChange={(e) => updateForm(draft.id, { editor_note: e.target.value })}
+                    rows={2}
+                    className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm leading-relaxed focus:outline-none focus:border-blue-500"
+                  />
+                </label>
 
                 <div className="mt-4">
                   <p className="text-xs font-medium text-gray-500 mb-2">

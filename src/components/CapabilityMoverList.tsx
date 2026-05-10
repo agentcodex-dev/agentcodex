@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowDown, ArrowUp, ArrowUpRight } from 'lucide-react'
 import { CapabilityMover } from '@/lib/radar'
+import { getCompareTarget } from '@/lib/radar'
 
 type Props = {
   movers: CapabilityMover[]
@@ -46,6 +47,14 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
               <p className="text-xs text-gray-500 mt-1">
                 {mover.previous.version_number} to {mover.latest.version_number} · {formatDate(mover.latest.release_date)}
               </p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className="text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 capitalize">
+                  {mover.changeType} change
+                </span>
+                <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                  Importance {mover.importanceScore}/10
+                </span>
+              </div>
             </div>
             <Link
               href={`/agents/${mover.agent.slug}`}
@@ -75,6 +84,24 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
                 </span>
               )
             })}
+            <Link
+              href={`/compare/${mover.agent.slug}-vs-${getCompareTarget(mover.agent)}`}
+              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+            >
+              Compare
+              <ArrowUpRight size={12} />
+            </Link>
+            {mover.latest.source_url && (
+              <a
+                href={mover.latest.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+              >
+                Source
+                <ArrowUpRight size={12} />
+              </a>
+            )}
           </div>
         </div>
       ))}

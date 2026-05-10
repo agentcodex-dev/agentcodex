@@ -12,6 +12,7 @@ REQUIRED_CAPABILITIES = {
 
 MAX_FUTURE_DAYS = 7
 DEFAULT_MAX_RELEASE_AGE_DAYS = 30
+CHANGE_TYPES = {'major', 'minor', 'patch', 'noise'}
 
 
 def _valid_date(value: str, max_release_age_days: int) -> bool:
@@ -42,6 +43,17 @@ def _clean_capabilities(raw: object) -> dict:
             clean[key] = score
 
     return clean
+
+
+def _derive_change_type(what_changed: str) -> str:
+    text = what_changed.lower()
+    major_keywords = ('launch', 'major', 'breaking', 'ga', 'preview', 'new model', 'enterprise')
+    patch_keywords = ('patch', 'hotfix', 'bug fix', 'stability')
+    if any(token in text for token in major_keywords):
+        return 'major'
+    if any(token in text for token in patch_keywords):
+        return 'patch'
+    return 'minor'
 
 
 def validate_extraction(
@@ -92,7 +104,23 @@ def validate_extraction(
         'context_window': context_window,
         'pricing_info': extraction.get('pricing_info'),
         'source_url': extraction.get('source_url') or article.get('url'),
+        'importance_score': extraction.get('importance_score'),
+        'change_type': extraction.get('change_type'),
+        'extraction_confidence': extraction.get('extraction_confidence'),
+        'editor_note': extraction.get('editor_note'),
     }
+
+    if clean['change_type'] not in CHANGE_TYPES:
+        clean['change_type'] = _derive_change_type(what_changed)
+
+    if not isinstance(clean['importance_score'], int):
+        clean['importance_score'] = 8 if clean['change_type'] == 'major' else 6 if clean['change_type'] == 'minor' else 4
+
+    confidence = clean['extraction_confidence']
+    if not isinstance(confidence, (int, float)):
+        clean['extraction_confidence'] = 0.7
+    else:
+        clean['extraction_confidence'] = max(0.0, min(1.0, float(confidence)))
 
     missing_scores = REQUIRED_CAPABILITIES - set(capabilities.keys())
     if missing_scores:

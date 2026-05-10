@@ -20,6 +20,8 @@ The current v2 direction is **Agent Change Radar**: a homepage and `/radar` expe
 - Agent profile pages with version history and current capabilities
 - Side-by-side agent comparison pages
 - Change Radar for latest releases, capability movers, and release velocity
+- Decision layer: compare presets, workflow shortlists, best-for/avoid-if guidance
+- Trust layer: source trust, extraction confidence, change type and importance score
 - Password-gated admin dashboard for approving/rejecting pipeline drafts
 - Daily GitHub Actions pipeline that scrapes sources and writes draft releases
 
@@ -85,6 +87,7 @@ Core tables:
 - `pipeline_seen_articles`
 - `pipeline_runs`
 - `pipeline_article_events`
+- `version_editor_audits`
 
 Public pages only show `agent_versions` where `status = 'published'`. The pipeline writes new extracted updates as `draft`; the admin dashboard moves them to `published` or `rejected`.
 
@@ -138,6 +141,18 @@ Pipeline flow:
 6. Validate extracted agent slug, date, version, summary, scores, and context window
 7. Save new findings as Supabase drafts
 8. Record run counters and article-level events for debugging
+
+Draft rows now include editorial intelligence fields:
+- `importance_score` (1-10)
+- `change_type` (`major`/`minor`/`patch`/`noise`)
+- `extraction_confidence` (0-1)
+- `editor_note`
+
+Apply the latest migration before using admin editorial fields:
+
+```bash
+supabase db push
+```
 
 Pipeline tuning variables:
 

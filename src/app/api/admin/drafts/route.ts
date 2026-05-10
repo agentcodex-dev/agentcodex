@@ -28,6 +28,10 @@ export async function GET(request: NextRequest) {
         context_window,
         pricing_info,
         source_url,
+        importance_score,
+        change_type,
+        extraction_confidence,
+        editor_note,
         pipeline_run_date,
         pipeline_source,
         agents (

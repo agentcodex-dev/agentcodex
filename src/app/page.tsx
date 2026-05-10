@@ -7,6 +7,7 @@ import RadarStatCards from '@/components/RadarStatCards'
 import LatestReleaseFeed from '@/components/LatestReleaseFeed'
 import CapabilityMoverList from '@/components/CapabilityMoverList'
 import ReleaseVelocityList from '@/components/ReleaseVelocityList'
+import WatchlistFeed from '@/components/WatchlistFeed'
 import { getRadarData } from '@/lib/radar'
 
 export default async function Home() {
@@ -140,6 +141,26 @@ export default async function Home() {
           ))}
         </div>
 
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Weekly Watchlist Digest
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Personal release feed based on your watched agents
+            </p>
+          </div>
+          <Link
+            href="/radar"
+            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+          >
+            Open radar →
+          </Link>
+        </div>
+        <WatchlistFeed releases={radar.latestReleases} />
       </section>
 
       <Footer />

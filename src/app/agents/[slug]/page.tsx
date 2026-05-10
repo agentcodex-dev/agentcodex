@@ -7,6 +7,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import Footer from '@/components/Footer'
+import WatchlistButton from '@/components/WatchlistButton'
+import { deriveQualitySignal, getAvoidIf, getBestFor } from '@/lib/intelligence'
 
 async function getAgent(slug: string) {
   const { data, error } = await supabase
@@ -84,6 +86,7 @@ export default async function AgentPage({
 
   const versions = await getAgentVersions(agent.id)
   const latestVersion = versions[0]
+  const quality = latestVersion ? deriveQualitySignal(agent, latestVersion) : null
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -145,10 +148,29 @@ export default async function AgentPage({
                 >
                   Visit Site →
                 </a>
+                <div className="sm:shrink-0 w-full sm:w-auto">
+                  <WatchlistButton slug={agent.slug} />
+                </div>
               </div>
               <p className="mt-6 text-gray-600 leading-relaxed">
                 {agent.description}
               </p>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Decision Fit
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                  <p className="font-semibold text-green-800">Best For</p>
+                  <p className="text-green-700 mt-1">{getBestFor(agent)}</p>
+                </div>
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                  <p className="font-semibold text-amber-800">Avoid If</p>
+                  <p className="text-amber-700 mt-1">{getAvoidIf(agent)}</p>
+                </div>
+              </div>
             </div>
 
             {/* Latest Capabilities */}
@@ -180,7 +202,7 @@ export default async function AgentPage({
                   {versions.length} releases documented
                 </span>
               </h2>
-              <VersionTimeline versions={versions} />
+              <VersionTimeline versions={versions} agentSlug={agent.slug} />
             </div>
 
           </div>
@@ -237,6 +259,20 @@ export default async function AgentPage({
                         </span>
                       </div>
                     )}
+                    <div className="border-t border-gray-100" />
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Source Trust</span>
+                      <span className={`font-medium ${quality?.sourceOfficial ? 'text-green-700' : 'text-amber-700'}`}>
+                        {quality?.sourceOfficial ? 'Official' : 'Needs review'}
+                      </span>
+                    </div>
+                    <div className="border-t border-gray-100" />
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Extraction Confidence</span>
+                      <span className="font-medium text-gray-900">
+                        {quality ? `${Math.round(quality.extractionConfidence * 100)}%` : 'N/A'}
+                      </span>
+                    </div>
                   </>
                 )}
               </div>

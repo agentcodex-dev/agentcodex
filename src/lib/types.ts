@@ -22,6 +22,11 @@ export type AgentVersion = {
   pricing_info: string | null
   source_url: string | null
   is_auto_generated: boolean
+  status?: 'draft' | 'published' | 'rejected'
+  importance_score?: number | null
+  change_type?: 'major' | 'minor' | 'patch' | 'noise' | null
+  extraction_confidence?: number | null
+  editor_note?: string | null
   created_at: string
 }
 

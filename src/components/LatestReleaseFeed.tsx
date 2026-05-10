@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ArrowUpRight, ExternalLink } from 'lucide-react'
 import { getCompareTarget, LatestRelease } from '@/lib/radar'
+import { deriveQualitySignal } from '@/lib/intelligence'
+import { deriveChangeType, deriveImportanceScore } from '@/lib/intelligence'
 
 type Props = {
   releases: LatestRelease[]
@@ -33,6 +35,9 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
     <div className="space-y-3">
       {visibleReleases.map((release) => {
         const compareTarget = getCompareTarget(release.agent)
+        const quality = deriveQualitySignal(release.agent, release)
+        const changeType = release.change_type || deriveChangeType(0, release.what_changed || '')
+        const importance = release.importance_score || deriveImportanceScore(0, release.what_changed || '')
 
         return (
           <article
@@ -58,6 +63,24 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
                 <p className="text-sm text-gray-500 mt-1">
                   {release.agent.provider}
                 </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    quality.sourceOfficial
+                      ? 'bg-green-50 text-green-700'
+                      : 'bg-yellow-50 text-yellow-700'
+                  }`}>
+                    {quality.sourceOfficial ? 'Official source' : 'Source not verified'}
+                  </span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 capitalize">
+                    {changeType}
+                  </span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                    Importance {importance}/10
+                  </span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                    Confidence {Math.round(quality.extractionConfidence * 100)}%
+                  </span>
+                </div>
                 <p className="text-sm text-gray-600 leading-relaxed mt-3 line-clamp-3">
                   {release.what_changed}
                 </p>
