@@ -4,13 +4,13 @@ SOURCES = [
         'name': 'OpenAI',
         'agent_slugs': ['chatgpt'],
         'method': 'rss',
-        'url': 'https://openai.com/blog/rss.xml',
+        'url': 'https://openai.com/news/rss.xml',
     },
     {
         'name': 'GitHub',
         'agent_slugs': ['github-copilot'],
         'method': 'rss',
-        'url': 'https://github.blog/feed/',
+        'url': 'https://github.blog/changelog/feed/',
     },
     {
         'name': 'Google DeepMind',
@@ -22,7 +22,7 @@ SOURCES = [
         'name': 'Meta AI',
         'agent_slugs': ['llama'],
         'method': 'rss',
-        'url': 'https://engineering.fb.com/feed/',
+        'url': 'https://ai.meta.com/blog/rss/',
     },
     {
         'name': 'Codeium Windsurf',
@@ -76,13 +76,13 @@ SOURCES = [
         'name': 'AWS Amazon Q',
         'agent_slugs': ['amazon-q'],
         'method': 'rss',
-        'url': 'https://aws.amazon.com/blogs/aws/feed/',
+        'url': 'https://aws.amazon.com/blogs/aws/category/artificial-intelligence/feed/',
     },
     {
         'name': 'xAI Grok',
         'agent_slugs': ['grok'],
         'method': 'jina',
-        'url': 'https://x.ai/blog',
+        'url': 'https://docs.x.ai/developers/release-notes',
     },
     {
         'name': 'Vercel v0',

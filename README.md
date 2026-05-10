@@ -167,6 +167,9 @@ python3 pipeline/admin_tools.py detect-misclassified
 
 # Reassign detected versions to target agents (requires target agent rows)
 python3 pipeline/admin_tools.py reassign-misclassified
+
+# Audit source URLs against expected official domains/hints
+python3 pipeline/audit_sources.py
 ```
 
 ## Verification
