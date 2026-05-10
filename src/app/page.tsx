@@ -58,6 +58,10 @@ export default async function Home() {
                   Browse agents
                 </Link>
               </div>
+
+              <div className="mt-10">
+                <RadarStatCards stats={radar.stats} />
+              </div>
             </div>
 
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
@@ -74,10 +78,6 @@ export default async function Home() {
               </div>
               <LatestReleaseFeed releases={radar.latestReleases} limit={3} />
             </div>
-          </div>
-
-          <div className="mt-10">
-            <RadarStatCards stats={radar.stats} />
           </div>
         </div>
       </section>
