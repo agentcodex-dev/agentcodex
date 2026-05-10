@@ -76,7 +76,9 @@ export default async function Home() {
                   View all
                 </Link>
               </div>
-              <LatestReleaseFeed releases={radar.latestReleases} limit={3} />
+              <div className="lg:max-h-[560px] lg:overflow-y-auto lg:pr-1">
+                <LatestReleaseFeed releases={radar.latestReleases} limit={6} />
+              </div>
             </div>
           </div>
         </div>
