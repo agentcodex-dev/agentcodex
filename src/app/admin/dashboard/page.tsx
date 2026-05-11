@@ -27,6 +27,13 @@ type Draft = {
   }
 }
 
+type ScoreAdjustment = {
+  capability: string
+  from: number | null
+  to: number
+  reason: string
+}
+
 type DraftForm = {
   version_number: string
   release_date: string
@@ -321,6 +328,20 @@ export default function AdminDashboard() {
       ]))
     ]))
   ), [drafts, forms])
+
+  const getCalibratedScoreInfo = (draft: Draft, key: string) => {
+    const impact = draft.impact_factors as
+      | { llmSuggestedScores?: Record<string, number>; calibratedScores?: Record<string, number>; scoreAdjustments?: ScoreAdjustment[] }
+      | null
+      | undefined
+
+    if (!impact) return null
+    const legacy = impact.llmSuggestedScores?.[key]
+    const calibrated = impact.calibratedScores?.[key]
+    const adjustment = impact.scoreAdjustments?.find((item) => item.capability === key)
+    if (typeof legacy !== 'number' || typeof calibrated !== 'number' || legacy === calibrated) return null
+    return { legacy, calibrated, adjustment }
+  }
 
   if (loading) {
     return (
@@ -624,6 +645,16 @@ export default function AdminDashboard() {
                           onChange={(e) => updateCapability(draft.id, key, e.target.value)}
                           className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                         />
+                        {(() => {
+                          const info = getCalibratedScoreInfo(draft, key)
+                          if (!info) return null
+                          return (
+                            <p className="mt-1 text-[11px] text-indigo-700">
+                              Legacy {info.legacy} → Calibrated {info.calibrated}
+                              {info.adjustment?.reason ? ` (${info.adjustment.reason.replace(/_/g, ' ')})` : ''}
+                            </p>
+                          )
+                        })()}
                       </label>
                     ))}
                   </div>

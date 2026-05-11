@@ -106,6 +106,9 @@ Run locally:
 
 ```bash
 python3 main.py
+
+# Run with deterministic score calibration (for A/B validation)
+python3 main.py --scoring-mode calibrated
 ```
 
 Backfill mode for newly onboarded agents:
@@ -185,6 +188,20 @@ python3 pipeline/admin_tools.py reassign-misclassified
 
 # Audit source URLs against expected official domains/hints
 python3 pipeline/audit_sources.py
+
+# Export baseline score snapshot (JSON + CSV)
+python3 pipeline/score_snapshot.py --out-prefix pipeline/artifacts/score_snapshot
+
+# Compare baseline and candidate score snapshots
+python3 pipeline/score_diff_report.py \
+  --before pipeline/artifacts/score_snapshot_BASELINE.json \
+  --after pipeline/artifacts/score_snapshot_CANDIDATE.json \
+  --max-change-ratio 0.35 \
+  --max-abs-delta 5.0
+
+# Run score utility unit tests
+python3 -m unittest pipeline.tests.test_score_tools
+python3 -m unittest pipeline.tests.test_scoring
 ```
 
 ## Verification

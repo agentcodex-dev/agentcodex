@@ -39,6 +39,12 @@ def parse_args():
         help='Backfill mode: max versions to extract from one article/listing page',
     )
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument(
+        '--scoring-mode',
+        choices=['legacy', 'calibrated'],
+        default='legacy',
+        help='Score processing mode: keep current behavior (legacy) or deterministic calibration (calibrated)',
+    )
     return parser.parse_args()
 
 
@@ -102,6 +108,7 @@ def run_pipeline():
             max_release_age_days=max(1, args.max_age_days),
             backfill_mode=is_backfill,
             max_versions_per_article=max(1, args.max_versions_per_article),
+            scoring_mode=args.scoring_mode,
         )
 
         if not versions_found:
@@ -148,6 +155,7 @@ def run_pipeline():
                 'max_age_days': max(1, args.max_age_days),
                 'max_versions_per_article': max(1, args.max_versions_per_article),
                 'dry_run': args.dry_run,
+                'scoring_mode': args.scoring_mode,
             }
         )
 
