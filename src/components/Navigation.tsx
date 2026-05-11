@@ -7,7 +7,7 @@ export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
+    <nav className="border-b acx-divider bg-[var(--acx-surface)] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
@@ -22,31 +22,31 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               href="/radar"
-              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
             >
               Radar
             </Link>
             <Link
               href="/agents"
-              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
             >
               All Agents
             </Link>
             <Link
               href="/categories"
-              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
             >
               Categories
             </Link>
             <Link
               href="/compare"
-              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
             >
               Compare
             </Link>
             <Link
               href="/copilot"
-              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
             >
               Copilot
             </Link>
@@ -57,7 +57,7 @@ export default function Navigation() {
             {/* Desktop Browse Button */}
             <Link
               href="/agents"
-              className="hidden md:block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="hidden md:block acx-btn-primary px-4 py-2 text-sm"
             >
               Browse Agents
             </Link>
@@ -65,7 +65,7 @@ export default function Navigation() {
             {/* Mobile Hamburger */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-lg acx-body hover:bg-gray-100 transition-colors"
               aria-label="Toggle menu"
             >
               {menuOpen ? (
@@ -103,39 +103,39 @@ export default function Navigation() {
 
         {/* Mobile Menu Dropdown */}
         {menuOpen && (
-          <div className="md:hidden border-t border-gray-100 py-4 space-y-1">
+          <div className="md:hidden border-t acx-divider py-4 space-y-1">
             <Link
               href="/radar"
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
             >
               Radar
             </Link>
             <Link
               href="/agents"
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
             >
               All Agents
             </Link>
             <Link
               href="/categories"
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
             >
               Categories
             </Link>
             <Link
               href="/compare"
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
             >
               Compare
             </Link>
             <Link
               href="/copilot"
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
             >
               Copilot
             </Link>
@@ -143,7 +143,7 @@ export default function Navigation() {
               <Link
                 href="/agents"
                 onClick={() => setMenuOpen(false)}
-                className="block w-full bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors text-center"
+                className="block w-full acx-btn-primary px-4 py-3 text-sm text-center"
               >
                 Browse Agents
               </Link>

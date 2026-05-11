@@ -5,10 +5,10 @@ type Props = {
 
 export default function ImpactBreakdown({ summary, score }: Props) {
   return (
-    <div className="mt-2 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1">
-      <span className="font-medium text-gray-700">Why moved:</span> {summary}
+    <div className="mt-2 text-xs acx-body bg-[var(--acx-surface)] border acx-divider rounded-lg px-2 py-1">
+      <span className="font-medium text-[var(--acx-text-soft)]">Why moved:</span> {summary}
       {typeof score === 'number' && (
-        <span className="ml-2 text-gray-500">Impact {score.toFixed(1)}</span>
+        <span className="ml-2 acx-muted">Impact {score.toFixed(1)}</span>
       )}
     </div>
   )

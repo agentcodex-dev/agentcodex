@@ -23,32 +23,32 @@ function isRecent(value: string) {
 export default function AgentCard({ agent, latestVersion }: Props) {
   return (
     <Link href={`/agents/${agent.slug}`}>
-      <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group">
+      <div className="acx-panel p-6 hover:shadow-md hover:border-[var(--acx-border-strong)] transition-all cursor-pointer group">
         
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
             {/* Logo placeholder */}
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <span className="text-blue-600 font-bold text-sm">
+            <div className="w-10 h-10 rounded-lg bg-[var(--acx-accent-soft)] flex items-center justify-center">
+              <span className="text-[var(--acx-accent)] font-bold text-sm">
                 {agent.name.charAt(0)}
               </span>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+              <h3 className="font-semibold text-[var(--acx-text)] group-hover:text-[var(--acx-accent)] transition-colors">
                 {agent.name}
               </h3>
-              <p className="text-sm text-gray-500">{agent.provider}</p>
+              <p className="text-sm acx-muted">{agent.provider}</p>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
             {latestVersion && isRecent(latestVersion.release_date) && (
-              <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium">
+              <span className="acx-badge acx-badge-trust font-medium">
                 Updated recently
               </span>
             )}
             {agent.is_verified && (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+              <span className="acx-badge acx-badge-official font-medium">
                 Verified
               </span>
             )}
@@ -57,13 +57,13 @@ export default function AgentCard({ agent, latestVersion }: Props) {
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+        <p className="text-sm acx-body mb-4 line-clamp-2">
           {agent.description}
         </p>
 
         {latestVersion && (
-          <div className="mb-4 text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
-            Latest: <span className="font-medium text-gray-700">{latestVersion.version_number}</span>
+          <div className="mb-4 text-xs acx-muted bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
+            Latest: <span className="font-medium text-[var(--acx-text-soft)]">{latestVersion.version_number}</span>
             <span className="mx-1">·</span>
             {formatDate(latestVersion.release_date)}
           </div>
@@ -74,7 +74,7 @@ export default function AgentCard({ agent, latestVersion }: Props) {
           {agent.category.map((cat) => (
             <span
               key={cat}
-              className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+              className="text-xs bg-gray-100 text-[var(--acx-text-soft)] px-2 py-1 rounded-full"
             >
               {cat}
             </span>

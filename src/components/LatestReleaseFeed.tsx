@@ -49,7 +49,7 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
         return (
           <article
             key={release.id}
-            className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-sm transition-all"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] hover:shadow-sm transition-all"
           >
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="min-w-0">
@@ -60,7 +60,7 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
                   >
                     {release.agent.name}
                   </Link>
-                  <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full">
+                  <span className="acx-badge acx-badge-trust">
                     {release.version_number}
                   </span>
                   <span className="text-xs text-gray-500">
@@ -71,20 +71,16 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
                   {release.agent.provider}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    quality.sourceOfficial
-                      ? 'bg-green-50 text-green-700'
-                      : 'bg-yellow-50 text-yellow-700'
-                  }`}>
+                  <span className={`acx-badge ${quality.sourceOfficial ? 'acx-badge-official' : 'acx-badge-warn'}`}>
                     {quality.sourceOfficial ? 'Official source' : 'Source not verified'}
                   </span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 capitalize">
+                  <span className="acx-badge acx-badge-trust capitalize">
                     {changeType}
                   </span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                  <span className="acx-badge bg-gray-100 text-gray-700">
                     Importance {importance}/10
                   </span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                  <span className="acx-badge bg-gray-100 text-gray-700">
                     Confidence {Math.round(quality.extractionConfidence * 100)}%
                   </span>
                 </div>

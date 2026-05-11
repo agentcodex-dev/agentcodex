@@ -21,9 +21,9 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
 
   if (visibleMovers.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-        <h3 className="font-semibold text-gray-900">No capability movers yet</h3>
-        <p className="text-sm text-gray-500 mt-2">
+      <div className="acx-panel p-8 text-center">
+        <h3 className="font-semibold text-[var(--acx-text)]">No capability movers yet</h3>
+        <p className="text-sm acx-muted mt-2">
           Agents need at least two scored versions before movement can be measured.
         </p>
       </div>
@@ -35,24 +35,24 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
       {visibleMovers.map((mover) => (
         <div
           key={`${mover.agent.id}-${mover.latest.id}`}
-          className="bg-white border border-gray-200 rounded-xl p-5"
+          className="acx-panel p-5"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
               <Link
                 href={`/agents/${mover.agent.slug}`}
-                className="font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+                className="font-semibold text-[var(--acx-text)] hover:text-[var(--acx-accent)] transition-colors"
               >
                 {mover.agent.name}
               </Link>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs acx-muted mt-1">
                 {mover.previous.version_number} to {mover.latest.version_number} · {formatDate(mover.latest.release_date)}
               </p>
               <div className="flex flex-wrap gap-2 mt-2">
-                <span className="text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 capitalize">
+                <span className="acx-badge acx-badge-trust capitalize">
                   {mover.changeType} change
                 </span>
-                <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                <span className="acx-badge bg-gray-100 text-gray-700">
                   Importance {mover.importanceScore}/10
                 </span>
               </div>
@@ -63,7 +63,7 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
             </div>
             <Link
               href={`/agents/${mover.agent.slug}`}
-              className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 shrink-0"
+              className="inline-flex items-center gap-1 text-xs font-medium text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)] shrink-0"
             >
               View
               <ArrowUpRight size={14} />

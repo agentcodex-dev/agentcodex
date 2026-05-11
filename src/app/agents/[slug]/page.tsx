@@ -89,7 +89,7 @@ export default async function AgentPage({
   const quality = latestVersion ? deriveQualitySignal(agent, latestVersion) : null
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen acx-shell">
       <Navigation />
 
       {/* Breadcrumb */}
@@ -110,7 +110,7 @@ export default async function AgentPage({
           <div className="lg:col-span-2 space-y-8">
 
             {/* Agent Header */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
+            <div className="acx-panel p-8">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
                   <span className="text-blue-600 font-bold text-2xl">
@@ -157,7 +157,7 @@ export default async function AgentPage({
               </p>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
+            <div className="acx-panel p-8">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 Decision Fit
               </h2>
@@ -175,7 +175,7 @@ export default async function AgentPage({
 
             {/* Latest Capabilities */}
             {latestVersion?.capabilities && (
-              <div className="bg-white rounded-xl border border-gray-200 p-8">
+              <div className="acx-panel p-8">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">
                   Current Capabilities
                   <span className="ml-2 text-sm font-normal text-gray-500">
@@ -195,7 +195,7 @@ export default async function AgentPage({
             )}
 
             {/* Version History */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
+            <div className="acx-panel p-8">
               <h2 className="text-xl font-bold text-gray-900 mb-8">
                 Version History
                 <span className="ml-2 text-sm font-normal text-gray-500">
@@ -211,7 +211,7 @@ export default async function AgentPage({
           <div className="space-y-6">
 
             {/* Quick Facts */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="acx-panel p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Quick Facts</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
@@ -299,7 +299,7 @@ export default async function AgentPage({
             </div>
 
             {/* Links */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="acx-panel p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Links</h3>
               <div className="space-y-2">
                 <a

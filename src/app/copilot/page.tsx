@@ -48,11 +48,11 @@ export default async function CopilotPage({
   const leader = ranked[0]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen acx-shell">
       <Navigation />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="text-3xl font-bold text-gray-900">Use-Case Copilot</h1>
-        <p className="text-gray-600 mt-2">Pick a workflow and get shortlist recommendations with fast compare links.</p>
+        <h1 className="text-3xl font-bold text-[var(--acx-text)]">Use-Case Copilot</h1>
+        <p className="acx-body mt-2">Pick a workflow and get shortlist recommendations with fast compare links.</p>
 
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
           {Object.entries(COPILOT_PRESETS).map(([key, p]) => (
@@ -60,7 +60,7 @@ export default async function CopilotPage({
               key={key}
               href={`/copilot?preset=${key}`}
               className={`px-4 py-3 rounded-lg border text-sm font-medium ${
-                key === selected ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-700 border-gray-200'
+                key === selected ? 'bg-[var(--acx-accent-soft)] text-[var(--acx-accent)] border-[var(--acx-accent)]' : 'bg-white text-[var(--acx-text-soft)] border-[var(--acx-border)]'
               }`}
             >
               {p.label}
@@ -68,7 +68,7 @@ export default async function CopilotPage({
           ))}
         </div>
 
-        <section className="mt-8 bg-white border border-gray-200 rounded-xl p-6">
+        <section className="mt-8 acx-panel p-6">
           <h2 className="font-semibold text-gray-900">Top picks for {COPILOT_PRESETS[selected].label}</h2>
           <div className="mt-4 space-y-3">
             {ranked.map((row, index) => (

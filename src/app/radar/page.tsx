@@ -43,19 +43,19 @@ export default async function RadarPage({
   ))
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen acx-shell">
       <Navigation />
 
-      <section className="bg-white border-b border-gray-200">
+      <section className="acx-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold text-blue-600">
+            <p className="text-sm font-semibold text-[var(--acx-accent)]">
               Agent Change Radar
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-3 leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-bold text-[var(--acx-text)] mt-3 leading-tight">
               Track what changed across AI agents
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 mt-4 leading-relaxed">
+            <p className="text-base sm:text-lg acx-body mt-4 leading-relaxed">
               Recent releases, capability movement and release velocity across the agents AgentCodex tracks.
             </p>
           </div>
@@ -72,8 +72,8 @@ export default async function RadarPage({
             href="/radar"
             className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               !selectedCategory
-                ? 'bg-blue-600 text-white'
-                : 'bg-white border border-gray-200 text-gray-600 hover:text-gray-900'
+                ? 'acx-btn-primary'
+                : 'acx-btn-secondary'
             }`}
           >
             All
@@ -84,8 +84,8 @@ export default async function RadarPage({
               href={`/radar?category=${cat}`}
               className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 selectedCategory === cat
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:text-gray-900'
+                  ? 'acx-btn-primary'
+                  : 'acx-btn-secondary'
               }`}
             >
               {cat}
@@ -97,10 +97,10 @@ export default async function RadarPage({
           <section className="lg:col-span-2">
             <div className="flex items-end justify-between gap-4 mb-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-[var(--acx-text)]">
                   Latest Releases
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm acx-muted mt-1">
                   Published updates, newest first
                 </p>
               </div>
@@ -110,14 +110,14 @@ export default async function RadarPage({
 
           <div className="space-y-8">
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <h2 className="text-xl font-bold text-[var(--acx-text)] mb-4">
                 Biggest Movers
               </h2>
               <CapabilityMoverList movers={capabilityMovers} limit={6} />
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <h2 className="text-xl font-bold text-[var(--acx-text)] mb-4">
                 Release Velocity
               </h2>
               <ReleaseVelocityList velocities={releaseVelocity} limit={8} />
@@ -126,7 +126,7 @@ export default async function RadarPage({
         </div>
 
         <section className="mt-10">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl font-bold text-[var(--acx-text)] mb-4">
             Watchlist Digest
           </h2>
           <WatchlistFeed releases={radar.latestReleases} />

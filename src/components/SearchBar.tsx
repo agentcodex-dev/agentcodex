@@ -22,11 +22,11 @@ export default function SearchBar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search agents... try Claude, Copilot, Cursor"
-          className="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 shadow-sm pr-32"
+          className="w-full px-6 py-4 text-lg acx-input shadow-sm pr-32"
         />
         <button
           type="submit"
-          className="absolute right-2 top-2 bottom-2 bg-blue-600 text-white px-6 rounded-xl font-medium hover:bg-blue-700 transition-colors"
+          className="absolute right-2 top-2 bottom-2 acx-btn-primary px-6 rounded-xl"
         >
           Search
         </button>
