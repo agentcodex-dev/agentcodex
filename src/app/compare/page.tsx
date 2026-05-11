@@ -6,6 +6,7 @@ import CompareView from '@/components/CompareView'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import AgentSelector from '@/components/AgentSelector'
+import MethodologyCallout from '@/components/MethodologyCallout'
 
 export const metadata: Metadata = {
   title: 'Compare AI Agents - Side by Side Comparison',
@@ -164,6 +165,12 @@ export default async function ComparePage({
             agents={agents}
             selectedA={a ?? ''}
             selectedB={b ?? ''}
+          />
+        </div>
+
+        <div className="mb-8">
+          <MethodologyCallout
+            body="Compare uses each agent's latest published version and applies workflow-specific weights across capabilities. Scores indicate fit for that workflow, not absolute product quality."
           />
         </div>
 
