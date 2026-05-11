@@ -42,3 +42,8 @@ next-env.d.ts
 
 # local media exports
 /media/
+
+# local pipeline artifacts and caches
+/pipeline/artifacts/
+/.pycache_local/
+**/__pycache__/
