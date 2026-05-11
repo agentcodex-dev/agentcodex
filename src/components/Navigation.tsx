@@ -50,6 +50,12 @@ export default function Navigation() {
             >
               Copilot
             </Link>
+            <Link
+              href="/methodology"
+              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
+            >
+              Methodology
+            </Link>
           </div>
 
           {/* Right side */}
@@ -138,6 +144,13 @@ export default function Navigation() {
               className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
             >
               Copilot
+            </Link>
+            <Link
+              href="/methodology"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
+            >
+              Methodology
             </Link>
             <div className="pt-2 px-4">
               <Link

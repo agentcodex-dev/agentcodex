@@ -7,6 +7,7 @@ import LatestReleaseFeed from '@/components/LatestReleaseFeed'
 import CapabilityMoverList from '@/components/CapabilityMoverList'
 import ReleaseVelocityList from '@/components/ReleaseVelocityList'
 import WatchlistFeed from '@/components/WatchlistFeed'
+import MethodologyCallout from '@/components/MethodologyCallout'
 import { getRadarData } from '@/lib/radar'
 
 export const metadata: Metadata = {
@@ -109,6 +110,10 @@ export default async function RadarPage({
           </section>
 
           <div className="space-y-8">
+            <MethodologyCallout
+              compact
+              body="Radar highlights movement using version-to-version capability deltas and release tempo. Use it as change intelligence, not a benchmark leaderboard."
+            />
             <section>
               <h2 className="text-xl font-bold text-[var(--acx-text)] mb-4">
                 Biggest Movers
