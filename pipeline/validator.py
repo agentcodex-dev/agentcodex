@@ -1,5 +1,6 @@
 from datetime import datetime, timezone, timedelta
 from typing import Optional
+from scoring import apply_scoring_mode
 
 REQUIRED_CAPABILITIES = {
     'coding',
@@ -83,6 +84,7 @@ def validate_extraction(
     extraction: dict,
     article: dict,
     max_release_age_days: int = DEFAULT_MAX_RELEASE_AGE_DAYS,
+    scoring_mode: str = 'legacy',
 ) -> tuple[Optional[dict], list[str]]:
     """
     Validate and normalize model output before writing drafts.
@@ -117,6 +119,16 @@ def validate_extraction(
     if errors:
         return None, errors
 
+    extraction_confidence = extraction.get('extraction_confidence')
+    if not isinstance(extraction_confidence, (int, float)):
+        extraction_confidence = 0.7
+
+    capabilities, score_meta = apply_scoring_mode(
+        capabilities,
+        what_changed=what_changed,
+        extraction_confidence=float(extraction_confidence),
+        scoring_mode=scoring_mode,
+    )
     clean = {
         **extraction,
         'agent_slug': agent_slug,
@@ -131,7 +143,11 @@ def validate_extraction(
         'change_type': extraction.get('change_type'),
         'extraction_confidence': extraction.get('extraction_confidence'),
         'editor_note': extraction.get('editor_note'),
+        'scoring_mode': score_meta['mode'],
+        'score_adjustments': score_meta['score_adjustments'],
     }
+    source_url = str(clean.get('source_url') or '')
+    is_official = _is_official_source(agent_slug, source_url)
 
     if clean['change_type'] not in CHANGE_TYPES:
         clean['change_type'] = _derive_change_type(what_changed)
@@ -145,8 +161,6 @@ def validate_extraction(
     else:
         clean['extraction_confidence'] = max(0.0, min(1.0, float(confidence)))
 
-    source_url = str(clean.get('source_url') or '')
-    is_official = _is_official_source(agent_slug, source_url)
     quality_flags = []
     if not is_official:
         quality_flags.append('needs_source_review')
@@ -168,6 +182,10 @@ def validate_extraction(
         'confidenceImpact': round(confidence_impact, 2),
         'finalImpact': final_impact,
         'summary': f"{clean['change_type']} update with {'official' if is_official else 'non-official'} source and {int(clean['extraction_confidence'] * 100)}% confidence",
+        'scoringMode': score_meta['mode'],
+        'llmSuggestedScores': score_meta['llm_suggested_scores'],
+        'calibratedScores': score_meta['calibrated_scores'],
+        'scoreAdjustments': score_meta['score_adjustments'],
     }
 
     missing_scores = REQUIRED_CAPABILITIES - set(capabilities.keys())

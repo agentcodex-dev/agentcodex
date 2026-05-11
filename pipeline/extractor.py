@@ -343,6 +343,7 @@ def extract_all(
     max_release_age_days: int = 30,
     backfill_mode: bool = False,
     max_versions_per_article: int = 8,
+    scoring_mode: str = 'legacy',
 ) -> list:
     """
     Three stage pipeline
@@ -452,6 +453,7 @@ def extract_all(
                 result,
                 article,
                 max_release_age_days=max_release_age_days,
+                scoring_mode=scoring_mode,
             )
             if clean_result:
                 clean_result['pipeline_source'] = article['url']
