@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from supabase import create_client
+from scoring import apply_scoring_mode
 
 load_dotenv()
 
@@ -12,6 +13,7 @@ supabase = create_client(
 )
 
 TEST_TAG = '[TEST-DRAFT]'
+REQUIRED_CAPABILITIES = ('coding', 'reasoning', 'multimodal', 'tool_use', 'memory', 'speed')
 
 ONBOARDING_AGENTS = [
     {
@@ -275,6 +277,128 @@ def reassign_misclassified_versions():
         print(f"Moved {row['id']} to {to_slug}")
 
 
+def _normalize_capabilities(capabilities: object) -> dict:
+    if not isinstance(capabilities, dict):
+        return {}
+
+    clean = {}
+    for key, value in capabilities.items():
+        if key not in REQUIRED_CAPABILITIES:
+            continue
+        if not isinstance(value, (int, float)):
+            continue
+        clean[key] = int(value)
+    return clean
+
+
+def _sanitize_only_scores(raw_caps: dict) -> tuple[dict, list[dict]]:
+    adjusted = dict(raw_caps)
+    adjustments = []
+    for capability, value in raw_caps.items():
+        fixed = value
+        if value < 1:
+            fixed = 1
+        elif value > 10:
+            fixed = 10
+        if fixed != value:
+            adjusted[capability] = fixed
+            adjustments.append({
+                'capability': capability,
+                'from': value,
+                'to': fixed,
+                'reason': 'out_of_range_clamped',
+            })
+    return adjusted, adjustments
+
+
+def backfill_capabilities(scoring_mode: str, apply_changes: bool, status: str, strategy: str):
+    rows = []
+    has_confidence = True
+    has_impact = True
+    try:
+        rows = supabase.table('agent_versions')\
+            .select('id, capabilities, what_changed, extraction_confidence, impact_factors, status')\
+            .eq('status', status)\
+            .order('release_date', desc=True)\
+            .execute().data or []
+    except Exception:
+        has_confidence = False
+        has_impact = False
+        rows = supabase.table('agent_versions')\
+            .select('id, capabilities, what_changed, status')\
+            .eq('status', status)\
+            .order('release_date', desc=True)\
+            .execute().data or []
+
+    scanned = 0
+    changed = 0
+    skipped = 0
+
+    for row in rows:
+        scanned += 1
+        row_id = row.get('id')
+        raw_caps = _normalize_capabilities(row.get('capabilities'))
+        if not raw_caps:
+            skipped += 1
+            continue
+
+        confidence = row.get('extraction_confidence') if has_confidence else None
+        if not isinstance(confidence, (int, float)):
+            confidence = 0.7
+
+        if strategy == 'sanitize':
+            adjusted, adjustments = _sanitize_only_scores(raw_caps)
+            score_meta = {
+                'mode': 'sanitize',
+                'llm_suggested_scores': raw_caps,
+                'calibrated_scores': adjusted,
+                'score_adjustments': adjustments,
+            }
+        else:
+            adjusted, score_meta = apply_scoring_mode(
+                raw_caps,
+                what_changed=str(row.get('what_changed') or ''),
+                extraction_confidence=float(confidence),
+                scoring_mode=scoring_mode,
+            )
+
+        if adjusted == raw_caps:
+            continue
+
+        changed += 1
+
+        if not apply_changes:
+            print(f"DRY-RUN change {row_id}: {raw_caps} -> {adjusted}")
+            continue
+
+        update_payload = {
+            'capabilities': adjusted,
+        }
+        if has_impact:
+            impact = row.get('impact_factors')
+            if not isinstance(impact, dict):
+                impact = {}
+            impact.update({
+                'scoringMode': score_meta['mode'],
+                'llmSuggestedScores': score_meta['llm_suggested_scores'],
+                'calibratedScores': score_meta['calibrated_scores'],
+                'scoreAdjustments': score_meta['score_adjustments'],
+            })
+            update_payload['impact_factors'] = impact
+
+        supabase.table('agent_versions')\
+            .update(update_payload)\
+            .eq('id', row_id)\
+            .execute()
+        print(f"UPDATED {row_id}")
+
+    mode_text = 'APPLY' if apply_changes else 'DRY-RUN'
+    print(
+        f"{mode_text} complete. scanned={scanned} changed={changed} skipped={skipped} "
+        f"status={status} scoring_mode={scoring_mode} strategy={strategy}"
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description='Admin utilities for pipeline and drafts')
     parser.add_argument(
@@ -285,9 +409,14 @@ def main():
             'delete-test-drafts',
             'detect-misclassified',
             'reassign-misclassified',
+            'backfill-capabilities',
         ],
     )
     parser.add_argument('--agent-slug', default='claude')
+    parser.add_argument('--status', default='published', choices=['published', 'draft', 'rejected'])
+    parser.add_argument('--scoring-mode', default='calibrated', choices=['legacy', 'calibrated'])
+    parser.add_argument('--strategy', default='sanitize', choices=['sanitize', 'calibrated'])
+    parser.add_argument('--apply', action='store_true')
     args = parser.parse_args()
 
     if args.command == 'seed-onboarding-agents':
@@ -300,6 +429,13 @@ def main():
         detect_misclassified_versions()
     elif args.command == 'reassign-misclassified':
         reassign_misclassified_versions()
+    elif args.command == 'backfill-capabilities':
+        backfill_capabilities(
+            scoring_mode=args.scoring_mode,
+            apply_changes=args.apply,
+            status=args.status,
+            strategy=args.strategy,
+        )
 
 
 if __name__ == '__main__':
