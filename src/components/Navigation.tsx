@@ -5,16 +5,12 @@ import { useState } from 'react'
 
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark') {
-      return 'dark'
-    }
-    return 'light'
-  })
 
   function toggleTheme() {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
+    const current = document.documentElement.getAttribute('data-theme')
+    const fallback = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    const active = current === 'dark' || current === 'light' ? current : fallback
+    const next = active === 'dark' ? 'light' : 'dark'
     document.documentElement.setAttribute('data-theme', next)
     localStorage.setItem('acx-theme', next)
   }
@@ -75,27 +71,24 @@ export default function Navigation() {
           <div className="flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label="Toggle color theme"
+              title="Toggle color theme"
               className="hidden md:inline-flex items-center justify-center w-10 h-10 rounded-lg border acx-divider acx-body hover:bg-gray-100 transition-colors"
             >
-              {theme === 'dark' ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="4" />
-                  <line x1="12" y1="2" x2="12" y2="5" />
-                  <line x1="12" y1="19" x2="12" y2="22" />
-                  <line x1="2" y1="12" x2="5" y2="12" />
-                  <line x1="19" y1="12" x2="22" y2="12" />
-                  <line x1="4.93" y1="4.93" x2="7.05" y2="7.05" />
-                  <line x1="16.95" y1="16.95" x2="19.07" y2="19.07" />
-                  <line x1="4.93" y1="19.07" x2="7.05" y2="16.95" />
-                  <line x1="16.95" y1="7.05" x2="19.07" y2="4.93" />
-                </svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3c0 0 0 0 0 0A7 7 0 0 0 21 12.79z" />
-                </svg>
-              )}
+              <svg className="acx-theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="4" />
+                <line x1="12" y1="2" x2="12" y2="5" />
+                <line x1="12" y1="19" x2="12" y2="22" />
+                <line x1="2" y1="12" x2="5" y2="12" />
+                <line x1="19" y1="12" x2="22" y2="12" />
+                <line x1="4.93" y1="4.93" x2="7.05" y2="7.05" />
+                <line x1="16.95" y1="16.95" x2="19.07" y2="19.07" />
+                <line x1="4.93" y1="19.07" x2="7.05" y2="16.95" />
+                <line x1="16.95" y1="7.05" x2="19.07" y2="4.93" />
+              </svg>
+              <svg className="acx-theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3c0 0 0 0 0 0A7 7 0 0 0 21 12.79z" />
+              </svg>
             </button>
 
             {/* Desktop Browse Button */}
@@ -197,7 +190,7 @@ export default function Navigation() {
               }}
               className="w-full text-left px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
             >
-              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+              Toggle theme
             </button>
             <div className="pt-2 px-4">
               <Link

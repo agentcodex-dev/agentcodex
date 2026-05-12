@@ -56,18 +56,18 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
                 <div className="flex flex-wrap items-center gap-2">
                   <Link
                     href={`/agents/${release.agent.slug}`}
-                    className="font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+                    className="font-semibold text-[var(--acx-text)] hover:text-[var(--acx-accent)] transition-colors"
                   >
                     {release.agent.name}
                   </Link>
                   <span className="acx-badge acx-badge-trust">
                     {release.version_number}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs acx-muted">
                     {formatDate(release.release_date)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm acx-muted mt-1">
                   {release.agent.provider}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -77,21 +77,21 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
                   <span className="acx-badge acx-badge-trust capitalize">
                     {changeType}
                   </span>
-                  <span className="acx-badge bg-gray-100 text-gray-700">
+                  <span className="acx-badge acx-badge-neutral">
                     Importance {importance}/10
                   </span>
-                  <span className="acx-badge bg-gray-100 text-gray-700">
+                  <span className="acx-badge acx-badge-neutral">
                     Confidence {Math.round(quality.extractionConfidence * 100)}%
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed mt-3 line-clamp-3">
+                <p className="text-sm acx-body leading-relaxed mt-3 line-clamp-3">
                   {release.what_changed}
                 </p>
                 <ImpactBreakdown summary={summary} score={impactScore} />
                 {release.quality_flags && release.quality_flags.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {release.quality_flags.slice(0, 3).map((flag) => (
-                      <span key={flag} className="text-[11px] px-2 py-1 rounded-full bg-amber-50 text-amber-700">
+                  <span key={flag} className="text-[11px] px-2 py-1 rounded-full bg-amber-50 text-amber-700">
                         {flag.replace(/_/g, ' ')}
                       </span>
                     ))}
@@ -102,14 +102,14 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
               <div className="flex sm:flex-col gap-2 sm:items-end shrink-0">
                 <Link
                   href={`/agents/${release.agent.slug}`}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]"
                 >
                   View agent
                   <ArrowUpRight size={14} />
                 </Link>
                 <Link
                   href={`/compare/${release.agent.slug}-vs-${compareTarget}`}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900"
+                  className="inline-flex items-center gap-1 text-xs font-medium acx-link-subtle"
                 >
                   Compare
                   <ArrowUpRight size={14} />
@@ -119,7 +119,7 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
                     href={release.source_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900"
+                    className="inline-flex items-center gap-1 text-xs font-medium acx-link-subtle"
                   >
                     Source
                     <ExternalLink size={13} />
