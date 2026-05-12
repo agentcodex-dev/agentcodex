@@ -14,8 +14,18 @@ function formatDate(value: string) {
   })
 }
 
+function getMomentumLabel(velocity: ReleaseVelocity) {
+  const expectedMonthly = velocity.releases90 / 3
+  if (velocity.releases30 >= expectedMonthly + 1) return { label: 'Accelerating', tone: 'up' as const }
+  if (velocity.releases30 <= Math.max(0, expectedMonthly - 1)) return { label: 'Cooling', tone: 'down' as const }
+  return { label: 'Steady', tone: 'flat' as const }
+}
+
 export default function ReleaseVelocityList({ velocities, limit }: Props) {
   const visibleVelocities = limit ? velocities.slice(0, limit) : velocities
+  const maxSignal = Math.max(...visibleVelocities.map((item) => item.weightedScore), 1)
+  const max30 = Math.max(...visibleVelocities.map((item) => item.releases30), 1)
+  const max90 = Math.max(...visibleVelocities.map((item) => item.releases90), 1)
 
   if (visibleVelocities.length === 0) {
     return (
@@ -29,62 +39,95 @@ export default function ReleaseVelocityList({ velocities, limit }: Props) {
   }
 
   return (
-    <div className="acx-panel overflow-hidden">
-      <div className="divide-y acx-divider">
-        {visibleVelocities.map((velocity, index) => (
-          <div
-            key={velocity.agent.id}
-            className="p-4 sm:p-5 flex items-center justify-between gap-4"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-8 h-8 rounded-lg acx-badge-neutral flex items-center justify-center text-sm font-semibold shrink-0">
-                {index + 1}
+    <div className="space-y-3">
+      {visibleVelocities.map((velocity, index) => {
+        const momentum = getMomentumLabel(velocity)
+        const signalWidth = Math.max(6, Math.round((velocity.weightedScore / maxSignal) * 100))
+        const releases30Width = Math.max(6, Math.round((velocity.releases30 / max30) * 100))
+        const releases90Width = Math.max(6, Math.round((velocity.releases90 / max90) * 100))
+
+        return (
+          <div key={velocity.agent.id} className="acx-panel p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg acx-badge-neutral flex items-center justify-center text-sm font-semibold shrink-0">
+                  {index + 1}
+                </div>
+                <div className="min-w-0">
+                  <Link
+                    href={`/agents/${velocity.agent.slug}`}
+                    className="font-semibold text-[var(--acx-text)] hover:text-[var(--acx-accent)] transition-colors truncate block"
+                  >
+                    {velocity.agent.name}
+                  </Link>
+                  <p className="text-xs acx-muted mt-1">
+                    {velocity.latestRelease
+                      ? `Latest ${formatDate(velocity.latestRelease.release_date)}`
+                      : 'No published release date'}
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
+
+              <div className="flex items-center gap-3 shrink-0">
+                <span className={`acx-badge ${
+                  momentum.tone === 'up'
+                    ? 'acx-badge-official'
+                    : momentum.tone === 'down'
+                      ? 'acx-badge-warn'
+                      : 'acx-badge-neutral'
+                }`}>
+                  {momentum.label}
+                </span>
                 <Link
                   href={`/agents/${velocity.agent.slug}`}
-                  className="font-semibold text-[var(--acx-text)] hover:text-[var(--acx-accent)] transition-colors truncate block"
+                  className="text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]"
+                  aria-label={`View ${velocity.agent.name}`}
                 >
-                  {velocity.agent.name}
+                  <ArrowUpRight size={18} />
                 </Link>
-                <p className="text-xs acx-muted mt-1">
-                  {velocity.latestRelease
-                    ? `Latest ${formatDate(velocity.latestRelease.release_date)}`
-                    : 'No published release date'}
-                </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 shrink-0">
-              <div className="hidden sm:block text-right">
-                <div className="text-sm font-semibold text-[var(--acx-text)]">
-                  {velocity.weightedScore.toFixed(1)}
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] acx-muted">Velocity score</span>
+                  <span className="text-sm font-semibold text-[var(--acx-text)]">
+                    {velocity.weightedScore.toFixed(1)}
+                  </span>
                 </div>
-                <div className="text-xs acx-muted">signal</div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-semibold text-[var(--acx-text)]">
-                  {velocity.releases90}
+                <div className="mt-1 h-1.5 rounded-full bg-[var(--acx-surface)] overflow-hidden">
+                  <div className="h-full bg-[var(--acx-accent)]" style={{ width: `${signalWidth}%` }} />
                 </div>
-                <div className="text-xs acx-muted">90 days</div>
               </div>
-              <div className="hidden sm:block text-right">
-                <div className="text-sm font-semibold text-[var(--acx-text)]">
-                  {velocity.releases30}
+
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] acx-muted">30d releases</span>
+                  <span className="text-sm font-semibold text-[var(--acx-text)]">
+                    {velocity.releases30}
+                  </span>
                 </div>
-                <div className="text-xs acx-muted">30 days</div>
+                <div className="mt-1 h-1.5 rounded-full bg-[var(--acx-surface)] overflow-hidden">
+                  <div className="h-full bg-[var(--acx-text-soft)]" style={{ width: `${releases30Width}%` }} />
+                </div>
               </div>
-              <Link
-                href={`/agents/${velocity.agent.slug}`}
-                className="text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]"
-                aria-label={`View ${velocity.agent.name}`}
-              >
-                <ArrowUpRight size={18} />
-              </Link>
+
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] acx-muted">Quarter releases</span>
+                  <span className="text-sm font-semibold text-[var(--acx-text)]">
+                    {velocity.releases90}
+                  </span>
+                </div>
+                <div className="mt-1 h-1.5 rounded-full bg-[var(--acx-surface)] overflow-hidden">
+                  <div className="h-full bg-[var(--acx-text-muted)]" style={{ width: `${releases90Width}%` }} />
+                </div>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        )
+      })}
     </div>
   )
 }

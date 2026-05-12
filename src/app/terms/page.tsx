@@ -8,24 +8,27 @@ export const metadata: Metadata = {
 }
 
 export default function TermsPage() {
+  const lastUpdated = 'May 12, 2026'
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen acx-shell">
       <Navigation />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Terms of Service
-        </h1>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-8 space-y-6 text-gray-600">
-
-          <p className="text-sm text-gray-500">
-            Last updated: {new Date().toLocaleDateString('en-US', { 
-              month: 'long', day: 'numeric', year: 'numeric' 
-            })}
+      <section className="acx-section">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <h1 className="text-3xl font-bold text-[var(--acx-text)]">Terms of Service</h1>
+          <p className="acx-body mt-2">
+            Conditions for using AgentCodex and relying on its published intelligence.
           </p>
+          <p className="text-sm acx-muted mt-4">Last updated: {lastUpdated}</p>
+        </div>
+      </section>
+
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="acx-panel p-6 sm:p-8 space-y-7 text-sm acx-body leading-relaxed">
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Acceptance of Terms
             </h2>
             <p>
@@ -35,7 +38,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               About AgentCodex
             </h2>
             <p>
@@ -47,7 +50,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Accuracy of Information
             </h2>
             <p>
@@ -63,7 +66,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Intellectual Property
             </h2>
             <p>
@@ -79,11 +82,11 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Acceptable Use
             </h2>
             <p>You agree not to:</p>
-            <ul className="list-disc list-inside space-y-2">
+            <ul className="list-disc list-inside space-y-2 text-[var(--acx-text-soft)]">
               <li>Scrape or bulk download content from AgentCodex</li>
               <li>Use content for commercial purposes without permission</li>
               <li>Attempt to disrupt or damage the service</li>
@@ -92,7 +95,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Disclaimer of Warranties
             </h2>
             <p>
@@ -103,7 +106,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Changes to Terms
             </h2>
             <p>
@@ -114,7 +117,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Contact
             </h2>
             <p>
@@ -124,8 +127,8 @@ export default function TermsPage() {
           </section>
 
         </div>
-      </div>
-      <Footer/>
+      </main>
+      <Footer />
     </div>
   )
 }
