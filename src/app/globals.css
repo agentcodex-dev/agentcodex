@@ -22,6 +22,28 @@
   --acx-danger-soft: #fdecef;
 }
 
+html[data-theme='dark'] {
+  --acx-canvas: #0e1116;
+  --acx-surface: #141922;
+  --acx-elevated: #1a202b;
+  --acx-border: #2a3342;
+  --acx-border-strong: #3a475b;
+  --acx-text: #e6ecf5;
+  --acx-text-soft: #c2cfdf;
+  --acx-text-muted: #95a4b7;
+
+  --acx-accent: #5f8dff;
+  --acx-accent-hover: #4b78e8;
+  --acx-accent-soft: #203255;
+
+  --acx-success: #56c78a;
+  --acx-success-soft: #1a3a2a;
+  --acx-warn: #f2b46f;
+  --acx-warn-soft: #3c2d1b;
+  --acx-danger: #ff7f9b;
+  --acx-danger-soft: #472133;
+}
+
 html,
 body {
   background: var(--acx-canvas);
@@ -138,4 +160,31 @@ body {
 .acx-badge-warn {
   background: var(--acx-warn-soft);
   color: var(--acx-warn);
+}
+
+html[data-theme='dark'] .bg-white,
+html[data-theme='dark'] .bg-gray-50 {
+  background-color: var(--acx-elevated);
+}
+
+html[data-theme='dark'] .bg-gray-100 {
+  background-color: #202837;
+}
+
+html[data-theme='dark'] .text-gray-900 {
+  color: var(--acx-text);
+}
+
+html[data-theme='dark'] .text-gray-600,
+html[data-theme='dark'] .text-gray-500 {
+  color: var(--acx-text-soft);
+}
+
+html[data-theme='dark'] .border-gray-200 {
+  border-color: var(--acx-border);
+}
+
+html[data-theme='dark'] .hover\:bg-gray-50:hover,
+html[data-theme='dark'] .hover\:bg-gray-100:hover {
+  background-color: #222c3d;
 }
