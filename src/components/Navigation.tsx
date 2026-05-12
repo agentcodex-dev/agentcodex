@@ -3,16 +3,30 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
+declare global {
+  interface Window {
+    __acxSetThemePref?: (pref: 'light' | 'dark' | 'system') => void
+  }
+}
+
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false)
 
-  function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme')
-    const fallback = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    const active = current === 'dark' || current === 'light' ? current : fallback
-    const next = active === 'dark' ? 'light' : 'dark'
-    document.documentElement.setAttribute('data-theme', next)
-    localStorage.setItem('acx-theme', next)
+  function setThemePref(pref: 'light' | 'dark' | 'system') {
+    if (typeof window !== 'undefined' && window.__acxSetThemePref) {
+      window.__acxSetThemePref(pref)
+    }
+  }
+
+  function cycleThemePref() {
+    const current = document.documentElement.getAttribute('data-theme-pref')
+    const next =
+      current === 'system'
+        ? 'light'
+        : current === 'light'
+          ? 'dark'
+          : 'system'
+    setThemePref(next)
   }
 
   return (
@@ -69,27 +83,34 @@ export default function Navigation() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle color theme"
-              title="Toggle color theme"
-              className="hidden md:inline-flex items-center justify-center w-10 h-10 rounded-lg border acx-divider acx-body hover:bg-gray-100 transition-colors"
-            >
-              <svg className="acx-theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="4" />
-                <line x1="12" y1="2" x2="12" y2="5" />
-                <line x1="12" y1="19" x2="12" y2="22" />
-                <line x1="2" y1="12" x2="5" y2="12" />
-                <line x1="19" y1="12" x2="22" y2="12" />
-                <line x1="4.93" y1="4.93" x2="7.05" y2="7.05" />
-                <line x1="16.95" y1="16.95" x2="19.07" y2="19.07" />
-                <line x1="4.93" y1="19.07" x2="7.05" y2="16.95" />
-                <line x1="16.95" y1="7.05" x2="19.07" y2="4.93" />
-              </svg>
-              <svg className="acx-theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3c0 0 0 0 0 0A7 7 0 0 0 21 12.79z" />
-              </svg>
-            </button>
+            <div className="hidden md:block">
+              <button
+                onClick={cycleThemePref}
+                aria-label="Cycle theme mode"
+                title="Cycle theme mode"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-lg border acx-divider acx-body hover:bg-gray-100 transition-colors"
+              >
+                <svg className="acx-theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="4" />
+                  <line x1="12" y1="2" x2="12" y2="5" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                  <line x1="2" y1="12" x2="5" y2="12" />
+                  <line x1="19" y1="12" x2="22" y2="12" />
+                  <line x1="4.93" y1="4.93" x2="7.05" y2="7.05" />
+                  <line x1="16.95" y1="16.95" x2="19.07" y2="19.07" />
+                  <line x1="4.93" y1="19.07" x2="7.05" y2="16.95" />
+                  <line x1="16.95" y1="7.05" x2="19.07" y2="4.93" />
+                </svg>
+                <svg className="acx-theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3c0 0 0 0 0 0A7 7 0 0 0 21 12.79z" />
+                </svg>
+                <svg className="acx-theme-icon-system" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="12" rx="2" />
+                  <line x1="8" y1="20" x2="16" y2="20" />
+                  <line x1="12" y1="16" x2="12" y2="20" />
+                </svg>
+              </button>
+            </div>
 
             {/* Desktop Browse Button */}
             <Link
@@ -183,15 +204,41 @@ export default function Navigation() {
             >
               Methodology
             </Link>
-            <button
-              onClick={() => {
-                toggleTheme()
-                setMenuOpen(false)
-              }}
-              className="w-full text-left px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
-            >
-              Toggle theme
-            </button>
+            <div className="px-4 py-2">
+              <p className="text-xs acx-muted mb-2">Theme</p>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => {
+                    setThemePref('light')
+                    setMenuOpen(false)
+                  }}
+                  data-theme-pref-option="light"
+                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium"
+                >
+                  Light
+                </button>
+                <button
+                  onClick={() => {
+                    setThemePref('dark')
+                    setMenuOpen(false)
+                  }}
+                  data-theme-pref-option="dark"
+                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium"
+                >
+                  Dark
+                </button>
+                <button
+                  onClick={() => {
+                    setThemePref('system')
+                    setMenuOpen(false)
+                  }}
+                  data-theme-pref-option="system"
+                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium"
+                >
+                  System
+                </button>
+              </div>
+            </div>
             <div className="pt-2 px-4">
               <Link
                 href="/agents"

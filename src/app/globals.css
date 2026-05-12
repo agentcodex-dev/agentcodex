@@ -227,18 +227,37 @@ html[data-theme='dark'] .text-green-700 {
   color: #7fdbac;
 }
 
-.acx-theme-icon-sun {
+.acx-theme-choice {
+  color: var(--acx-text-soft);
+  background: transparent;
+}
+
+.acx-theme-choice:hover {
+  background: var(--acx-accent-soft);
+  color: var(--acx-accent);
+}
+
+html[data-theme-pref='light'] [data-theme-pref-option='light'],
+html[data-theme-pref='dark'] [data-theme-pref-option='dark'],
+html[data-theme-pref='system'] [data-theme-pref-option='system'] {
+  background: var(--acx-accent-soft);
+  color: var(--acx-accent);
+}
+
+.acx-theme-icon-light,
+.acx-theme-icon-dark,
+.acx-theme-icon-system {
   display: none;
 }
 
-.acx-theme-icon-moon {
+html[data-theme-pref='light'] .acx-theme-icon-light {
   display: block;
 }
 
-html[data-theme='dark'] .acx-theme-icon-sun {
+html[data-theme-pref='dark'] .acx-theme-icon-dark {
   display: block;
 }
 
-html[data-theme='dark'] .acx-theme-icon-moon {
-  display: none;
+html[data-theme-pref='system'] .acx-theme-icon-system {
+  display: block;
 }

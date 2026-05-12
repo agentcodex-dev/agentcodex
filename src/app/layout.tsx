@@ -63,9 +63,36 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var stored = localStorage.getItem('acx-theme');
-                  var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                  document.documentElement.setAttribute('data-theme', theme);
+                  var prefKey = 'acx-theme-pref';
+                  var media = window.matchMedia('(prefers-color-scheme: dark)');
+                  var storedPref = localStorage.getItem(prefKey);
+                  var pref = (storedPref === 'light' || storedPref === 'dark' || storedPref === 'system')
+                    ? storedPref
+                    : 'system';
+
+                  function resolveTheme(value) {
+                    if (value === 'light' || value === 'dark') return value;
+                    return media.matches ? 'dark' : 'light';
+                  }
+
+                  function applyPref(value) {
+                    var safePref = (value === 'light' || value === 'dark' || value === 'system') ? value : 'system';
+                    var theme = resolveTheme(safePref);
+                    document.documentElement.setAttribute('data-theme-pref', safePref);
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem(prefKey, safePref);
+                  }
+
+                  applyPref(pref);
+
+                  window.__acxSetThemePref = applyPref;
+
+                  media.addEventListener('change', function() {
+                    var currentPref = document.documentElement.getAttribute('data-theme-pref') || 'system';
+                    if (currentPref === 'system') {
+                      document.documentElement.setAttribute('data-theme', resolveTheme('system'));
+                    }
+                  });
                 } catch (e) {}
               })();
             `,
