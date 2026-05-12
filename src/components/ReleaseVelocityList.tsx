@@ -37,7 +37,7 @@ export default function ReleaseVelocityList({ velocities, limit }: Props) {
             className="p-4 sm:p-5 flex items-center justify-between gap-4"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 text-[var(--acx-text-soft)] flex items-center justify-center text-sm font-semibold shrink-0">
+              <div className="w-8 h-8 rounded-lg acx-badge-neutral flex items-center justify-center text-sm font-semibold shrink-0">
                 {index + 1}
               </div>
               <div className="min-w-0">

@@ -52,7 +52,7 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
                 <span className="acx-badge acx-badge-trust capitalize">
                   {mover.changeType} change
                 </span>
-                <span className="acx-badge bg-gray-100 text-gray-700">
+                <span className="acx-badge acx-badge-neutral">
                   Importance {mover.importanceScore}/10
                 </span>
               </div>
@@ -78,7 +78,7 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
               return (
                 <span
                   key={change.key}
-                  className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
+              className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
                     isPositive
                       ? 'bg-green-50 text-green-700'
                       : 'bg-red-50 text-red-700'
@@ -91,7 +91,7 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
             })}
             <Link
               href={`/compare/${mover.agent.slug}-vs-${getCompareTarget(mover.agent)}`}
-              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full acx-badge-neutral"
             >
               Compare
               <ArrowUpRight size={12} />
@@ -101,7 +101,7 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
                 href={mover.latest.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full acx-badge-neutral"
               >
                 Source
                 <ArrowUpRight size={12} />
