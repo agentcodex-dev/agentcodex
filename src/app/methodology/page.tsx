@@ -55,7 +55,7 @@ export default function MethodologyPage() {
         </div>
       </section>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 space-y-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
         <section className="acx-panel p-6">
           <h2 className="text-xl font-bold text-[var(--acx-text)]">What We Track</h2>
           <p className="text-sm acx-body mt-2 leading-relaxed">
