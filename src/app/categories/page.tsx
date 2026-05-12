@@ -41,20 +41,20 @@ export const metadata: Metadata = {
 
 export default function CategoriesPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen acx-shell">
       <Navigation />
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <h1 className="text-3xl font-bold text-gray-900">
+      <section className="acx-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <h1 className="text-3xl font-bold text-[var(--acx-text)]">
             Categories
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="acx-muted mt-2">
             Browse AI agents by category
           </p>
         </div>
-      </div>
+      </section>
 
       {/* Categories Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

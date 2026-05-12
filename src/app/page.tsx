@@ -32,7 +32,7 @@ export default async function Home() {
                 Agent Change Radar
               </div>
 
-              <h1 className="acx-title text-4xl sm:text-5xl font-bold mb-6">
+              <h1 className="acx-title text-3xl sm:text-4xl font-bold mb-6 max-w-3xl">
                 See what changed across AI agents this week
               </h1>
 

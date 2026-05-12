@@ -44,7 +44,7 @@ export default function MethodologyPage() {
       <Navigation />
 
       <section className="acx-section">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
           <p className="text-sm font-semibold text-[var(--acx-accent)]">Trust Center</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-[var(--acx-text)] mt-3 leading-tight">
             How AgentCodex Works
