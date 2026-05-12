@@ -143,8 +143,8 @@ export default async function ComparePage({
       <Navigation />
 
       {/* Header */}
-      <div className="acx-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <section className="acx-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
           <h1 className="text-3xl font-bold text-[var(--acx-text)]">
             Compare AI Agents
           </h1>
@@ -152,7 +152,7 @@ export default async function ComparePage({
             Side by side capability and version comparison
           </p>
         </div>
-      </div>
+      </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 

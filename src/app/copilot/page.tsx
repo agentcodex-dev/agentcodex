@@ -50,9 +50,15 @@ export default async function CopilotPage({
   return (
     <div className="min-h-screen acx-shell">
       <Navigation />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="text-3xl font-bold text-[var(--acx-text)]">Use-Case Copilot</h1>
-        <p className="acx-body mt-2">Pick a workflow and get shortlist recommendations with fast compare links.</p>
+
+      <section className="acx-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <h1 className="text-3xl font-bold text-[var(--acx-text)]">Use-Case Copilot</h1>
+          <p className="acx-body mt-2">Pick a workflow and get shortlist recommendations with fast compare links.</p>
+        </div>
+      </section>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
           {Object.entries(COPILOT_PRESETS).map(([key, p]) => (
