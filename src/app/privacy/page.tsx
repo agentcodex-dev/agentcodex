@@ -8,24 +8,26 @@ export const metadata: Metadata = {
 }
 
 export default function PrivacyPage() {
+  const lastUpdated = 'May 12, 2026'
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen acx-shell">
       <Navigation />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Privacy Policy
-        </h1>
-        
-        <div className="bg-white rounded-xl border border-gray-200 p-8 space-y-6 text-gray-600">
-          
-          <p className="text-sm text-gray-500">
-            Last updated: {new Date().toLocaleDateString('en-US', { 
-              month: 'long', day: 'numeric', year: 'numeric' 
-            })}
+      <section className="acx-section">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <h1 className="text-3xl font-bold text-[var(--acx-text)]">Privacy Policy</h1>
+          <p className="acx-body mt-2">
+            How AgentCodex handles analytics and operational data.
           </p>
+          <p className="text-sm acx-muted mt-4">Last updated: {lastUpdated}</p>
+        </div>
+      </section>
+
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="acx-panel p-6 sm:p-8 space-y-7 text-sm acx-body leading-relaxed">
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Overview
             </h2>
             <p>
@@ -36,7 +38,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Information We Collect
             </h2>
             <p>
@@ -52,7 +54,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Cookies
             </h2>
             <p>
@@ -62,14 +64,14 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Third Party Services
             </h2>
             <p>
               We use the following third party services to operate 
               AgentCodex:
             </p>
-            <ul className="list-disc list-inside space-y-2">
+            <ul className="list-disc list-inside space-y-2 text-[var(--acx-text-soft)]">
               <li>Vercel - hosting and analytics</li>
               <li>Supabase - database infrastructure</li>
             </ul>
@@ -80,7 +82,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Data Retention
             </h2>
             <p>
@@ -90,7 +92,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Your Rights
             </h2>
             <p>
@@ -102,7 +104,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Changes to This Policy
             </h2>
             <p>
@@ -113,7 +115,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-[var(--acx-text)]">
               Contact
             </h2>
             <p>
@@ -123,8 +125,8 @@ export default function PrivacyPage() {
           </section>
 
         </div>
-      </div>
-      <Footer/>
+      </main>
+      <Footer />
     </div>
   )
 }

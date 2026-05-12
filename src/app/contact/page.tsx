@@ -1,6 +1,7 @@
 import Navigation from '@/components/Navigation'
 import type { Metadata } from 'next'
 import Footer from '@/components/Footer'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -9,100 +10,93 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen acx-shell">
       <Navigation />
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Contact
-        </h1>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-8 space-y-6">
-
-          <p className="text-gray-600">
-            Have a question, suggestion or want to report 
-            incorrect information? We would love to hear from you.
+      <section className="acx-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <h1 className="text-3xl font-bold text-[var(--acx-text)]">Contact</h1>
+          <p className="acx-body mt-2">
+            Reach the AgentCodex team for support, corrections, partnerships, and media.
           </p>
-
-          <div className="space-y-4">
-
-            <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl">
-              <span className="text-2xl">📧</span>
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  General Enquiries
-                </h3>
-                <a 
-                  href="mailto:info@agentcodex.dev"
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  info@agentcodex.dev
-                </a>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 p-4 bg-green-50 rounded-xl">
-              <span className="text-2xl">🤖</span>
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  Suggest an Agent
-                </h3>
-                <p className="text-gray-600 text-sm mt-1">
-                  Know an AI agent we should be tracking?
-                  Email us with the name and a brief description.
-                </p>
-                <a 
-                  href="mailto:info@agentcodex.dev?subject=Agent Suggestion"
-                  className="text-green-600 hover:text-green-700 text-sm font-medium"
-                >
-                  Suggest an agent →
-                </a>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 p-4 bg-orange-50 rounded-xl">
-              <span className="text-2xl">✏️</span>
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  Report Incorrect Information
-                </h3>
-                <p className="text-gray-600 text-sm mt-1">
-                  Spotted something wrong? We take accuracy seriously.
-                  Let us know and we will fix it quickly.
-                </p>
-                <a 
-                  href="mailto:info@agentcodex.dev?subject=Incorrect Information"
-                  className="text-orange-600 hover:text-orange-700 text-sm font-medium"
-                >
-                  Report an issue →
-                </a>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 p-4 bg-purple-50 rounded-xl">
-              <span className="text-2xl">🐦</span>
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  Follow on X
-                </h3>
-                <p className="text-gray-600 text-sm mt-1">
-                  Stay updated on new agents and features
-                </p>
-                <a 
-                  href="https://x.com/agentcodex_dev"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-600 hover:text-purple-700 text-sm font-medium"
-                >
-                  @agentcodex_dev →
-                </a>
-              </div>
-            </div>
-
-          </div>
-
         </div>
-      </div>
-      <Footer/>
+      </section>
+
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a
+            href="mailto:info@agentcodex.dev?subject=General%20Enquiry"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors"
+          >
+            <h2 className="font-semibold text-[var(--acx-text)]">General Enquiries</h2>
+            <p className="text-sm acx-body mt-2">
+              Product questions, account requests, and roadmap feedback.
+            </p>
+            <p className="text-sm text-[var(--acx-accent)] mt-3">info@agentcodex.dev</p>
+          </a>
+
+          <a
+            href="mailto:info@agentcodex.dev?subject=Data%20Correction%20Request"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors"
+          >
+            <h2 className="font-semibold text-[var(--acx-text)]">Data Corrections</h2>
+            <p className="text-sm acx-body mt-2">
+              Report inaccurate release details, scoring, links, or metadata.
+            </p>
+            <p className="text-sm text-[var(--acx-accent)] mt-3">Request review</p>
+          </a>
+
+          <a
+            href="mailto:info@agentcodex.dev?subject=Partnership%20Request"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors"
+          >
+            <h2 className="font-semibold text-[var(--acx-text)]">Partnerships</h2>
+            <p className="text-sm acx-body mt-2">
+              Integrations, data partnerships, and ecosystem collaborations.
+            </p>
+            <p className="text-sm text-[var(--acx-accent)] mt-3">Start a conversation</p>
+          </a>
+
+          <a
+            href="mailto:info@agentcodex.dev?subject=Press%20Request"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors"
+          >
+            <h2 className="font-semibold text-[var(--acx-text)]">Press and Media</h2>
+            <p className="text-sm acx-body mt-2">
+              Interviews, quotes, and product background for publications.
+            </p>
+            <p className="text-sm text-[var(--acx-accent)] mt-3">Press contact</p>
+          </a>
+        </div>
+
+        <section className="acx-panel p-5 mt-6">
+          <h2 className="font-semibold text-[var(--acx-text)]">Response Expectations</h2>
+          <p className="text-sm acx-body mt-2">
+            We usually respond within 1-2 business days. For correction requests, include agent name, version, and source URL so we can verify quickly.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              href="mailto:info@agentcodex.dev"
+              className="acx-btn-primary px-4 py-2 text-sm"
+            >
+              Email AgentCodex
+            </a>
+            <a
+              href="https://x.com/agentcodex_dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="acx-btn-secondary px-4 py-2 text-sm"
+            >
+              Follow @agentcodex_dev
+            </a>
+            <Link href="/methodology" className="acx-btn-secondary px-4 py-2 text-sm">
+              View Methodology
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
     </div>
   )
 }
