@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 declare global {
@@ -10,7 +11,21 @@ declare global {
 }
 
 export default function Navigation() {
+  const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+
+  const links = [
+    { href: '/radar', label: 'Radar' },
+    { href: '/agents', label: 'All Agents' },
+    { href: '/categories', label: 'Categories' },
+    { href: '/compare', label: 'Compare' },
+    { href: '/copilot', label: 'Copilot' },
+  ]
+
+  function isActive(href: string) {
+    if (href === '/radar') return pathname === '/' || pathname.startsWith('/radar')
+    return pathname === href || pathname.startsWith(`${href}/`)
+  }
 
   function setThemePref(pref: 'light' | 'dark' | 'system') {
     if (typeof window !== 'undefined' && window.__acxSetThemePref) {
@@ -30,55 +45,29 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="border-b acx-divider bg-[var(--acx-surface)] sticky top-0 z-50">
+    <nav className="border-b acx-divider bg-[var(--acx-surface)]/95 backdrop-blur sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl sm:text-2xl font-bold text-gray-900">
-              Agent<span className="text-blue-600">Codex</span>
+          <Link href="/" className="flex items-center space-x-2 group">
+            <span className="text-2xl font-semibold acx-page-title text-[var(--acx-text)]">
+              Agent<span className="text-[var(--acx-accent)]">Codex</span>
             </span>
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/radar"
-              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
-            >
-              Radar
-            </Link>
-            <Link
-              href="/agents"
-              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
-            >
-              All Agents
-            </Link>
-            <Link
-              href="/categories"
-              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
-            >
-              Categories
-            </Link>
-            <Link
-              href="/compare"
-              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
-            >
-              Compare
-            </Link>
-            <Link
-              href="/copilot"
-              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
-            >
-              Copilot
-            </Link>
-            <Link
-              href="/methodology"
-              className="acx-body hover:text-[var(--acx-text)] font-medium transition-colors"
-            >
-              Methodology
-            </Link>
+          <div className="hidden md:flex items-center gap-7">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                data-active={isActive(link.href)}
+                className="acx-nav-link text-sm font-medium transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           {/* Right side */}
@@ -88,7 +77,7 @@ export default function Navigation() {
                 onClick={cycleThemePref}
                 aria-label="Cycle theme mode"
                 title="Cycle theme mode"
-                className="inline-flex items-center justify-center w-10 h-10 rounded-lg border acx-divider acx-body hover:bg-gray-100 transition-colors"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-lg border acx-divider acx-body acx-btn-ghost"
               >
                 <svg className="acx-theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="4" />
@@ -123,7 +112,7 @@ export default function Navigation() {
             {/* Mobile Hamburger */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-lg acx-body hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-lg acx-body acx-btn-ghost"
               aria-label="Toggle menu"
             >
               {menuOpen ? (
@@ -161,49 +150,18 @@ export default function Navigation() {
 
         {/* Mobile Menu Dropdown */}
         {menuOpen && (
-          <div className="md:hidden border-t acx-divider py-4 space-y-1">
-            <Link
-              href="/radar"
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
-            >
-              Radar
-            </Link>
-            <Link
-              href="/agents"
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
-            >
-              All Agents
-            </Link>
-            <Link
-              href="/categories"
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
-            >
-              Categories
-            </Link>
-            <Link
-              href="/compare"
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
-            >
-              Compare
-            </Link>
-            <Link
-              href="/copilot"
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
-            >
-              Copilot
-            </Link>
-            <Link
-              href="/methodology"
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 acx-body hover:bg-gray-50 rounded-lg font-medium transition-colors"
-            >
-              Methodology
-            </Link>
+          <div className="md:hidden border-t acx-divider py-4 space-y-1 acx-reveal">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                data-active={isActive(link.href)}
+                className="block px-4 py-3 acx-nav-link rounded-lg text-sm font-medium acx-btn-ghost"
+              >
+                {link.label}
+              </Link>
+            ))}
             <div className="px-4 py-2">
               <p className="text-xs acx-muted mb-2">Theme</p>
               <div className="grid grid-cols-3 gap-2">
@@ -213,7 +171,7 @@ export default function Navigation() {
                     setMenuOpen(false)
                   }}
                   data-theme-pref-option="light"
-                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium"
+                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium acx-btn-ghost"
                 >
                   Light
                 </button>
@@ -223,7 +181,7 @@ export default function Navigation() {
                     setMenuOpen(false)
                   }}
                   data-theme-pref-option="dark"
-                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium"
+                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium acx-btn-ghost"
                 >
                   Dark
                 </button>
@@ -233,7 +191,7 @@ export default function Navigation() {
                     setMenuOpen(false)
                   }}
                   data-theme-pref-option="system"
-                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium"
+                  className="acx-theme-choice border acx-divider rounded-lg px-2 py-2 text-xs font-medium acx-btn-ghost"
                 >
                   System
                 </button>

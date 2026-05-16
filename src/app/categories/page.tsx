@@ -44,19 +44,18 @@ export default function CategoriesPage() {
     <div className="min-h-screen acx-shell">
       <Navigation />
 
-      {/* Header */}
       <section className="acx-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <h1 className="text-3xl font-bold text-[var(--acx-text)]">
+          <p className="acx-eyebrow text-sm">Explorer</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-2">
             Categories
           </h1>
-          <p className="acx-muted mt-2">
+          <p className="acx-body mt-3 text-base sm:text-lg">
             Browse AI agents by category
           </p>
         </div>
       </section>
 
-      {/* Categories Grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {CATEGORIES.map((cat) => (
@@ -64,16 +63,16 @@ export default function CategoriesPage() {
               key={cat.name}
               href={`/agents?category=${cat.name}`}
             >
-              <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group">
+              <div className="acx-panel p-8 hover:border-[var(--acx-border-strong)] transition-colors cursor-pointer group acx-reveal">
                 
                 <div className="flex items-center gap-4 mb-4">
                   <span className="text-4xl">{cat.emoji}</span>
-                  <h2 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  <h2 className="text-3xl font-semibold acx-page-title group-hover:text-[var(--acx-accent)] transition-colors">
                     {cat.name}
                   </h2>
                 </div>
 
-                <p className="text-gray-600 mb-4">
+                <p className="acx-body mb-4">
                   {cat.description}
                 </p>
 
@@ -81,14 +80,14 @@ export default function CategoriesPage() {
                   {cat.examples.map((example) => (
                     <span
                       key={example}
-                      className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                      className="acx-chip"
                     >
                       {example}
                     </span>
                   ))}
                 </div>
 
-                <div className="mt-4 text-blue-600 text-sm font-medium group-hover:text-blue-700">
+                <div className="mt-4 text-[var(--acx-accent)] text-sm font-medium group-hover:text-[var(--acx-accent-hover)]">
                   Browse {cat.name} agents →
                 </div>
 

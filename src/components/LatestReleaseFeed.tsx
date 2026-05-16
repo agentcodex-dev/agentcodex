@@ -23,9 +23,9 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
 
   if (visibleReleases.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-        <h3 className="font-semibold text-gray-900">No releases yet</h3>
-        <p className="text-sm text-gray-500 mt-2">
+      <div className="acx-panel p-8 text-center">
+        <h3 className="font-semibold text-[var(--acx-text)]">No releases yet</h3>
+        <p className="text-sm acx-muted mt-2">
           Published agent updates will appear here as the pipeline approves them.
         </p>
       </div>
@@ -49,7 +49,7 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
         return (
           <article
             key={release.id}
-            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] hover:shadow-sm transition-all"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors acx-reveal"
           >
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="min-w-0">
@@ -74,7 +74,15 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
                   <span className={`acx-badge ${quality.sourceOfficial ? 'acx-badge-official' : 'acx-badge-warn'}`}>
                     {quality.sourceOfficial ? 'Official source' : 'Source not verified'}
                   </span>
-                  <span className="acx-badge acx-badge-trust capitalize">
+                  <span className={`acx-badge capitalize ${
+                    changeType === 'major'
+                      ? 'acx-badge-major'
+                      : changeType === 'minor'
+                        ? 'acx-badge-minor'
+                        : changeType === 'patch'
+                          ? 'acx-badge-patch'
+                          : 'acx-badge-trust'
+                  }`}>
                     {changeType}
                   </span>
                   <span className="acx-badge acx-badge-neutral">
@@ -91,7 +99,7 @@ export default function LatestReleaseFeed({ releases, limit }: Props) {
                 {release.quality_flags && release.quality_flags.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {release.quality_flags.slice(0, 3).map((flag) => (
-                  <span key={flag} className="text-[11px] px-2 py-1 rounded-full bg-amber-50 text-amber-700">
+                      <span key={flag} className="text-[11px] px-2 py-1 rounded-full acx-badge-warn">
                         {flag.replace(/_/g, ' ')}
                       </span>
                     ))}

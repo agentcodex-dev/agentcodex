@@ -39,7 +39,7 @@ export default function ReleaseVelocityList({ velocities, limit }: Props) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="acx-panel overflow-hidden">
       {visibleVelocities.map((velocity, index) => {
         const momentum = getMomentumLabel(velocity)
         const signalWidth = Math.max(6, Math.round((velocity.weightedScore / maxSignal) * 100))
@@ -47,7 +47,10 @@ export default function ReleaseVelocityList({ velocities, limit }: Props) {
         const releases90Width = Math.max(6, Math.round((velocity.releases90 / max90) * 100))
 
         return (
-          <div key={velocity.agent.id} className="acx-panel p-4 sm:p-5">
+          <div
+            key={velocity.agent.id}
+            className={`p-4 sm:p-5 ${index > 0 ? 'border-t acx-divider' : ''}`}
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-lg acx-badge-neutral flex items-center justify-center text-sm font-semibold shrink-0">
@@ -96,8 +99,8 @@ export default function ReleaseVelocityList({ velocities, limit }: Props) {
                     {velocity.weightedScore.toFixed(1)}
                   </span>
                 </div>
-                <div className="mt-1 h-1.5 rounded-full bg-[var(--acx-surface)] overflow-hidden">
-                  <div className="h-full bg-[var(--acx-accent)]" style={{ width: `${signalWidth}%` }} />
+                <div className="acx-meter mt-1">
+                  <span className="bg-[var(--acx-bar-1)]" style={{ width: `${signalWidth}%` }} />
                 </div>
               </div>
 
@@ -108,8 +111,8 @@ export default function ReleaseVelocityList({ velocities, limit }: Props) {
                     {velocity.releases30}
                   </span>
                 </div>
-                <div className="mt-1 h-1.5 rounded-full bg-[var(--acx-surface)] overflow-hidden">
-                  <div className="h-full bg-[var(--acx-text-soft)]" style={{ width: `${releases30Width}%` }} />
+                <div className="acx-meter mt-1">
+                  <span className="bg-[var(--acx-bar-2)]" style={{ width: `${releases30Width}%` }} />
                 </div>
               </div>
 
@@ -120,8 +123,8 @@ export default function ReleaseVelocityList({ velocities, limit }: Props) {
                     {velocity.releases90}
                   </span>
                 </div>
-                <div className="mt-1 h-1.5 rounded-full bg-[var(--acx-surface)] overflow-hidden">
-                  <div className="h-full bg-[var(--acx-text-muted)]" style={{ width: `${releases90Width}%` }} />
+                <div className="acx-meter mt-1">
+                  <span className="bg-[var(--acx-bar-3)]" style={{ width: `${releases90Width}%` }} />
                 </div>
               </div>
             </div>

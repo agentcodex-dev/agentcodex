@@ -23,15 +23,15 @@ export default function AgentSelector({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-[var(--acx-text-soft)] mb-2">
           Agent A
         </label>
         <select
           value={selectedA}
           onChange={(e) => handleChange('a', e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+          className="w-full acx-input px-3 py-2 text-sm"
         >
           <option value="">Select an agent</option>
           {agents.map(agent => (
@@ -46,13 +46,13 @@ export default function AgentSelector({
         </select>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-[var(--acx-text-soft)] mb-2">
           Agent B
         </label>
         <select
           value={selectedB}
           onChange={(e) => handleChange('b', e.target.value)}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+          className="w-full acx-input px-3 py-2 text-sm"
         >
           <option value="">Select an agent</option>
           {agents.map(agent => (

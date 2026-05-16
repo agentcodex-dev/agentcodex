@@ -15,8 +15,9 @@ export default function PrivacyPage() {
       <Navigation />
       <section className="acx-section">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <h1 className="text-3xl font-bold text-[var(--acx-text)]">Privacy Policy</h1>
-          <p className="acx-body mt-2">
+          <p className="acx-eyebrow text-sm">Policy</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-2">Privacy Policy</h1>
+          <p className="acx-body mt-3 text-base sm:text-lg">
             How AgentCodex handles analytics and operational data.
           </p>
           <p className="text-sm acx-muted mt-4">Last updated: {lastUpdated}</p>
@@ -24,7 +25,7 @@ export default function PrivacyPage() {
       </section>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <div className="acx-panel p-6 sm:p-8 space-y-7 text-sm acx-body leading-relaxed">
+        <div className="acx-panel p-6 sm:p-8 space-y-7 text-sm acx-body leading-relaxed acx-reveal">
 
           <section className="space-y-3">
             <h2 className="text-xl font-semibold text-[var(--acx-text)]">

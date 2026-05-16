@@ -95,28 +95,25 @@ export default async function CompareStaticPage({
   const versionsB = await getVersions(agentB.id)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen acx-shell">
       <Navigation />
 
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="acx-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-            <Link href="/" className="hover:text-gray-700">Home</Link>
+          <div className="flex items-center gap-2 text-sm acx-muted mb-4">
+            <Link href="/" className="hover:text-[var(--acx-text-soft)]">Home</Link>
             <span>→</span>
-            <Link href="/compare" className="hover:text-gray-700">Compare</Link>
+            <Link href="/compare" className="hover:text-[var(--acx-text-soft)]">Compare</Link>
             <span>→</span>
-            <span className="text-gray-900">
+            <span className="text-[var(--acx-text)]">
               {agentA.name} vs {agentB.name}
             </span>
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title">
             {agentA.name} vs {agentB.name}
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="acx-body mt-3 text-base sm:text-lg">
             Side by side comparison of capabilities, pricing and version history
           </p>
         </div>
@@ -131,9 +128,8 @@ export default async function CompareStaticPage({
           versionsB={versionsB}
         />
 
-        {/* Try Other Comparisons */}
         <div className="mt-12">
-          <h2 className="font-semibold text-gray-900 mb-4">
+          <h2 className="font-semibold text-[var(--acx-text)] mb-4">
             Other Comparisons
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -151,12 +147,12 @@ export default async function CompareStaticPage({
                 <Link
                   key={`${pair.a}-${pair.b}`}
                   href={`/compare/${pair.a}-vs-${pair.b}`}
-                  className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-blue-300 transition-all text-center"
+                  className="acx-panel p-4 hover:border-[var(--acx-border-strong)] transition-colors text-center"
                 >
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-[var(--acx-text)]">
                     {pair.label}
                   </span>
-                  <div className="text-xs text-blue-600 mt-1">
+                  <div className="text-xs text-[var(--acx-accent)] mt-1">
                     Compare →
                   </div>
                 </Link>

@@ -48,12 +48,12 @@ export default async function RadarPage({
       <Navigation />
 
       <section className="acx-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold text-[var(--acx-accent)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 acx-reveal">
+          <div className="max-w-4xl">
+            <p className="acx-eyebrow text-sm">
               Agent Change Radar
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-[var(--acx-text)] mt-3 leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-3 leading-tight">
               Track what changed across AI agents
             </h1>
             <p className="text-base sm:text-lg acx-body mt-4 leading-relaxed">
@@ -68,7 +68,7 @@ export default async function RadarPage({
       </section>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="flex flex-wrap gap-2 mb-8 acx-reveal">
           <Link
             href="/radar"
             className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -95,10 +95,10 @@ export default async function RadarPage({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <section className="lg:col-span-2">
+          <section className="lg:col-span-2 acx-reveal">
             <div className="flex items-end justify-between gap-4 mb-4">
               <div>
-                <h2 className="text-xl font-bold text-[var(--acx-text)]">
+                <h2 className="text-3xl font-semibold acx-page-title">
                   Latest Releases
                 </h2>
                 <p className="text-sm acx-muted mt-1">
@@ -109,20 +109,20 @@ export default async function RadarPage({
             <LatestReleaseFeed releases={latestReleases} limit={12} />
           </section>
 
-          <div className="space-y-8">
+          <div className="space-y-8 acx-reveal acx-reveal-delay-1">
             <MethodologyCallout
               compact
               body="Radar highlights movement using version-to-version capability deltas and release tempo. Use it as change intelligence, not a benchmark leaderboard."
             />
             <section>
-              <h2 className="text-xl font-bold text-[var(--acx-text)] mb-4">
+              <h2 className="text-3xl font-semibold acx-page-title mb-4">
                 Biggest Movers
               </h2>
               <CapabilityMoverList movers={capabilityMovers} limit={6} />
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-[var(--acx-text)] mb-4">
+              <h2 className="text-3xl font-semibold acx-page-title mb-4">
                 Release Velocity
               </h2>
               <ReleaseVelocityList velocities={releaseVelocity} limit={8} />
@@ -130,8 +130,8 @@ export default async function RadarPage({
           </div>
         </div>
 
-        <section className="mt-10">
-          <h2 className="text-xl font-bold text-[var(--acx-text)] mb-4">
+        <section className="mt-10 acx-reveal acx-reveal-delay-2">
+          <h2 className="text-3xl font-semibold acx-page-title mb-4">
             Watchlist Digest
           </h2>
           <WatchlistFeed releases={radar.latestReleases} />

@@ -21,9 +21,18 @@ async function getAgents(search?: string, category?: string) {
     .order('name', { ascending: true })
 
   if (search) {
-    query = query.or(
-      `name.ilike.%${search}%,provider.ilike.%${search}%,description.ilike.%${search}%`
-    )
+    const sanitized = search
+      .trim()
+      .replace(/[,%()]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .slice(0, 80)
+
+    if (sanitized.length > 0) {
+      const ilike = `%${sanitized}%`
+      query = query.or(
+        `name.ilike.${ilike},provider.ilike.${ilike},description.ilike.${ilike}`
+      )
+    }
   }
 
   if (category) {
@@ -76,30 +85,26 @@ export default async function AgentsPage({
     <div className="min-h-screen acx-shell">
       <Navigation />
 
-      {/* Header */}
       <section className="acx-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--acx-text)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+          <p className="acx-eyebrow text-sm">Directory</p>
+          <h1 className="text-3xl sm:text-4xl font-semibold acx-page-title mt-2">
             All AI Agents
           </h1>
-          <p className="acx-muted mt-2 text-sm sm:text-base">
+          <p className="acx-body mt-3 text-base sm:text-lg max-w-3xl">
+            Scan verified profiles, latest versions and category fit across the live agent ecosystem.
+          </p>
+          <p className="acx-muted mt-3 text-sm sm:text-base">
             {agents.length} agents documented and growing daily
           </p>
         </div>
       </section>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-
-        {/* Mobile - Filters on top */}
-        {/* Desktop - Sidebar left, grid right */}
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-
-          {/* Filters */}
-          <div className="w-full lg:w-56 lg:shrink-0 space-y-4 lg:space-y-6">
-
-            {/* Search */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">
+          <div className="w-full lg:w-64 lg:shrink-0 space-y-4 lg:space-y-6 acx-reveal">
+            <div className="acx-panel p-4">
+              <h3 className="font-semibold text-[var(--acx-text)] mb-3">
                 Search
               </h3>
               <form method="GET">
@@ -108,34 +113,32 @@ export default async function AgentsPage({
                   name="search"
                   defaultValue={search}
                   placeholder="Search agents..."
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 text-sm acx-input"
                 />
                 {category && (
                   <input type="hidden" name="category" value={category} />
                 )}
                 <button
                   type="submit"
-                  className="w-full mt-2 bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  className="w-full mt-2 acx-btn-primary py-2 text-sm"
                 >
                   Search
                 </button>
               </form>
             </div>
 
-            {/* Categories - horizontal scroll on mobile */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">
+            <div className="acx-panel p-4">
+              <h3 className="font-semibold text-[var(--acx-text)] mb-3">
                 Category
               </h3>
 
-              {/* Mobile - horizontal scroll */}
               <div className="flex lg:hidden gap-2 overflow-x-auto pb-2">
                 <Link
                   href="/agents"
                   className={`shrink-0 px-3 py-2 rounded-lg text-sm transition-colors ${
                     !category
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'bg-white border border-gray-200 text-gray-600'
+                      ? 'acx-btn-primary'
+                      : 'acx-btn-secondary'
                   }`}
                 >
                   All
@@ -146,8 +149,8 @@ export default async function AgentsPage({
                     href={`/agents?category=${cat}${search ? `&search=${search}` : ''}`}
                     className={`shrink-0 px-3 py-2 rounded-lg text-sm transition-colors ${
                       category === cat
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'bg-white border border-gray-200 text-gray-600'
+                        ? 'acx-btn-primary'
+                        : 'acx-btn-secondary'
                     }`}
                   >
                     {cat}
@@ -155,14 +158,13 @@ export default async function AgentsPage({
                 ))}
               </div>
 
-              {/* Desktop - vertical list */}
               <div className="hidden lg:flex flex-col space-y-1">
                 <Link
                   href="/agents"
                   className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
                     !category
-                      ? 'bg-blue-50 text-blue-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      ? 'bg-[var(--acx-accent-soft)] text-[var(--acx-accent)] font-medium'
+                      : 'acx-link-subtle hover:bg-[var(--acx-elevated-soft)]'
                   }`}
                 >
                   All Categories
@@ -173,8 +175,8 @@ export default async function AgentsPage({
                     href={`/agents?category=${cat}${search ? `&search=${search}` : ''}`}
                     className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
                       category === cat
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-[var(--acx-accent-soft)] text-[var(--acx-accent)] font-medium'
+                        : 'acx-link-subtle hover:bg-[var(--acx-elevated-soft)]'
                     }`}
                   >
                     {cat}
@@ -182,23 +184,20 @@ export default async function AgentsPage({
                 ))}
               </div>
             </div>
-
           </div>
 
-          {/* Agents Grid */}
-          <div className="flex-1">
+          <div className="flex-1 acx-reveal acx-reveal-delay-1">
             {agents.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="text-4xl mb-4">🔍</div>
-                <h3 className="font-semibold text-gray-900 mb-2">
+              <div className="acx-panel text-center py-16 px-6">
+                <h3 className="font-semibold text-[var(--acx-text)] mb-2">
                   No agents found
                 </h3>
-                <p className="text-gray-500 text-sm mb-4">
+                <p className="acx-muted text-sm mb-4">
                   Try a different search term
                 </p>
                 <Link
                   href="/agents"
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  className="text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)] text-sm font-medium"
                 >
                   Clear search
                 </Link>

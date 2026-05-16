@@ -142,23 +142,22 @@ export default async function ComparePage({
     <div className="min-h-screen acx-shell">
       <Navigation />
 
-      {/* Header */}
       <section className="acx-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <h1 className="text-3xl font-bold text-[var(--acx-text)]">
+          <p className="acx-eyebrow text-sm">Decision Workspace</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-2">
             Compare AI Agents
           </h1>
-          <p className="acx-muted mt-2">
-            Side by side capability and version comparison
+          <p className="acx-body mt-3 text-base sm:text-lg max-w-3xl">
+            Evaluate fit, tradeoffs and latest version movement side by side for your workflow.
           </p>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        {/* Agent Selector */}
-        <div className="acx-panel p-6 mb-8">
-          <h2 className="font-semibold text-gray-900 mb-4">
+        <div className="acx-panel p-6 mb-8 acx-reveal">
+          <h2 className="font-semibold text-[var(--acx-text)] mb-4">
             Select Agents to Compare
           </h2>
           <AgentSelector
@@ -168,14 +167,14 @@ export default async function ComparePage({
           />
         </div>
 
-        <div className="mb-8">
+        <div className="mb-8 acx-reveal acx-reveal-delay-1">
           <MethodologyCallout
             body="Compare uses each agent's latest published version and applies workflow-specific weights across capabilities. Scores indicate fit for that workflow, not absolute product quality."
           />
         </div>
 
-        <div className="acx-panel p-6 mb-8">
-          <h2 className="font-semibold text-gray-900 mb-4">
+        <div className="acx-panel p-6 mb-8 acx-reveal acx-reveal-delay-2">
+          <h2 className="font-semibold text-[var(--acx-text)] mb-4">
             Compare Presets
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -185,39 +184,39 @@ export default async function ComparePage({
                 href={`/compare?preset=${key}`}
                 className={`border rounded-xl p-4 transition-colors ${
                   selectedPreset === key
-                    ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 bg-white hover:border-blue-200'
+                    ? 'border-[var(--acx-accent)] bg-[var(--acx-accent-soft)]'
+                    : 'border-[var(--acx-border)] bg-[var(--acx-elevated)] hover:border-[var(--acx-border-strong)]'
                 }`}
               >
-                <p className="text-sm font-semibold text-gray-900">{value.label}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-semibold text-[var(--acx-text)]">{value.label}</p>
+                <p className="text-xs acx-muted mt-1">
                   Weighted shortlist for this workflow
                 </p>
               </Link>
             ))}
           </div>
           <div className="mt-5">
-            <h3 className="font-medium text-gray-900 text-sm">
+            <h3 className="font-medium text-[var(--acx-text)] text-sm">
               Top shortlist: {PRESETS[selectedPreset].label}
             </h3>
             <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
               {shortlist.map((entry, index) => (
-                <div key={entry.agent.id} className="border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
+                <div key={entry.agent.id} className="border acx-divider rounded-lg px-4 py-3 bg-[var(--acx-elevated-soft)]">
                   <div className="flex items-center justify-between gap-3">
-                    <Link href={`/agents/${entry.agent.slug}`} className="text-sm font-semibold text-gray-900 hover:text-blue-600">
+                    <Link href={`/agents/${entry.agent.slug}`} className="text-sm font-semibold text-[var(--acx-text)] hover:text-[var(--acx-accent)]">
                       {index + 1}. {entry.agent.name}
                     </Link>
-                    <span className="text-xs px-2 py-1 rounded-full bg-gray-900 text-white">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[var(--acx-text)] text-[var(--acx-elevated)]">
                       {entry.score.toFixed(2)}
                     </span>
                   </div>
-                  <div className="mt-2 text-xs text-gray-600">
+                  <div className="mt-2 text-xs acx-muted">
                     Latest {entry.latest.version_number}
                   </div>
                   {shortlist[0] && shortlist[0].agent.slug !== entry.agent.slug && (
                     <Link
                       href={`/compare/${shortlist[0].agent.slug}-vs-${entry.agent.slug}`}
-                      className="inline-block mt-2 text-xs text-blue-600 hover:text-blue-700"
+                      className="inline-block mt-2 text-xs text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]"
                     >
                       Compare with #{1} →
                     </Link>
@@ -228,10 +227,9 @@ export default async function ComparePage({
           </div>
         </div>
 
-        {/* Popular Comparisons */}
         {!a && !b && (
-          <div className="mb-8">
-            <h2 className="font-semibold text-gray-900 mb-4">
+          <div className="mb-8 acx-reveal acx-reveal-delay-3">
+            <h2 className="font-semibold text-[var(--acx-text)] mb-4">
               Popular Comparisons
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -239,12 +237,12 @@ export default async function ComparePage({
                 <Link
                   key={`${pair.a}-${pair.b}`}
                   href={`/compare/${pair.a}-vs-${pair.b}`}
-                  className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-blue-300 transition-all text-center"
+                  className="acx-panel p-4 hover:border-[var(--acx-border-strong)] transition-colors text-center"
                 >
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-[var(--acx-text)]">
                     {pair.label}
                   </span>
-                  <div className="text-xs text-blue-600 mt-1">
+                  <div className="text-xs text-[var(--acx-accent)] mt-1">
                     Compare →
                   </div>
                 </Link>
@@ -253,7 +251,6 @@ export default async function ComparePage({
           </div>
         )}
 
-        {/* Compare Results */}
         {agentA && agentB ? (
           <CompareView
             agentA={agentA}
@@ -262,12 +259,11 @@ export default async function ComparePage({
             versionsB={versionsB}
           />
         ) : a && b ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <div className="text-4xl mb-4">⚠️</div>
-            <h3 className="font-semibold text-gray-900 mb-2">
+          <div className="acx-panel p-12 text-center">
+            <h3 className="font-semibold text-[var(--acx-text)] mb-2">
               Agent not found
             </h3>
-            <p className="text-gray-500 text-sm">
+            <p className="acx-muted text-sm">
               One or both agents could not be found
             </p>
           </div>

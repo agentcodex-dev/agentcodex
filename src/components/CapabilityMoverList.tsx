@@ -35,7 +35,7 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
       {visibleMovers.map((mover) => (
         <div
           key={`${mover.agent.id}-${mover.latest.id}`}
-          className="acx-panel p-5"
+          className="acx-panel p-5 acx-reveal"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -49,7 +49,15 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
                 {mover.previous.version_number} to {mover.latest.version_number} · {formatDate(mover.latest.release_date)}
               </p>
               <div className="flex flex-wrap gap-2 mt-2">
-                <span className="acx-badge acx-badge-trust capitalize">
+                <span className={`acx-badge capitalize ${
+                  mover.changeType === 'major'
+                    ? 'acx-badge-major'
+                    : mover.changeType === 'minor'
+                      ? 'acx-badge-minor'
+                      : mover.changeType === 'patch'
+                        ? 'acx-badge-patch'
+                        : 'acx-badge-trust'
+                }`}>
                   {mover.changeType} change
                 </span>
                 <span className="acx-badge acx-badge-neutral">
@@ -78,10 +86,10 @@ export default function CapabilityMoverList({ movers, limit }: Props) {
               return (
                 <span
                   key={change.key}
-              className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
+                  className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
                     isPositive
-                      ? 'bg-green-50 text-green-700'
-                      : 'bg-red-50 text-red-700'
+                      ? 'acx-badge-official'
+                      : 'acx-badge-warn'
                   }`}
                 >
                   <Icon size={12} />

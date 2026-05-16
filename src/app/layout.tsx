@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Fraunces, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-ui',
+})
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-display',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -99,7 +107,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${inter.variable} ${fraunces.variable}`}>
         {children}
         <Analytics />
       </body>

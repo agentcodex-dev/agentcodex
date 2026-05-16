@@ -15,8 +15,9 @@ export default function ContactPage() {
 
       <section className="acx-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <h1 className="text-3xl font-bold text-[var(--acx-text)]">Contact</h1>
-          <p className="acx-body mt-2">
+          <p className="acx-eyebrow text-sm">Support</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-2">Contact</h1>
+          <p className="acx-body mt-3 text-base sm:text-lg max-w-3xl">
             Reach the AgentCodex team for support, corrections, partnerships, and media.
           </p>
         </div>
@@ -26,7 +27,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <a
             href="mailto:info@agentcodex.dev?subject=General%20Enquiry"
-            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors acx-reveal"
           >
             <h2 className="font-semibold text-[var(--acx-text)]">General Enquiries</h2>
             <p className="text-sm acx-body mt-2">
@@ -37,7 +38,7 @@ export default function ContactPage() {
 
           <a
             href="mailto:info@agentcodex.dev?subject=Data%20Correction%20Request"
-            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors acx-reveal"
           >
             <h2 className="font-semibold text-[var(--acx-text)]">Data Corrections</h2>
             <p className="text-sm acx-body mt-2">
@@ -48,7 +49,7 @@ export default function ContactPage() {
 
           <a
             href="mailto:info@agentcodex.dev?subject=Partnership%20Request"
-            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors acx-reveal"
           >
             <h2 className="font-semibold text-[var(--acx-text)]">Partnerships</h2>
             <p className="text-sm acx-body mt-2">
@@ -59,7 +60,7 @@ export default function ContactPage() {
 
           <a
             href="mailto:info@agentcodex.dev?subject=Press%20Request"
-            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors"
+            className="acx-panel p-5 hover:border-[var(--acx-border-strong)] transition-colors acx-reveal"
           >
             <h2 className="font-semibold text-[var(--acx-text)]">Press and Media</h2>
             <p className="text-sm acx-body mt-2">
@@ -69,7 +70,7 @@ export default function ContactPage() {
           </a>
         </div>
 
-        <section className="acx-panel p-5 mt-6">
+        <section className="acx-panel p-5 mt-6 acx-reveal acx-reveal-delay-1">
           <h2 className="font-semibold text-[var(--acx-text)]">Response Expectations</h2>
           <p className="text-sm acx-body mt-2">
             We usually respond within 1-2 business days. For correction requests, include agent name, version, and source URL so we can verify quickly.

@@ -53,20 +53,24 @@ export default async function CopilotPage({
 
       <section className="acx-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <h1 className="text-3xl font-bold text-[var(--acx-text)]">Use-Case Copilot</h1>
-          <p className="acx-body mt-2">Pick a workflow and get shortlist recommendations with fast compare links.</p>
+          <p className="acx-eyebrow text-sm">Workflow Copilot</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-2">Use-Case Copilot</h1>
+          <p className="acx-body mt-3 text-base sm:text-lg max-w-3xl">
+            Pick a workflow and get decision-ready shortlists with fast compare links.
+          </p>
         </div>
       </section>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-3 acx-reveal">
           {Object.entries(COPILOT_PRESETS).map(([key, p]) => (
             <Link
               key={key}
               href={`/copilot?preset=${key}`}
               className={`px-4 py-3 rounded-lg border text-sm font-medium ${
-                key === selected ? 'bg-[var(--acx-accent-soft)] text-[var(--acx-accent)] border-[var(--acx-accent)]' : 'bg-white text-[var(--acx-text-soft)] border-[var(--acx-border)]'
+                key === selected
+                  ? 'bg-[var(--acx-accent-soft)] text-[var(--acx-accent)] border-[var(--acx-accent)]'
+                  : 'bg-[var(--acx-elevated)] text-[var(--acx-text-soft)] border-[var(--acx-border)] hover:border-[var(--acx-border-strong)]'
               }`}
             >
               {p.label}
@@ -74,21 +78,21 @@ export default async function CopilotPage({
           ))}
         </div>
 
-        <section className="mt-8 acx-panel p-6">
-          <h2 className="font-semibold text-gray-900">Top picks for {COPILOT_PRESETS[selected].label}</h2>
+        <section className="mt-8 acx-panel p-6 acx-reveal acx-reveal-delay-1">
+          <h2 className="font-semibold text-[var(--acx-text)]">Top picks for {COPILOT_PRESETS[selected].label}</h2>
           <div className="mt-4 space-y-3">
             {ranked.map((row, index) => (
-              <div key={row.agent.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <div key={row.agent.id} className="border acx-divider rounded-lg p-4 bg-[var(--acx-elevated-soft)]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-gray-900">{index + 1}. {row.agent.name}</p>
-                    <p className="text-xs text-gray-500 mt-1">Latest {row.latest.version_number}</p>
+                    <p className="font-semibold text-[var(--acx-text)]">{index + 1}. {row.agent.name}</p>
+                    <p className="text-xs acx-muted mt-1">Latest {row.latest.version_number}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs px-2 py-1 rounded-full bg-gray-900 text-white">{row.score.toFixed(2)}</span>
-                    <Link href={`/agents/${row.agent.slug}`} className="text-xs text-blue-600 hover:text-blue-700">View agent</Link>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[var(--acx-text)] text-[var(--acx-elevated)]">{row.score.toFixed(2)}</span>
+                    <Link href={`/agents/${row.agent.slug}`} className="text-xs text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]">View agent</Link>
                     {leader && leader.agent.slug !== row.agent.slug && (
-                      <Link href={`/compare/${leader.agent.slug}-vs-${row.agent.slug}`} className="text-xs text-blue-600 hover:text-blue-700">
+                      <Link href={`/compare/${leader.agent.slug}-vs-${row.agent.slug}`} className="text-xs text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]">
                         Compare with #{1}
                       </Link>
                     )}

@@ -92,48 +92,44 @@ export default async function AgentPage({
     <div className="min-h-screen acx-shell">
       <Navigation />
 
-      {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <Link href="/" className="hover:text-gray-700">Home</Link>
+        <div className="flex items-center gap-2 text-sm acx-muted">
+          <Link href="/" className="hover:text-[var(--acx-text-soft)]">Home</Link>
           <span>→</span>
-          <Link href="/agents" className="hover:text-gray-700">Agents</Link>
+          <Link href="/agents" className="hover:text-[var(--acx-text-soft)]">Agents</Link>
           <span>→</span>
-          <span className="text-gray-900">{agent.name}</span>
+          <span className="text-[var(--acx-text)]">{agent.name}</span>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
-          {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-8">
-
-            {/* Agent Header */}
-            <div className="acx-panel p-8">
+            <div className="acx-panel p-8 acx-reveal">
               <div className="flex flex-col sm:flex-row items-start gap-4">
-                <div className="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                  <span className="text-blue-600 font-bold text-2xl">
+                <div className="w-16 h-16 rounded-xl bg-[var(--acx-accent-soft)] flex items-center justify-center shrink-0">
+                  <span className="text-[var(--acx-accent)] font-bold text-2xl">
                     {agent.name.charAt(0)}
                   </span>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h1 className="text-3xl font-bold text-gray-900">
+                    <h1 className="text-4xl font-semibold acx-page-title">
                       {agent.name}
                     </h1>
                     {agent.is_verified && (
-                      <span className="bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full font-medium">
+                      <span className="acx-badge acx-badge-official text-sm px-3 py-1 font-medium">
                         ✓ Verified
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-500 mt-1">by {agent.provider}</p>
+                  <p className="acx-muted mt-1">by {agent.provider}</p>
                   <div className="flex flex-wrap gap-2 mt-3">
                     {agent.category.map((cat) => (
                       <span
                         key={cat}
-                        className="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded-full"
+                        className="acx-chip text-sm px-3 py-1"
                       >
                         {cat}
                       </span>
@@ -144,7 +140,7 @@ export default async function AgentPage({
                   href={agent.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors sm:shrink-0 w-full sm:w-auto text-center"
+                  className="acx-btn-primary px-4 py-2 text-sm sm:shrink-0 w-full sm:w-auto text-center"
                 >
                   Visit Site →
                 </a>
@@ -152,33 +148,32 @@ export default async function AgentPage({
                   <WatchlistButton slug={agent.slug} />
                 </div>
               </div>
-              <p className="mt-6 text-gray-600 leading-relaxed">
+              <p className="mt-6 acx-body leading-relaxed">
                 {agent.description}
               </p>
             </div>
 
-            <div className="acx-panel p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+            <div className="acx-panel p-8 acx-reveal acx-reveal-delay-1">
+              <h2 className="text-3xl font-semibold acx-page-title mb-4">
                 Decision Fit
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-                  <p className="font-semibold text-green-800">Best For</p>
-                  <p className="text-green-700 mt-1">{getBestFor(agent)}</p>
+                <div className="rounded-lg border border-[var(--acx-success)] bg-[var(--acx-success-soft)] p-4">
+                  <p className="font-semibold text-[var(--acx-success)]">Best For</p>
+                  <p className="text-[var(--acx-success)] mt-1">{getBestFor(agent)}</p>
                 </div>
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <p className="font-semibold text-amber-800">Avoid If</p>
-                  <p className="text-amber-700 mt-1">{getAvoidIf(agent)}</p>
+                <div className="rounded-lg border border-[var(--acx-warn)] bg-[var(--acx-warn-soft)] p-4">
+                  <p className="font-semibold text-[var(--acx-warn)]">Avoid If</p>
+                  <p className="text-[var(--acx-warn)] mt-1">{getAvoidIf(agent)}</p>
                 </div>
               </div>
             </div>
 
-            {/* Latest Capabilities */}
             {latestVersion?.capabilities && (
-              <div className="acx-panel p-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">
+              <div className="acx-panel p-8 acx-reveal acx-reveal-delay-2">
+                <h2 className="text-3xl font-semibold acx-page-title mb-6">
                   Current Capabilities
-                  <span className="ml-2 text-sm font-normal text-gray-500">
+                  <span className="ml-2 text-sm font-normal acx-muted">
                     ({latestVersion.version_number})
                   </span>
                 </h2>
@@ -194,11 +189,10 @@ export default async function AgentPage({
               </div>
             )}
 
-            {/* Version History */}
-            <div className="acx-panel p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-8">
+            <div className="acx-panel p-8 acx-reveal acx-reveal-delay-3">
+              <h2 className="text-3xl font-semibold acx-page-title mb-8">
                 Version History
-                <span className="ml-2 text-sm font-normal text-gray-500">
+                <span className="ml-2 text-sm font-normal acx-muted">
                   {versions.length} releases documented
                 </span>
               </h2>
@@ -207,69 +201,66 @@ export default async function AgentPage({
 
           </div>
 
-          {/* Right Column - Sidebar */}
           <div className="space-y-6">
-
-            {/* Quick Facts */}
-            <div className="acx-panel p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Quick Facts</h3>
+            <div className="acx-panel p-6 acx-reveal">
+              <h3 className="font-semibold text-[var(--acx-text)] mb-4">Quick Facts</h3>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Provider</span>
-                  <span className="font-medium text-gray-900">
+                  <span className="acx-muted">Provider</span>
+                  <span className="font-medium text-[var(--acx-text)]">
                     {agent.provider}
                   </span>
                 </div>
-                <div className="border-t border-gray-100" />
+                <div className="border-t acx-divider" />
                 {latestVersion && (
                   <>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Latest Version</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="acx-muted">Latest Version</span>
+                      <span className="font-medium text-[var(--acx-text)]">
                         {latestVersion.version_number}
                       </span>
                     </div>
-                    <div className="border-t border-gray-100" />
+                    <div className="border-t acx-divider" />
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Last Updated</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="acx-muted">Last Updated</span>
+                      <span className="font-medium text-[var(--acx-text)]">
                         {new Date(latestVersion.release_date).toLocaleDateString('en-US', {
                           month: 'short',
                           year: 'numeric'
                         })}
                       </span>
                     </div>
-                    <div className="border-t border-gray-100" />
+                    <div className="border-t acx-divider" />
                     {latestVersion.context_window && (
                       <>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-500">Context Window</span>
-                          <span className="font-medium text-gray-900">
+                          <span className="acx-muted">Context Window</span>
+                          <span className="font-medium text-[var(--acx-text)]">
                             {latestVersion.context_window.toLocaleString()}
                           </span>
                         </div>
-                        <div className="border-t border-gray-100" />
+                        <div className="border-t acx-divider" />
                       </>
                     )}
                     {latestVersion.pricing_info && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Pricing</span>
-                        <span className="font-medium text-gray-900 text-right max-w-32">
+                        <span className="acx-muted">Pricing</span>
+                        <span className="font-medium text-[var(--acx-text)] text-right max-w-32">
                           {latestVersion.pricing_info}
                         </span>
                       </div>
                     )}
-                    <div className="border-t border-gray-100" />
+                    <div className="border-t acx-divider" />
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Source Trust</span>
-                      <span className={`font-medium ${quality?.sourceOfficial ? 'text-green-700' : 'text-amber-700'}`}>
+                      <span className="acx-muted">Source Trust</span>
+                      <span className={`font-medium ${quality?.sourceOfficial ? 'text-[var(--acx-success)]' : 'text-[var(--acx-warn)]'}`}>
                         {quality?.sourceOfficial ? 'Official' : 'Needs review'}
                       </span>
                     </div>
-                    <div className="border-t border-gray-100" />
+                    <div className="border-t acx-divider" />
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Extraction Confidence</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="acx-muted">Extraction Confidence</span>
+                      <span className="font-medium text-[var(--acx-text)]">
                         {quality ? `${Math.round(quality.extractionConfidence * 100)}%` : 'N/A'}
                       </span>
                     </div>
@@ -278,16 +269,15 @@ export default async function AgentPage({
               </div>
             </div>
 
-            {/* Total Versions */}
-            <div className="bg-blue-50 rounded-xl border border-blue-100 p-6">
+            <div className="acx-panel p-6 bg-[var(--acx-accent-soft)] border-[var(--acx-accent)] acx-reveal acx-reveal-delay-1">
               <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600">
+                <div className="text-4xl font-semibold text-[var(--acx-accent)]">
                   {versions.length}
                 </div>
-                <div className="text-sm text-blue-700 mt-1 font-medium">
+                <div className="text-sm text-[var(--acx-accent)] mt-1 font-medium">
                   Versions Documented
                 </div>
-                <div className="text-xs text-blue-600 mt-2">
+                <div className="text-xs text-[var(--acx-accent)] mt-2">
                   Since {versions.length > 0 && new Date(
                     versions[versions.length - 1].release_date
                   ).toLocaleDateString('en-US', {
@@ -298,15 +288,14 @@ export default async function AgentPage({
               </div>
             </div>
 
-            {/* Links */}
-            <div className="acx-panel p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Links</h3>
+            <div className="acx-panel p-6 acx-reveal acx-reveal-delay-2">
+              <h3 className="font-semibold text-[var(--acx-text)] mb-4">Links</h3>
               <div className="space-y-2">
                 <a
                   href={agent.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-700 py-2"
+                  className="flex items-center justify-between text-sm text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)] py-2"
                 >
                   <span>Official Website</span>
                   <span>→</span>

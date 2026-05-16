@@ -44,9 +44,9 @@ export default function MethodologyPage() {
       <Navigation />
 
       <section className="acx-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <p className="text-sm font-semibold text-[var(--acx-accent)]">Trust Center</p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--acx-text)] mt-3 leading-tight">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 acx-reveal">
+          <p className="acx-eyebrow text-sm">Trust Center</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-3 leading-tight">
             How AgentCodex Works
           </h1>
           <p className="text-base sm:text-lg acx-body mt-4 leading-relaxed max-w-3xl">
@@ -56,8 +56,8 @@ export default function MethodologyPage() {
       </section>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
-        <section className="acx-panel p-6">
-          <h2 className="text-xl font-bold text-[var(--acx-text)]">What We Track</h2>
+        <section className="acx-panel p-6 acx-reveal">
+          <h2 className="text-3xl font-semibold acx-page-title">What We Track</h2>
           <p className="text-sm acx-body mt-2 leading-relaxed">
             We monitor agent releases, version notes, and source links, then store each release as a version record with capability and impact metadata.
           </p>
@@ -68,8 +68,8 @@ export default function MethodologyPage() {
           </ul>
         </section>
 
-        <section className="acx-panel p-6">
-          <h2 className="text-xl font-bold text-[var(--acx-text)]">How Scoring Works</h2>
+        <section className="acx-panel p-6 acx-reveal acx-reveal-delay-1">
+          <h2 className="text-3xl font-semibold acx-page-title">How Scoring Works</h2>
           <div className="mt-4 space-y-3 text-sm acx-body leading-relaxed">
             <p>1. Parse release evidence into structured fields.</p>
             <p>2. Score capability dimensions on a normalized 1-10 scale.</p>
@@ -78,18 +78,18 @@ export default function MethodologyPage() {
           </div>
         </section>
 
-        <section className="acx-panel p-6">
-          <h2 className="text-xl font-bold text-[var(--acx-text)]">How Comparison Works</h2>
+        <section className="acx-panel p-6 acx-reveal acx-reveal-delay-2">
+          <h2 className="text-3xl font-semibold acx-page-title">How Comparison Works</h2>
           <p className="text-sm acx-body mt-2 leading-relaxed">
             Compare uses the latest published version per agent and applies workflow presets with weighted capabilities. This means every shortlist reflects both capability fit and current release state.
           </p>
         </section>
 
-        <section className="acx-panel p-6">
-          <h2 className="text-xl font-bold text-[var(--acx-text)]">Frequently Asked Questions</h2>
+        <section className="acx-panel p-6 acx-reveal acx-reveal-delay-3">
+          <h2 className="text-3xl font-semibold acx-page-title">Frequently Asked Questions</h2>
           <div className="mt-4 space-y-4">
             {FAQS.map((item) => (
-              <div key={item.q} className="border border-[var(--acx-divider)] rounded-lg p-4">
+              <div key={item.q} className="border acx-divider rounded-lg p-4">
                 <h3 className="font-semibold text-[var(--acx-text)]">{item.q}</h3>
                 <p className="text-sm acx-body mt-2 leading-relaxed">{item.a}</p>
               </div>

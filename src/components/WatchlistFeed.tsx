@@ -75,7 +75,7 @@ export default function WatchlistFeed({ releases }: Props) {
 
   if (watchlist.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-600">
+      <div className="acx-panel p-6 text-sm acx-body">
         Add agents to your watchlist to get a personal change feed here.
       </div>
     )
@@ -83,7 +83,7 @@ export default function WatchlistFeed({ releases }: Props) {
 
   if (filtered.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-600">
+      <div className="acx-panel p-6 text-sm acx-body">
         No published releases yet for your watched agents.
       </div>
     )
@@ -91,8 +91,8 @@ export default function WatchlistFeed({ releases }: Props) {
 
   return (
     <div className="space-y-3">
-      <div className="bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-700">
-        <span className="font-semibold text-gray-900">Since your last visit:</span>{' '}
+      <div className="acx-panel p-4 text-sm acx-body">
+        <span className="font-semibold text-[var(--acx-text)]">Since your last visit:</span>{' '}
         {changeBuckets.major || 0} major, {changeBuckets.minor || 0} minor, {changeBuckets.patch || 0} patches
       </div>
       <LatestReleaseFeed releases={filtered} limit={6} />
