@@ -1,64 +1,60 @@
 # AgentCodex
 
-AgentCodex is a public reference site for AI agents. It tracks agent profiles, version history, capability scores, source links, pricing/context details, and side-by-side comparisons.
+[![Pipeline](https://img.shields.io/github/actions/workflow/status/agentcodex-dev/agentcodex/pipeline.yml?label=Pipeline&style=flat-square)](https://github.com/agentcodex-dev/agentcodex/actions/workflows/pipeline.yml)
+[![Live Site](https://img.shields.io/badge/Live-agentcodex.dev-2456e3?style=flat-square)](https://www.agentcodex.dev/)
 
-The current v2 direction is **Agent Change Radar**: a homepage and `/radar` experience that highlights recent releases, capability movement, and the agents shipping fastest.
+![Next.js 16](https://img.shields.io/badge/Next.js-16-111827?style=flat-square&logo=nextdotjs&logoColor=white)
+![TypeScript 5](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Tests Python unittest](https://img.shields.io/badge/Tests-Python%20unittest-2E8B57?style=flat-square)
+![Data Supabase](https://img.shields.io/badge/Data-Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+![Analytics Vercel](https://img.shields.io/badge/Analytics-Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
+![Pipeline Python](https://img.shields.io/badge/Pipeline-Python%203.11-3776AB?style=flat-square&logo=python&logoColor=white)
 
-## Tech Stack
+AgentCodex is a live intelligence desk for AI agents.  
+It tracks release changes, capability movement, and version history so teams can decide faster with source-aware context.
 
-- Next.js 16 App Router
-- React 19
-- TypeScript
-- Tailwind CSS v4
-- Supabase
-- Vercel Analytics
-- Python ingestion pipeline with Anthropic extraction
+## Why AgentCodex Exists
 
-## Main Features
+AI agent updates are scattered across blogs, changelogs, social posts, and docs.  
+AgentCodex turns that noise into one decision surface:
 
-- AI agent directory with search and category filters
-- Agent profile pages with version history and current capabilities
-- Side-by-side agent comparison pages
-- Change Radar for latest releases, capability movers, and release velocity
-- Decision layer: compare presets, workflow shortlists, best-for/avoid-if guidance
-- Trust layer: source trust, extraction confidence, change type and importance score
-- Password-gated admin dashboard for approving/rejecting pipeline drafts
-- Daily GitHub Actions pipeline that scrapes sources and writes draft releases
+- What changed recently?
+- Which agents are moving fastest?
+- Which tool fits this workflow today?
 
-## Local Development
+## Product Surfaces
 
-Install dependencies:
+- **Homepage (`/`)**: radar-led command surface for weekly change intelligence
+- **Radar (`/radar`)**: latest releases, biggest movers, release velocity
+- **Agents (`/agents`)**: searchable directory with metadata and version context
+- **Agent Profile (`/agents/[slug]`)**: capability snapshot + release timeline
+- **Compare (`/compare`, `/compare/[pair]`)**: side-by-side fit and tradeoff analysis
+- **Copilot (`/copilot`)**: workflow preset shortlists
+- **Methodology (`/methodology`)**: transparent scoring and comparison logic
+- **Admin (`/admin`)**: draft approval workflow for pipeline output
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A["Source URLs (RSS / docs / blogs)"] --> B["Python Pipeline"]
+    B --> C["Extraction + Validation"]
+    C --> D["Supabase: draft agent_versions"]
+    D --> E["Admin Review"]
+    E --> F["published agent_versions"]
+    F --> G["Next.js App Router UI"]
+    G --> H["Radar / Compare / Agents / Copilot"]
+```
+
+## Quick Start (Web App)
+
+### 1) Install dependencies
 
 ```bash
 npm install
 ```
 
-Run the app:
-
-```bash
-npm run dev
-```
-
-Open:
-
-```text
-http://localhost:3000
-```
-
-Useful routes:
-
-- `/` - Radar-led homepage
-- `/radar` - full Agent Change Radar
-- `/agents` - all tracked agents
-- `/agents/[slug]` - agent profile and version history
-- `/compare` - dropdown comparison flow
-- `/compare/[agent-a]-vs-[agent-b]` - SEO comparison page
-- `/admin` - admin login
-- `/admin/dashboard` - draft review dashboard
-
-## Environment Variables
-
-Create `.env.local` for the web app:
+### 2) Create `.env.local`
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
@@ -67,7 +63,33 @@ SUPABASE_SERVICE_KEY=
 ADMIN_PASSWORD=
 ```
 
-Pipeline runs also need:
+### 3) Run locally
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### 4) Validate before push
+
+```bash
+npm run lint
+npm run build
+```
+
+## Pipeline Quick Start
+
+The ingestion pipeline is in [`pipeline/`](./pipeline).
+
+### 1) Install Python deps
+
+```bash
+cd pipeline
+pip install -r requirements.txt
+```
+
+### 2) Required env vars
 
 ```bash
 ANTHROPIC_API_KEY=
@@ -75,11 +97,21 @@ SUPABASE_URL=
 SUPABASE_SERVICE_KEY=
 ```
 
-## Supabase
+### 3) Run pipeline
 
-Database migrations live in `supabase/migrations`.
+```bash
+python3 main.py
+```
 
-Core tables:
+Calibrated scoring mode:
+
+```bash
+python3 main.py --scoring-mode calibrated
+```
+
+## Data Model (Core)
+
+Primary tables:
 
 - `agents`
 - `agent_versions`
@@ -89,32 +121,25 @@ Core tables:
 - `pipeline_article_events`
 - `version_editor_audits`
 
-Public pages only show `agent_versions` where `status = 'published'`. The pipeline writes new extracted updates as `draft`; the admin dashboard moves them to `published` or `rejected`.
+Public UI only reads `agent_versions` where `status = 'published'`.  
+Pipeline writes drafts; admin reviews and publishes/rejects.
 
-## Pipeline
+## Supabase Migrations
 
-The Python pipeline lives in `pipeline/`.
+Migrations live in [`supabase/migrations/`](./supabase/migrations).
 
-Install pipeline dependencies:
+Apply current schema:
 
 ```bash
-cd pipeline
-pip install -r requirements.txt
+supabase db push
 ```
 
-Run locally:
+## Operator Commands
+
+### Backfill for newly onboarded agents
 
 ```bash
-python3 main.py
-
-# Run with deterministic score calibration (for A/B validation)
-python3 main.py --scoring-mode calibrated
-```
-
-Backfill mode for newly onboarded agents:
-
-```bash
-# Dry run first (no writes)
+# Dry run
 python3 pipeline/main.py \
   --backfill \
   --agents codex,claude-code,aider,roo-code,continue \
@@ -123,7 +148,7 @@ python3 pipeline/main.py \
   --max-versions-per-article 20 \
   --dry-run
 
-# Real backfill write
+# Write mode
 python3 pipeline/main.py \
   --backfill \
   --agents codex,claude-code,aider,roo-code,continue \
@@ -132,89 +157,65 @@ python3 pipeline/main.py \
   --max-versions-per-article 20
 ```
 
-The production pipeline runs daily through `.github/workflows/pipeline.yml`.
-
-Pipeline flow:
-
-1. Scrape RSS/Jina sources from `pipeline/sources.py`
-2. Skip already-seen normalized URLs before expensive article fetches
-3. Deduplicate fetched content by content hash
-4. Filter likely release/version updates
-5. Use Anthropic extraction to produce structured version data
-6. Validate extracted agent slug, date, version, summary, scores, and context window
-7. Save new findings as Supabase drafts
-8. Record run counters and article-level events for debugging
-
-Draft rows now include editorial intelligence fields:
-- `importance_score` (1-10)
-- `change_type` (`major`/`minor`/`patch`/`noise`)
-- `extraction_confidence` (0-1)
-- `editor_note`
-
-Apply the latest migration before using admin editorial fields:
+### Admin/testing helpers
 
 ```bash
-supabase db push
-```
-
-Pipeline tuning variables:
-
-```bash
-PIPELINE_JINA_INTERVAL_SECONDS=0.5
-PIPELINE_HAIKU_INTERVAL_SECONDS=0.5
-PIPELINE_SONNET_INTERVAL_SECONDS=6
-PIPELINE_MAX_ARTICLES_PER_DAY=100
-PIPELINE_MAX_SONNET_CALLS_PER_DAY=50
-```
-
-Admin/testing helpers:
-
-```bash
-# Seed onboarding candidate agents:
-# claude-code, codex, aider, roo-code, continue
 python3 pipeline/admin_tools.py seed-onboarding-agents
-
-# Create a test draft for an existing agent (default: claude)
 python3 pipeline/admin_tools.py create-test-draft --agent-slug claude
-
-# Remove all test drafts created with the helper
 python3 pipeline/admin_tools.py delete-test-drafts
-
-# Detect likely misclassified versions (claude->claude-code, chatgpt->codex)
 python3 pipeline/admin_tools.py detect-misclassified
-
-# Reassign detected versions to target agents (requires target agent rows)
 python3 pipeline/admin_tools.py reassign-misclassified
-
-# Audit source URLs against expected official domains/hints
 python3 pipeline/audit_sources.py
+```
 
-# Export baseline score snapshot (JSON + CSV)
+### Score calibration checks
+
+```bash
 python3 pipeline/score_snapshot.py --out-prefix pipeline/artifacts/score_snapshot
 
-# Compare baseline and candidate score snapshots
 python3 pipeline/score_diff_report.py \
   --before pipeline/artifacts/score_snapshot_BASELINE.json \
   --after pipeline/artifacts/score_snapshot_CANDIDATE.json \
   --max-change-ratio 0.35 \
   --max-abs-delta 5.0
 
-# Run score utility unit tests
 python3 -m unittest pipeline.tests.test_score_tools
 python3 -m unittest pipeline.tests.test_scoring
 ```
 
-## Verification
+## Environment and Deployment Notes
 
-Before pushing:
+- Web app is designed for **Vercel + Supabase**
+- Daily pipeline runs from [`.github/workflows/pipeline.yml`](./.github/workflows/pipeline.yml)
+- Ensure secrets are set in GitHub Actions and Vercel
+- `dev` and `build` use webpack in this workspace to avoid unsupported SWC WASM fallback issues
 
-```bash
-npm run lint
-npm run build
-```
+## Roadmap (Current Direction)
 
-Current note: `dev` and `build` explicitly use webpack because this workspace can fall back to unsupported WASM bindings when Next.js tries Turbopack without the native SWC optional package.
+- Improve release-source auditing coverage and confidence
+- Expand watchlist/alerting workflows
+- Continue decision-intelligence polish for compare and copilot flows
+- Harden monetization and reporting flows with production-safe guardrails
 
-## Deployment
+## Contributing
 
-The app is designed for Vercel deployment with Supabase as the backing database. Ensure Vercel has the web app environment variables configured, and GitHub Actions has the pipeline secrets configured.
+PRs are welcome. Keep changes scoped and tested.
+
+Suggested branch prefixes:
+
+- `feature/*`
+- `fix/*`
+- `hotfix/*`
+
+Before opening a PR:
+
+1. Run `npm run lint`
+2. Run `npm run build`
+3. Add or update tests when behavior changes
+4. Include screenshots for UI-visible changes
+
+## Links
+
+- Live product: [agentcodex.dev](https://www.agentcodex.dev/)
+- Methodology: [agentcodex.dev/methodology](https://www.agentcodex.dev/methodology)
+- Radar: [agentcodex.dev/radar](https://www.agentcodex.dev/radar)
