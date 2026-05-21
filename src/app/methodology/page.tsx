@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
+import { PlatformBadge, PlatformHeader, PlatformMetric, PlatformPanel, PlatformShell } from '@/components/platform/PlatformUI'
 
 export const metadata: Metadata = {
   title: 'Methodology - How AgentCodex Scores and Compares',
@@ -17,6 +18,14 @@ const SCORE_DIMENSIONS = [
   'Memory',
   'Multimodal',
   'Speed',
+]
+
+const PROCESS = [
+  ['Source ingestion', 'Official changelogs, docs, blogs, and source URLs are collected as candidate release evidence.'],
+  ['Extraction', 'Release text is converted into structured fields like version, change summary, context, pricing, and capabilities.'],
+  ['Validation', 'Invalid values are sanitized and confidence/source signals are attached before publishing.'],
+  ['Scoring', 'Capability dimensions and movement deltas are normalized for comparison and radar views.'],
+  ['Publishing', 'Approved records power Radar, profiles, directory, compare, categories, and copilot shortlists.'],
 ]
 
 const FAQS = [
@@ -43,60 +52,67 @@ export default function MethodologyPage() {
     <div className="min-h-screen acx-shell">
       <Navigation />
 
-      <section className="acx-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 acx-reveal">
-          <p className="acx-eyebrow text-sm">Trust Center</p>
-          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-3 leading-tight">
-            How AgentCodex Works
-          </h1>
-          <p className="text-base sm:text-lg acx-body mt-4 leading-relaxed max-w-3xl">
-            AgentCodex tracks real release signals, converts them into structured version intelligence, and helps teams compare AI agents with transparent scoring context.
-          </p>
+      <PlatformShell>
+        <PlatformHeader
+          title="How AgentCodex Works"
+          subtitle="A transparent trust center for source collection, extraction, confidence, scoring, and published release intelligence."
+        />
+        <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <PlatformMetric label="Confidence" value="Extracted / EST" detail="not all values are measured" tone="amber" />
+          <PlatformMetric label="Capability Scale" value="1-10" detail="normalized dimensions" tone="blue" />
+          <PlatformMetric label="Metadata Gaps" value="Honest" detail="not captured is shown plainly" tone="green" />
         </div>
-      </section>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
-        <section className="acx-panel p-6 acx-reveal">
-          <h2 className="text-3xl font-semibold acx-page-title">What We Track</h2>
-          <p className="text-sm acx-body mt-2 leading-relaxed">
-            We monitor agent releases, version notes, and source links, then store each release as a version record with capability and impact metadata.
-          </p>
-          <ul className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
-            {SCORE_DIMENSIONS.map((item) => (
-              <li key={item} className="acx-chip">{item}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="acx-panel p-6 acx-reveal acx-reveal-delay-1">
-          <h2 className="text-3xl font-semibold acx-page-title">How Scoring Works</h2>
-          <div className="mt-4 space-y-3 text-sm acx-body leading-relaxed">
-            <p>1. Parse release evidence into structured fields.</p>
-            <p>2. Score capability dimensions on a normalized 1-10 scale.</p>
-            <p>3. Validate and sanitize invalid values before publishing.</p>
-            <p>4. Rank release movement and velocity using version timelines.</p>
-          </div>
-        </section>
-
-        <section className="acx-panel p-6 acx-reveal acx-reveal-delay-2">
-          <h2 className="text-3xl font-semibold acx-page-title">How Comparison Works</h2>
-          <p className="text-sm acx-body mt-2 leading-relaxed">
-            Compare uses the latest published version per agent and applies workflow presets with weighted capabilities. This means every shortlist reflects both capability fit and current release state.
-          </p>
-        </section>
-
-        <section className="acx-panel p-6 acx-reveal acx-reveal-delay-3">
-          <h2 className="text-3xl font-semibold acx-page-title">Frequently Asked Questions</h2>
-          <div className="mt-4 space-y-4">
-            {FAQS.map((item) => (
-              <div key={item.q} className="border acx-divider rounded-lg p-4">
-                <h3 className="font-semibold text-[var(--acx-text)]">{item.q}</h3>
-                <p className="text-sm acx-body mt-2 leading-relaxed">{item.a}</p>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="space-y-5">
+            <PlatformPanel title="What We Track" subtitle="Version-aware release intelligence, not benchmark leaderboards">
+              <div className="p-4">
+                <p className="text-sm leading-relaxed acx-body">
+                  AgentCodex monitors agent releases, version notes, source links, and structured metadata. Each published record becomes part of the radar, profile timeline, directory, comparison, and copilot shortlist layers.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {SCORE_DIMENSIONS.map((item) => (
+                    <PlatformBadge key={item} tone="blue">{item}</PlatformBadge>
+                  ))}
+                </div>
               </div>
-            ))}
+            </PlatformPanel>
+
+            <PlatformPanel title="Pipeline" subtitle="How a source becomes an AgentCodex signal">
+              <div className="divide-y acx-divider">
+                {PROCESS.map(([title, body], index) => (
+                  <div key={title} className="grid grid-cols-[2rem_1fr] gap-3 p-4">
+                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-[var(--acx-accent-soft)] text-xs font-semibold text-[var(--acx-accent)]">{index + 1}</span>
+                    <div>
+                      <h3 className="font-semibold text-[var(--acx-text)]">{title}</h3>
+                      <p className="mt-1 text-sm leading-relaxed acx-muted">{body}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </PlatformPanel>
+
+            <PlatformPanel title="Confidence, EST, and Missing Fields">
+              <div className="space-y-3 p-4 text-sm leading-relaxed acx-body">
+                <p><span className="font-semibold text-[var(--acx-text)]">Confidence</span> comes from extraction confidence when present. If missing, AgentCodex shows an estimated confidence badge instead of pretending it is measured.</p>
+                <p><span className="font-semibold text-[var(--acx-text)]">Context window and pricing</span> are shown only when captured on a release or carried forward as a last-known metadata value.</p>
+                <p><span className="font-semibold text-[var(--acx-text)]">Source trust</span> indicates whether a release source matches known official domains for that agent.</p>
+              </div>
+            </PlatformPanel>
           </div>
-        </section>
-      </main>
+
+          <PlatformPanel title="FAQ">
+            <div className="space-y-3 p-4">
+              {FAQS.map((item) => (
+                <div key={item.q} className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-4">
+                  <h3 className="font-semibold text-[var(--acx-text)]">{item.q}</h3>
+                  <p className="mt-2 text-sm leading-relaxed acx-muted">{item.a}</p>
+                </div>
+              ))}
+            </div>
+          </PlatformPanel>
+        </div>
+      </PlatformShell>
 
       <Footer />
     </div>

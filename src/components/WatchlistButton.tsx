@@ -25,7 +25,8 @@ type Props = {
 }
 
 export default function WatchlistButton({ slug }: Props) {
-  const [saved, setSaved] = useState(() => readWatchlist().includes(slug))
+  // Keep the first render deterministic across server/client to avoid hydration mismatches.
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     const sync = () => setSaved(readWatchlist().includes(slug))

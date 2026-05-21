@@ -7,6 +7,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import AgentSelector from '@/components/AgentSelector'
 import MethodologyCallout from '@/components/MethodologyCallout'
+import { PlatformBadge, PlatformHeader, PlatformMetric, PlatformPanel, PlatformShell } from '@/components/platform/PlatformUI'
 
 export const metadata: Metadata = {
   title: 'Compare AI Agents - Side by Side Comparison',
@@ -142,73 +143,57 @@ export default async function ComparePage({
     <div className="min-h-screen acx-shell">
       <Navigation />
 
-      <section className="acx-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <p className="acx-eyebrow text-sm">Decision Workspace</p>
-          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-2">
-            Compare AI Agents
-          </h1>
-          <p className="acx-body mt-3 text-base sm:text-lg max-w-3xl">
-            Evaluate fit, tradeoffs and latest version movement side by side for your workflow.
-          </p>
-        </div>
-      </section>
+      <PlatformShell>
+        <PlatformHeader
+          title="Compare AI Agents"
+          subtitle="Evaluate fit, tradeoffs, source context, and latest version movement side by side for your workflow."
+        />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PlatformPanel title="Comparison Control Bar" subtitle="Pick two agents or use a preset shortlist">
+          <div className="p-4">
+            <AgentSelector
+              agents={agents}
+              selectedA={a ?? ''}
+              selectedB={b ?? ''}
+            />
+          </div>
+        </PlatformPanel>
 
-        <div className="acx-panel p-6 mb-8 acx-reveal">
-          <h2 className="font-semibold text-[var(--acx-text)] mb-4">
-            Select Agents to Compare
-          </h2>
-          <AgentSelector
-            agents={agents}
-            selectedA={a ?? ''}
-            selectedB={b ?? ''}
-          />
-        </div>
-
-        <div className="mb-8 acx-reveal acx-reveal-delay-1">
+        <div className="my-3">
           <MethodologyCallout
             body="Compare uses each agent's latest published version and applies workflow-specific weights across capabilities. Scores indicate fit for that workflow, not absolute product quality."
           />
         </div>
 
-        <div className="acx-panel p-6 mb-8 acx-reveal acx-reveal-delay-2">
-          <h2 className="font-semibold text-[var(--acx-text)] mb-4">
-            Compare Presets
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <PlatformPanel title="Compare Presets" subtitle="Workflow-weighted recommendations from latest published versions" className="mb-5">
+          <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2 lg:grid-cols-4">
             {Object.entries(PRESETS).map(([key, value]) => (
               <Link
                 key={key}
                 href={`/compare?preset=${key}`}
-                className={`border rounded-xl p-4 transition-colors ${
+                className={`rounded-xl border p-4 transition-colors ${
                   selectedPreset === key
                     ? 'border-[var(--acx-accent)] bg-[var(--acx-accent-soft)]'
-                    : 'border-[var(--acx-border)] bg-[var(--acx-elevated)] hover:border-[var(--acx-border-strong)]'
+                    : 'acx-divider bg-[var(--acx-elevated)] hover:border-[var(--acx-border-strong)]'
                 }`}
               >
                 <p className="text-sm font-semibold text-[var(--acx-text)]">{value.label}</p>
-                <p className="text-xs acx-muted mt-1">
-                  Weighted shortlist for this workflow
-                </p>
+                <p className="mt-1 text-xs acx-muted">Weighted shortlist</p>
               </Link>
             ))}
           </div>
-          <div className="mt-5">
-            <h3 className="font-medium text-[var(--acx-text)] text-sm">
+          <div className="border-t acx-divider p-4">
+            <h3 className="text-sm font-semibold text-[var(--acx-text)]">
               Top shortlist: {PRESETS[selectedPreset].label}
             </h3>
-            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
               {shortlist.map((entry, index) => (
-                <div key={entry.agent.id} className="border acx-divider rounded-lg px-4 py-3 bg-[var(--acx-elevated-soft)]">
+                <div key={entry.agent.id} className="rounded-xl border acx-divider bg-[var(--acx-surface)] px-4 py-3">
                   <div className="flex items-center justify-between gap-3">
                     <Link href={`/agents/${entry.agent.slug}`} className="text-sm font-semibold text-[var(--acx-text)] hover:text-[var(--acx-accent)]">
                       {index + 1}. {entry.agent.name}
                     </Link>
-                    <span className="text-xs px-2 py-1 rounded-full bg-[var(--acx-text)] text-[var(--acx-elevated)]">
-                      {entry.score.toFixed(2)}
-                    </span>
+                    <PlatformBadge tone="blue">{entry.score.toFixed(2)}</PlatformBadge>
                   </div>
                   <div className="mt-2 text-xs acx-muted">
                     Latest {entry.latest.version_number}
@@ -216,7 +201,7 @@ export default async function ComparePage({
                   {shortlist[0] && shortlist[0].agent.slug !== entry.agent.slug && (
                     <Link
                       href={`/compare/${shortlist[0].agent.slug}-vs-${entry.agent.slug}`}
-                      className="inline-block mt-2 text-xs text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]"
+                      className="mt-2 inline-block text-xs font-semibold text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]"
                     >
                       Compare with #{1} →
                     </Link>
@@ -225,30 +210,25 @@ export default async function ComparePage({
               ))}
             </div>
           </div>
+        </PlatformPanel>
+
+        <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <PlatformMetric label="Agents" value={agents.length} detail="available to compare" tone="blue" />
+          <PlatformMetric label="Preset" value={PRESETS[selectedPreset].label} detail="active scoring lens" tone="amber" />
+          <PlatformMetric label="Shortlist" value={shortlist.length} detail="ranked candidates" tone="green" />
         </div>
 
         {!a && !b && (
-          <div className="mb-8 acx-reveal acx-reveal-delay-3">
-            <h2 className="font-semibold text-[var(--acx-text)] mb-4">
-              Popular Comparisons
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <PlatformPanel title="Popular Comparisons" className="mb-5">
+            <div className="grid grid-cols-2 gap-3 p-4 md:grid-cols-3">
               {POPULAR_PAIRS.map(pair => (
-                <Link
-                  key={`${pair.a}-${pair.b}`}
-                  href={`/compare/${pair.a}-vs-${pair.b}`}
-                  className="acx-panel p-4 hover:border-[var(--acx-border-strong)] transition-colors text-center"
-                >
-                  <span className="text-sm font-medium text-[var(--acx-text)]">
-                    {pair.label}
-                  </span>
-                  <div className="text-xs text-[var(--acx-accent)] mt-1">
-                    Compare →
-                  </div>
+                <Link key={`${pair.a}-${pair.b}`} href={`/compare/${pair.a}-vs-${pair.b}`} className="rounded-xl border acx-divider bg-[var(--acx-elevated)] p-4 text-center transition-colors hover:border-[var(--acx-border-strong)]">
+                  <span className="text-sm font-medium text-[var(--acx-text)]">{pair.label}</span>
+                  <div className="mt-1 text-xs font-semibold text-[var(--acx-accent)]">Compare →</div>
                 </Link>
               ))}
             </div>
-          </div>
+          </PlatformPanel>
         )}
 
         {agentA && agentB ? (
@@ -269,7 +249,7 @@ export default async function ComparePage({
           </div>
         ) : null}
 
-      </div>
+      </PlatformShell>
       <Footer />
     </div>
   )

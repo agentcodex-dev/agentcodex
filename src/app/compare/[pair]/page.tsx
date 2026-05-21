@@ -6,6 +6,7 @@ import CompareView from '@/components/CompareView'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { PlatformHeader, PlatformPanel, PlatformShell } from '@/components/platform/PlatformUI'
 
 async function getAgentBySlug(slug: string) {
   const { data } = await supabase
@@ -98,28 +99,18 @@ export default async function CompareStaticPage({
     <div className="min-h-screen acx-shell">
       <Navigation />
 
-      <div className="acx-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="flex items-center gap-2 text-sm acx-muted mb-4">
-            <Link href="/" className="hover:text-[var(--acx-text-soft)]">Home</Link>
-            <span>→</span>
-            <Link href="/compare" className="hover:text-[var(--acx-text-soft)]">Compare</Link>
-            <span>→</span>
-            <span className="text-[var(--acx-text)]">
-              {agentA.name} vs {agentB.name}
-            </span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title">
-            {agentA.name} vs {agentB.name}
-          </h1>
-          <p className="acx-body mt-3 text-base sm:text-lg">
-            Side by side comparison of capabilities, pricing and version history
-          </p>
+      <PlatformShell>
+        <div className="mb-3 flex items-center gap-2 text-sm acx-muted">
+          <Link href="/" className="hover:text-[var(--acx-text)]">Home</Link>
+          <span>/</span>
+          <Link href="/compare" className="hover:text-[var(--acx-text)]">Compare</Link>
+          <span>/</span>
+          <span className="text-[var(--acx-text)]">{agentA.name} vs {agentB.name}</span>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PlatformHeader
+          title={`${agentA.name} vs ${agentB.name}`}
+          subtitle="Side-by-side decision workspace for capabilities, pricing, context, and latest version state."
+        />
 
         <CompareView
           agentA={agentA}
@@ -128,11 +119,8 @@ export default async function CompareStaticPage({
           versionsB={versionsB}
         />
 
-        <div className="mt-12">
-          <h2 className="font-semibold text-[var(--acx-text)] mb-4">
-            Other Comparisons
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <PlatformPanel title="Other Comparisons" className="mt-6">
+          <div className="grid grid-cols-2 gap-3 p-4 md:grid-cols-3">
             {[
               { a: 'claude', b: 'chatgpt', label: 'Claude vs ChatGPT' },
               { a: 'cursor', b: 'windsurf', label: 'Cursor vs Windsurf' },
@@ -147,20 +135,19 @@ export default async function CompareStaticPage({
                 <Link
                   key={`${pair.a}-${pair.b}`}
                   href={`/compare/${pair.a}-vs-${pair.b}`}
-                  className="acx-panel p-4 hover:border-[var(--acx-border-strong)] transition-colors text-center"
+                  className="rounded-xl border acx-divider bg-[var(--acx-elevated)] p-4 text-center transition-colors hover:border-[var(--acx-border-strong)]"
                 >
                   <span className="text-sm font-medium text-[var(--acx-text)]">
                     {pair.label}
                   </span>
-                  <div className="text-xs text-[var(--acx-accent)] mt-1">
+                  <div className="mt-1 text-xs font-semibold text-[var(--acx-accent)]">
                     Compare →
                   </div>
                 </Link>
               ))}
           </div>
-        </div>
-
-      </div>
+        </PlatformPanel>
+      </PlatformShell>
       <Footer />
     </div>
   )

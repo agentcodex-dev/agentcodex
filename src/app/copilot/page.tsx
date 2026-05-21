@@ -5,6 +5,8 @@ import Footer from '@/components/Footer'
 import { supabase } from '@/lib/supabase'
 import { Agent, AgentVersion } from '@/lib/types'
 import { COPILOT_PRESETS, scoreForPreset } from '@/lib/copilot'
+import { PlatformBadge, PlatformHeader, PlatformMetric, PlatformPanel, PlatformShell } from '@/components/platform/PlatformUI'
+import { formatConfidence, formatShortDate } from '@/lib/display'
 
 export const metadata: Metadata = {
   title: 'Agent Copilot - Pick The Right Agent Fast',
@@ -51,26 +53,27 @@ export default async function CopilotPage({
     <div className="min-h-screen acx-shell">
       <Navigation />
 
-      <section className="acx-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-          <p className="acx-eyebrow text-sm">Workflow Copilot</p>
-          <h1 className="text-4xl sm:text-5xl font-semibold acx-page-title mt-2">Use-Case Copilot</h1>
-          <p className="acx-body mt-3 text-base sm:text-lg max-w-3xl">
-            Pick a workflow and get decision-ready shortlists with fast compare links.
-          </p>
-        </div>
-      </section>
+      <PlatformShell>
+        <PlatformHeader
+          title="Use-Case Copilot"
+          subtitle="Pick a workflow and get a decision-ready shortlist with rationale, current version context, and fast compare links."
+        />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-3 acx-reveal">
+        <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <PlatformMetric label="Preset" value={COPILOT_PRESETS[selected].label} detail="active workflow lens" tone="blue" />
+          <PlatformMetric label="Candidates" value={ranked.length} detail="ranked by latest version" tone="green" />
+          <PlatformMetric label="Leader" value={leader?.agent.name || 'N/A'} detail={leader ? leader.latest.version_number : 'no scored agents'} tone="amber" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {Object.entries(COPILOT_PRESETS).map(([key, p]) => (
             <Link
               key={key}
               href={`/copilot?preset=${key}`}
-              className={`px-4 py-3 rounded-lg border text-sm font-medium ${
+              className={`rounded-xl border px-4 py-3 text-sm font-semibold transition-colors ${
                 key === selected
-                  ? 'bg-[var(--acx-accent-soft)] text-[var(--acx-accent)] border-[var(--acx-accent)]'
-                  : 'bg-[var(--acx-elevated)] text-[var(--acx-text-soft)] border-[var(--acx-border)] hover:border-[var(--acx-border-strong)]'
+                  ? 'border-[var(--acx-accent)] bg-[var(--acx-accent-soft)] text-[var(--acx-accent)]'
+                  : 'acx-divider bg-[var(--acx-elevated)] text-[var(--acx-text-soft)] hover:border-[var(--acx-border-strong)]'
               }`}
             >
               {p.label}
@@ -78,21 +81,28 @@ export default async function CopilotPage({
           ))}
         </div>
 
-        <section className="mt-8 acx-panel p-6 acx-reveal acx-reveal-delay-1">
-          <h2 className="font-semibold text-[var(--acx-text)]">Top picks for {COPILOT_PRESETS[selected].label}</h2>
-          <div className="mt-4 space-y-3">
+        <PlatformPanel title={`Top picks for ${COPILOT_PRESETS[selected].label}`} subtitle="Weighted fit, freshness, and verification boosts" className="mt-5">
+          <div className="space-y-3 p-4">
             {ranked.map((row, index) => (
-              <div key={row.agent.id} className="border acx-divider rounded-lg p-4 bg-[var(--acx-elevated-soft)]">
+              <div key={row.agent.id} className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-[var(--acx-text)]">{index + 1}. {row.agent.name}</p>
-                    <p className="text-xs acx-muted mt-1">Latest {row.latest.version_number}</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-[var(--acx-text)]">{index + 1}. {row.agent.name}</p>
+                      {index === 0 && <PlatformBadge tone="green">Leader</PlatformBadge>}
+                    </div>
+                    <p className="mt-1 text-xs acx-muted">
+                      Latest {row.latest.version_number} / {formatShortDate(row.latest.release_date)} / Confidence {formatConfidence(row.agent, row.latest).label}{formatConfidence(row.agent, row.latest).estimated ? ' EST' : ''}
+                    </p>
+                    <p className="mt-2 text-sm acx-body">
+                      Strongest fit under the {COPILOT_PRESETS[selected].label.toLowerCase()} weighting based on current capability scores.
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs px-2 py-1 rounded-full bg-[var(--acx-text)] text-[var(--acx-elevated)]">{row.score.toFixed(2)}</span>
-                    <Link href={`/agents/${row.agent.slug}`} className="text-xs text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]">View agent</Link>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <PlatformBadge tone="blue">{row.score.toFixed(2)}</PlatformBadge>
+                    <Link href={`/agents/${row.agent.slug}`} className="rounded-lg border acx-divider px-3 py-2 text-xs font-semibold text-[var(--acx-text-soft)] hover:border-[var(--acx-accent)]">View agent</Link>
                     {leader && leader.agent.slug !== row.agent.slug && (
-                      <Link href={`/compare/${leader.agent.slug}-vs-${row.agent.slug}`} className="text-xs text-[var(--acx-accent)] hover:text-[var(--acx-accent-hover)]">
+                      <Link href={`/compare/${leader.agent.slug}-vs-${row.agent.slug}`} className="rounded-lg border acx-divider px-3 py-2 text-xs font-semibold text-[var(--acx-text-soft)] hover:border-[var(--acx-accent)]">
                         Compare with #{1}
                       </Link>
                     )}
@@ -101,8 +111,8 @@ export default async function CopilotPage({
               </div>
             ))}
           </div>
-        </section>
-      </main>
+        </PlatformPanel>
+      </PlatformShell>
       <Footer />
     </div>
   )

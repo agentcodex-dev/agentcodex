@@ -76,7 +76,7 @@ export default function RootLayout({
                   var storedPref = localStorage.getItem(prefKey);
                   var pref = (storedPref === 'light' || storedPref === 'dark' || storedPref === 'system')
                     ? storedPref
-                    : 'system';
+                    : 'light';
 
                   function resolveTheme(value) {
                     if (value === 'light' || value === 'dark') return value;

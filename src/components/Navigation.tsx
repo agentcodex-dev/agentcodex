@@ -27,6 +27,11 @@ export default function Navigation() {
     return pathname === href || pathname.startsWith(`${href}/`)
   }
 
+  const onAgentsDirectory = pathname === '/agents'
+  const browseClass = onAgentsDirectory
+    ? 'acx-btn-outline-accent'
+    : 'acx-btn-primary'
+
   function setThemePref(pref: 'light' | 'dark' | 'system') {
     if (typeof window !== 'undefined' && window.__acxSetThemePref) {
       window.__acxSetThemePref(pref)
@@ -104,7 +109,7 @@ export default function Navigation() {
             {/* Desktop Browse Button */}
             <Link
               href="/agents"
-              className="hidden md:block acx-btn-primary px-4 py-2 text-sm"
+              className={`hidden md:block ${browseClass} rounded-[var(--acx-radius-sm)] px-4 py-2 text-sm font-semibold transition-colors`}
             >
               Browse Agents
             </Link>
@@ -201,7 +206,7 @@ export default function Navigation() {
               <Link
                 href="/agents"
                 onClick={() => setMenuOpen(false)}
-                className="block w-full acx-btn-primary px-4 py-3 text-sm text-center"
+                className={`block w-full ${browseClass} rounded-[var(--acx-radius-sm)] px-4 py-3 text-center text-sm font-semibold transition-colors`}
               >
                 Browse Agents
               </Link>
