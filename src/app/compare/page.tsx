@@ -146,7 +146,7 @@ export default async function ComparePage({
       <PlatformShell>
         <PlatformHeader
           title="Compare AI Agents"
-          subtitle="Evaluate fit, tradeoffs, source context, and latest version movement side by side for your workflow."
+          subtitle="Evaluate fit, tradeoffs, and latest release posture side by side with an enterprise decision lens."
         />
 
         <PlatformPanel title="Comparison Control Bar" subtitle="Pick two agents or use a preset shortlist">
@@ -177,6 +177,7 @@ export default async function ComparePage({
                     : 'acx-divider bg-[var(--acx-elevated)] hover:border-[var(--acx-border-strong)]'
                 }`}
               >
+                <p className="acx-code-badge acx-muted mb-2">Preset</p>
                 <p className="text-sm font-semibold text-[var(--acx-text)]">{value.label}</p>
                 <p className="mt-1 text-xs acx-muted">Weighted shortlist</p>
               </Link>

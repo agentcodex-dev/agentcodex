@@ -76,6 +76,7 @@ export default async function CopilotPage({
                   : 'acx-divider bg-[var(--acx-elevated)] text-[var(--acx-text-soft)] hover:border-[var(--acx-border-strong)]'
               }`}
             >
+              <p className="acx-code-badge acx-muted mb-1">Workflow</p>
               {p.label}
             </Link>
           ))}
@@ -88,6 +89,7 @@ export default async function CopilotPage({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
+                      <span className="acx-code-badge acx-muted">Rank</span>
                       <p className="font-semibold text-[var(--acx-text)]">{index + 1}. {row.agent.name}</p>
                       {index === 0 && <PlatformBadge tone="green">Leader</PlatformBadge>}
                     </div>

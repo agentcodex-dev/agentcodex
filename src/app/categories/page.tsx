@@ -100,6 +100,7 @@ function CategoryPanel({
   return (
     <PlatformPanel className="h-full transition-colors hover:border-[var(--acx-border-strong)]">
       <div className="p-5">
+        <p className="acx-code-badge acx-muted mb-3">Category Map</p>
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[var(--acx-accent-soft)] text-sm font-bold text-[var(--acx-accent)]">
@@ -115,15 +116,15 @@ function CategoryPanel({
 
         <div className="grid grid-cols-3 gap-2">
           <div className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-3">
-            <p className="text-[10px] uppercase tracking-[0.08em] acx-muted">Updated</p>
+            <p className="acx-code-badge acx-muted">Updated</p>
             <p className="mt-1 text-lg font-semibold text-[var(--acx-text)]">{recent}</p>
           </div>
           <div className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-3">
-            <p className="text-[10px] uppercase tracking-[0.08em] acx-muted">Signals</p>
+            <p className="acx-code-badge acx-muted">Signals</p>
             <p className="mt-1 text-lg font-semibold text-[var(--acx-text)]">{releases.length}</p>
           </div>
           <div className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-3">
-            <p className="text-[10px] uppercase tracking-[0.08em] acx-muted">Delta</p>
+            <p className="acx-code-badge acx-muted">Delta</p>
             <p className={`mt-1 text-lg font-semibold ${topMover ? 'text-[var(--acx-success)]' : 'acx-muted'}`}>
               {topMover ? topMover.totalDelta : 0}
             </p>
@@ -131,7 +132,7 @@ function CategoryPanel({
         </div>
 
         <div className="mt-4 rounded-xl border acx-divider bg-[var(--acx-surface)] p-3">
-          <p className="text-xs font-semibold text-[var(--acx-text)]">Latest category signal</p>
+          <p className="acx-code-badge text-[var(--acx-text-muted)]">Latest Signal</p>
           <p className="mt-1 line-clamp-2 text-xs leading-relaxed acx-muted">
             {latest ? `${latest.agent.name}: ${latest.what_changed}` : 'No published releases yet.'}
           </p>

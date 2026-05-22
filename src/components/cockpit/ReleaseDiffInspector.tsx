@@ -220,16 +220,16 @@ export default function ReleaseDiffInspector({
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <div className="rounded-md border border-slate-800 bg-slate-950/40 p-2">
-                <p className="text-[10px] uppercase tracking-[0.08em] text-slate-500">Importance</p>
+              <div className="min-w-0 rounded-md border border-slate-800 bg-slate-950/40 px-2 py-2">
+                <p className="truncate text-[9px] leading-none uppercase tracking-[0.05em] text-slate-500">Importance</p>
                 <p className="mt-1 text-lg font-semibold text-slate-100">{release.importanceScore}</p>
               </div>
-              <div className="rounded-md border border-slate-800 bg-slate-950/40 p-2">
-                <p className="text-[10px] uppercase tracking-[0.08em] text-slate-500">Confidence</p>
+              <div className="min-w-0 rounded-md border border-slate-800 bg-slate-950/40 px-2 py-2">
+                <p className="truncate text-[9px] leading-none uppercase tracking-[0.05em] text-slate-500">Confidence</p>
                 <p className="mt-1 text-lg font-semibold text-slate-100">{release.confidencePercent}%</p>
               </div>
-              <div className="rounded-md border border-slate-800 bg-slate-950/40 p-2">
-                <p className="text-[10px] uppercase tracking-[0.08em] text-slate-500">Delta</p>
+              <div className="min-w-0 rounded-md border border-slate-800 bg-slate-950/40 px-2 py-2">
+                <p className="truncate text-[9px] leading-none uppercase tracking-[0.05em] text-slate-500">Delta</p>
                 <p className={`mt-1 text-lg font-semibold acx-cockpit-${release.capabilityTone}`}>
                   {release.capabilityDeltaLabel}
                 </p>

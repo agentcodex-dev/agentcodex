@@ -67,6 +67,7 @@ export default function MethodologyPage() {
           <div className="space-y-5">
             <PlatformPanel title="What We Track" subtitle="Version-aware release intelligence, not benchmark leaderboards">
               <div className="p-4">
+                <p className="acx-code-badge acx-muted mb-3">Scope</p>
                 <p className="text-sm leading-relaxed acx-body">
                   AgentCodex monitors agent releases, version notes, source links, and structured metadata. Each published record becomes part of the radar, profile timeline, directory, comparison, and copilot shortlist layers.
                 </p>
@@ -94,6 +95,7 @@ export default function MethodologyPage() {
 
             <PlatformPanel title="Confidence, EST, and Missing Fields">
               <div className="space-y-3 p-4 text-sm leading-relaxed acx-body">
+                <p className="acx-code-badge acx-muted">Trust Model</p>
                 <p><span className="font-semibold text-[var(--acx-text)]">Confidence</span> comes from extraction confidence when present. If missing, AgentCodex shows an estimated confidence badge instead of pretending it is measured.</p>
                 <p><span className="font-semibold text-[var(--acx-text)]">Context window and pricing</span> are shown only when captured on a release or carried forward as a last-known metadata value.</p>
                 <p><span className="font-semibold text-[var(--acx-text)]">Source trust</span> indicates whether a release source matches known official domains for that agent.</p>

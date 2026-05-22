@@ -149,6 +149,7 @@ export default async function AgentPage({
           <div className="space-y-3">
             <PlatformPanel>
               <div className="p-5">
+              <p className="acx-code-badge acx-muted mb-3">Profile</p>
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="grid h-16 w-16 shrink-0 place-items-center rounded-xl bg-[var(--acx-accent-soft)]">
                   <span className="font-bold text-2xl text-[var(--acx-accent)]">{agent.name.slice(0, 2).toUpperCase()}</span>
@@ -195,6 +196,7 @@ export default async function AgentPage({
             <PlatformPanel title="Current Release Intelligence" subtitle="Latest published version and metadata capture state">
               <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-[1fr_320px]">
                 <div className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-4">
+                  <p className="acx-code-badge acx-muted mb-2">Release</p>
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold text-[var(--acx-text)]">{latestVersion?.version_number || 'No release'}</h3>
                     {latestVersion?.change_type && <PlatformBadge tone={latestVersion.change_type === 'major' ? 'green' : latestVersion.change_type === 'minor' ? 'blue' : 'neutral'}>{latestVersion.change_type}</PlatformBadge>}
@@ -231,7 +233,7 @@ export default async function AgentPage({
             <PlatformPanel title="Release Diff" subtitle="Core fields and capture notes for this release">
               <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-2">
                 <div className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] acx-muted">Version</p>
+                  <p className="acx-code-badge acx-muted">Version</p>
                   <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                     <div className="rounded-lg border acx-divider bg-[var(--acx-elevated)] p-3 text-[var(--acx-danger)]">
                       - {previousVersion?.version_number || 'N/A'}
@@ -242,12 +244,12 @@ export default async function AgentPage({
                   </div>
                 </div>
                 <div className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] acx-muted">Context Window</p>
+                  <p className="acx-code-badge acx-muted">Context Window</p>
                   <p className="mt-2 text-xs acx-muted">{metadataNote(latestVersion?.context_window)}</p>
                   <p className="mt-3 text-sm font-semibold text-[var(--acx-text)]">{formatContext(lastKnownContext)}</p>
                 </div>
                 <div className="rounded-xl border acx-divider bg-[var(--acx-surface)] p-4 lg:col-span-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] acx-muted">Pricing</p>
+                  <p className="acx-code-badge acx-muted">Pricing</p>
                   <p className="mt-2 text-xs acx-muted">{metadataNote(latestVersion?.pricing_info)}</p>
                   <p className="mt-3 text-sm font-semibold text-[var(--acx-text)]">{formatPricing(lastKnownPricing)}</p>
                 </div>

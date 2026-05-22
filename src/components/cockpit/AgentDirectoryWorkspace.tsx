@@ -179,7 +179,8 @@ export default function AgentDirectoryWorkspace({
                   </div>
 
                   <div className="mt-auto flex items-end justify-between gap-3 pt-5">
-                    <span className="text-xs acx-muted">
+                    <span className="text-xs acx-muted inline-flex items-center gap-2">
+                      <span className="acx-code-badge text-[var(--acx-text-muted)]">Trust</span>
                       Confidence {confidence ? `${confidence.label}${confidence.estimated ? ' EST' : ''}` : 'N/A'}
                     </span>
                     <button
@@ -257,7 +258,7 @@ function AgentPreviewSheet({
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ type: 'tween', ease: [0.16, 1, 0.3, 1], duration: 0.6 }}
             className="absolute inset-x-3 bottom-3 mx-auto max-h-[86vh] max-w-4xl overflow-y-auto rounded-2xl border acx-divider bg-[var(--acx-elevated)] shadow-2xl sm:inset-x-6 sm:bottom-6"
           >
             <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b acx-divider bg-[var(--acx-elevated)] px-5 py-4">

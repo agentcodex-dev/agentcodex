@@ -99,6 +99,7 @@ export default function CompareView({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {[{ agent: agentA, tone: 'left' }, { agent: agentB, tone: 'right' }].map(({ agent, tone }) => (
           <div key={agent.id} className="acx-panel p-5 sm:p-6 acx-reveal">
+            <p className="acx-code-badge acx-muted mb-3">Candidate</p>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-11 h-11 rounded-xl bg-[var(--acx-accent-soft)] text-[var(--acx-accent)] flex items-center justify-center shrink-0">
                 <span className="font-semibold text-lg">{agent.name.charAt(0)}</span>
@@ -130,7 +131,7 @@ export default function CompareView({
       </div>
 
       <div className="acx-panel p-5 text-center acx-reveal acx-reveal-delay-1">
-        <p className="text-sm acx-muted mb-1">Overall fit signal</p>
+        <p className="acx-code-badge acx-muted mb-2">Fit Signal</p>
         {winsA === winsB ? (
           <p className="text-lg font-semibold text-[var(--acx-text)]">Tied {winsA} - {winsB}</p>
         ) : winsA > winsB ? (
@@ -143,6 +144,7 @@ export default function CompareView({
 
       <div className="acx-panel overflow-hidden acx-reveal acx-reveal-delay-2">
         <div className="px-5 py-4 border-b acx-divider bg-[var(--acx-surface)]">
+          <p className="acx-code-badge acx-muted mb-2">Snapshot</p>
           <h3 className="font-semibold text-[var(--acx-text)]">Decision Snapshot</h3>
         </div>
         <div className="divide-y acx-divider">
@@ -176,6 +178,7 @@ export default function CompareView({
       {allCapabilities.length > 0 && (
         <div className="acx-panel overflow-hidden acx-reveal acx-reveal-delay-3">
           <div className="px-5 py-4 border-b acx-divider bg-[var(--acx-surface)]">
+            <p className="acx-code-badge acx-muted mb-2">Capability Grid</p>
             <div className="grid grid-cols-3 items-center gap-3">
               <h3 className="font-semibold text-[var(--acx-text)]">Capability Fit</h3>
               <span className="text-xs sm:text-sm text-center font-medium text-[var(--acx-text-soft)] truncate">{agentA.name}</span>
