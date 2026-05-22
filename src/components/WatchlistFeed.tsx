@@ -76,7 +76,8 @@ export default function WatchlistFeed({ releases }: Props) {
   if (watchlist.length === 0) {
     return (
       <div className="acx-panel p-6 text-sm acx-body">
-        Add agents to your watchlist to get a personal change feed here.
+        <div className="acx-empty-visual" aria-hidden="true" />
+        <p className="mt-4 text-center">Add agents to your watchlist to get a personal change feed here.</p>
       </div>
     )
   }
@@ -84,7 +85,8 @@ export default function WatchlistFeed({ releases }: Props) {
   if (filtered.length === 0) {
     return (
       <div className="acx-panel p-6 text-sm acx-body">
-        No published releases yet for your watched agents.
+        <div className="acx-empty-visual" aria-hidden="true" />
+        <p className="mt-4 text-center">No published releases yet for your watched agents.</p>
       </div>
     )
   }
