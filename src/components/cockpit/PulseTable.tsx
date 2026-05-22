@@ -162,7 +162,7 @@ export default function PulseTable({
                   </td>
                   <td className="px-3 py-3">
                     <span className={`acx-cockpit-pill acx-tone-${release.changeTone}`}>
-                      {release.changeType}
+                      {release.changeLabel}
                     </span>
                   </td>
                   <td className="px-3 py-3">

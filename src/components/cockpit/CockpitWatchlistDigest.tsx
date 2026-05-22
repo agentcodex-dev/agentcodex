@@ -85,7 +85,7 @@ export default function CockpitWatchlistDigest({ releases }: Props) {
               <div className="flex items-center justify-between gap-3">
                 <p className="truncate text-xs font-semibold text-slate-200">{release.agent.name}</p>
                 <span className={`acx-cockpit-pill acx-tone-${release.changeTone}`}>
-                  {release.changeType}
+                  {release.changeLabel}
                 </span>
               </div>
               <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-500">

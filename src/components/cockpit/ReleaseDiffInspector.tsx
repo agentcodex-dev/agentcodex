@@ -207,7 +207,7 @@ export default function ReleaseDiffInspector({
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold text-slate-50">{release.agent.name}</h3>
                   <span className={`acx-cockpit-pill acx-tone-${release.changeTone}`}>
-                    {release.changeType}
+                    {release.changeLabel}
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-slate-400">

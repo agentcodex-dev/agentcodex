@@ -124,6 +124,44 @@ Rules:
 - Respond with JSON only.
 """
 
+SIGNAL_EXTRACTION_PROMPT = """You are an AI ecosystem change tracker. Today's date is {today}.
+
+Analyze this content from {source_name}. If there is a meaningful NON-VERSION platform update for any of these agents: {agent_slugs}, extract one high-signal item.
+
+Content:
+{content}
+
+Return JSON in this exact format:
+{{
+  "found": true,
+  "agent_slug": "the-agent-slug",
+  "signal_type": "meta_update|capability_update|policy_update",
+  "release_date": "YYYY-MM-DD",
+  "title": "short signal title",
+  "what_changed": "2-3 sentences summarizing the concrete update",
+  "capabilities": {{
+    "coding": 0,
+    "reasoning": 0,
+    "multimodal": 0,
+    "tool_use": 0,
+    "memory": 0,
+    "speed": 0
+  }},
+  "context_window": null,
+  "pricing_info": null,
+  "source_url": "url of the article"
+}}
+
+If no meaningful non-version update exists, return exactly:
+{{"found": false}}
+
+Rules:
+- Do not emit a signal when this is clearly a version release with a concrete version number.
+- Prefer updates about capabilities, policy/safety/usage limits, pricing/availability, enterprise rollout, platform behavior shifts, or deprecations.
+- Keep agent_slug within {agent_slugs}
+- Respond with JSON only.
+"""
+
 # ─────────────────────────────────────
 # VERSION KEYWORDS PRE-FILTER
 # ─────────────────────────────────────
@@ -330,6 +368,54 @@ def extract_versions_backfill(
     return []
 
 
+def extract_non_version_signal(article: dict, sonnet_model: str) -> Optional[dict]:
+    today = datetime.now(timezone.utc).date().isoformat()
+    prompt = SIGNAL_EXTRACTION_PROMPT.format(
+        today=today,
+        source_name=article['source_name'],
+        agent_slugs=article['agent_slugs'],
+        content=article['content'][:5000],
+    )
+
+    for attempt in range(3):
+        try:
+            SONNET_LIMITER.wait()
+            message = client.messages.create(
+                model=sonnet_model,
+                max_tokens=1024,
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }]
+            )
+            payload = _extract_json_payload(message.content[0].text)
+            if payload.get('found'):
+                print(f"  📡 Found non-version signal: {payload.get('signal_type', 'meta_update')}")
+                return payload
+            return None
+
+        except json.JSONDecodeError as e:
+            print(f"  ❌ Signal JSON parse error: {e}")
+            return None
+
+        except Exception as e:
+            if is_auth_error(e):
+                raise PipelineAuthError(
+                    'Anthropic authentication failed. Check the ANTHROPIC_API_KEY secret.'
+                ) from e
+
+            error_str = str(e)
+            if '429' in error_str and attempt < 2:
+                wait_time = (attempt + 1) * 60
+                print(f"  ⏳ Rate limited - waiting {wait_time}s...")
+                time.sleep(wait_time)
+                continue
+            print(f"  ❌ Signal extraction error: {e}")
+            return None
+
+    return None
+
+
 # ─────────────────────────────────────
 # MAIN EXTRACT ALL FUNCTION
 # ─────────────────────────────────────
@@ -448,6 +534,10 @@ def extract_all(
             if single:
                 candidates = [single]
 
+        signal_candidate = None
+        if not candidates:
+            signal_candidate = extract_non_version_signal(article, sonnet_model)
+
         for result in candidates:
             clean_result, errors = validate_extraction(
                 result,
@@ -479,6 +569,32 @@ def extract_all(
                         'rejected',
                         {'errors': errors}
                     )
+
+        if signal_candidate:
+            clean_signal, signal_errors = validate_extraction(
+                signal_candidate,
+                article,
+                max_release_age_days=max_release_age_days,
+                scoring_mode=scoring_mode,
+                allow_signal_lane=True,
+            )
+            if clean_signal:
+                clean_signal['pipeline_source'] = article['url']
+                versions_found.append(clean_signal)
+                if run_logger:
+                    run_logger.increment('extracted')
+                    run_logger.event(
+                        article,
+                        'sonnet',
+                        'signal_extracted',
+                        {
+                            'agent_slug': clean_signal.get('agent_slug'),
+                            'signal_type': (clean_signal.get('impact_factors') or {}).get('signalType'),
+                            'version_number': clean_signal.get('version_number'),
+                        }
+                    )
+            else:
+                print(f"  ❌ Signal validation rejected extraction: {'; '.join(signal_errors)}")
 
         mark_seen(article)
 

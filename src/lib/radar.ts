@@ -58,6 +58,8 @@ export type RadarPulseRelease = LatestRelease & {
   ageLabel: string
   ageMinutes: number
   changeType: ChangeType
+  changeLabel: string
+  recordLane: 'version' | 'signal'
   changeTone: RadarTone
   importanceScore: number
   confidencePercent: number
@@ -227,7 +229,13 @@ function buildPulseRelease(
   const capabilityDelta = changes.reduce((sum, change) => sum + change.delta, 0)
   const absoluteDelta = changes.reduce((sum, change) => sum + Math.abs(change.delta), 0)
   const quality = deriveQualitySignal(release.agent, release)
+  const isSignalRecord = (release.quality_flags || []).some((flag) => flag === 'non_version_signal')
   const changeType = release.change_type || deriveChangeType(absoluteDelta, release.what_changed || '')
+  const signalTypeFlag = (release.quality_flags || []).find((flag) => flag.startsWith('signal_type:'))
+  const signalType = signalTypeFlag ? signalTypeFlag.replace('signal_type:', '') : ''
+  const changeLabel = isSignalRecord
+    ? (signalType ? signalType.replace('_', ' ') : 'signal')
+    : changeType
   const importanceScore = release.importance_score || deriveImportanceScore(absoluteDelta, release.what_changed || '')
   const confidencePercent = Math.round(quality.extractionConfidence * 100)
   const confidenceKind = typeof release.extraction_confidence === 'number' ? 'extracted' : 'estimated'
@@ -237,6 +245,8 @@ function buildPulseRelease(
     ageLabel: formatAgeLabel(release.release_date),
     ageMinutes: getAgeMinutes(release.release_date),
     changeType,
+    changeLabel,
+    recordLane: isSignalRecord ? 'signal' : 'version',
     changeTone: getChangeTone(changeType),
     importanceScore,
     confidencePercent,

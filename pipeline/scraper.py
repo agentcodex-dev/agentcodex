@@ -111,6 +111,8 @@ def _extract_article_urls(
     base_url: str,
     limit: int = 5,
     allowed_hosts: Optional[Set[str]] = None,
+    include_patterns: Optional[list[str]] = None,
+    exclude_patterns: Optional[list[str]] = None,
 ) -> list[str]:
     """
     Parse markdown links from a Jina-rendered listing page.
@@ -129,8 +131,15 @@ def _extract_article_urls(
     skip_terms = ('/tag/', '/category/', '/author/', '/page/', '/search', '/feed', '.xml', '.rss', '/cdn-cgi/', '/assets/')
     skip_extensions = ('.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif', '.ico', '.pdf', '.zip', '.tar', '.gz', '.mp4')
 
+    include_rx = [re.compile(pattern, re.IGNORECASE) for pattern in (include_patterns or [])]
+    exclude_rx = [re.compile(pattern, re.IGNORECASE) for pattern in (exclude_patterns or [])]
+    release_terms = (
+        'changelog', 'release', 'announce', 'update', 'updates', 'new', 'model',
+        'launch', 'introducing', 'version', 'preview', 'ga'
+    )
+
+    candidates: list[tuple[int, str]] = []
     seen: set[str] = set()
-    results: list[str] = []
 
     for url in raw_links:
         parsed = urlparse(url)
@@ -151,19 +160,28 @@ def _extract_article_urls(
             continue
         if path_lower.endswith(skip_extensions):
             continue
+        if exclude_rx and any(rx.search(url) or rx.search(path_lower) for rx in exclude_rx):
+            continue
 
         # Strip fragment/query for deduplication
         clean = parsed._replace(fragment='', query='').geturl()
         if clean in seen:
             continue
 
+        score = 0
+        if include_rx and any(rx.search(clean) or rx.search(path_lower) for rx in include_rx):
+            score += 8
+        score += sum(2 for token in release_terms if token in path_lower)
+        if '/docs' in path_lower or '/api' in path_lower:
+            score -= 3
+        if '/news' in path_lower or '/blog' in path_lower or '/research' in path_lower:
+            score += 1
+
         seen.add(clean)
-        results.append(clean)
+        candidates.append((score, clean))
 
-        if len(results) >= limit:
-            break
-
-    return results
+    candidates.sort(key=lambda row: row[0], reverse=True)
+    return [url for _, url in candidates[:limit]]
 
 
 def _extract_canonical_source_url(listing_text: str, fallback_url: str) -> str:
@@ -227,6 +245,8 @@ def fetch_jina(
         listing_url,
         limit=max_links,
         allowed_hosts=allowed_hosts,
+        include_patterns=source.get('include_patterns'),
+        exclude_patterns=source.get('exclude_patterns'),
     )
     always_fetch_listing = bool(source.get('always_fetch_listing'))
     treat_as_snapshot = mode in {'listing_snapshot', 'hybrid'} or always_fetch_listing

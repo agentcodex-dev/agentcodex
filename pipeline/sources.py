@@ -34,6 +34,8 @@ SOURCES = [
         'url': 'https://api-docs.deepseek.com/updates/',
         'mode': 'listing_snapshot',
         'canonical_hosts': ['api-docs.deepseek.com', 'deepseek.com'],
+        'include_patterns': [r'/updates/', r'/release', r'/model', r'/reasoner', r'/coder', r'/chat'],
+        'exclude_patterns': [r'/search', r'/tag/', r'/category/', r'/assets/', r'\.(png|jpg|jpeg|svg|webp|gif|pdf)$'],
     },
     {
         'name': 'Qwen',
@@ -42,6 +44,8 @@ SOURCES = [
         'url': 'https://qwen.ai/research',
         'mode': 'hybrid',
         'canonical_hosts': ['qwen.ai', 'qwenlm.github.io', 'qwenlm.ai'],
+        'include_patterns': [r'/research', r'/blog', r'/qwen', r'/qwq', r'/code', r'/vl', r'/omni'],
+        'exclude_patterns': [r'/search', r'/tag/', r'/category/', r'/assets/', r'/docs', r'\.(png|jpg|jpeg|svg|webp|gif|pdf)$'],
     },
     {
         'name': 'Cohere Changelog',
@@ -50,6 +54,8 @@ SOURCES = [
         'url': 'https://docs.cohere.com/changelog',
         'mode': 'hybrid',
         'canonical_hosts': ['docs.cohere.com', 'cohere.com'],
+        'include_patterns': [r'/changelog', r'/release', r'/models', r'/command', r'/embed', r'/rerank'],
+        'exclude_patterns': [r'/search', r'/tag/', r'/category/', r'/assets/', r'/reference', r'\.(png|jpg|jpeg|svg|webp|gif|pdf)$'],
     },
     {
         'name': 'Cohere Models Overview',

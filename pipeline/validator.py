@@ -1,5 +1,6 @@
 from datetime import datetime, timezone, timedelta
 from typing import Optional
+import hashlib
 from scoring import apply_scoring_mode
 
 REQUIRED_CAPABILITIES = {
@@ -14,6 +15,7 @@ REQUIRED_CAPABILITIES = {
 MAX_FUTURE_DAYS = 7
 DEFAULT_MAX_RELEASE_AGE_DAYS = 30
 CHANGE_TYPES = {'major', 'minor', 'patch', 'noise'}
+SIGNAL_TYPES = {'meta_update', 'capability_update', 'policy_update'}
 OFFICIAL_DOMAINS = {
     'chatgpt': ['openai.com', 'help.openai.com'],
     'codex': ['openai.com', 'help.openai.com'],
@@ -107,6 +109,7 @@ def validate_extraction(
     article: dict,
     max_release_age_days: int = DEFAULT_MAX_RELEASE_AGE_DAYS,
     scoring_mode: str = 'legacy',
+    allow_signal_lane: bool = False,
 ) -> tuple[Optional[dict], list[str]]:
     """
     Validate and normalize model output before writing drafts.
@@ -119,11 +122,16 @@ def validate_extraction(
     if agent_slug not in allowed_slugs:
         errors.append(f"agent_slug must be one of {allowed_slugs}")
 
+    signal_type = str(extraction.get('signal_type') or '').strip().lower()
+    is_signal = allow_signal_lane and signal_type in SIGNAL_TYPES
+
     version_number = str(extraction.get('version_number') or '').strip()
-    if not version_number:
+    if not version_number and not is_signal:
         errors.append('version_number is required')
 
     release_date = str(extraction.get('release_date') or '').strip()
+    if not release_date and is_signal:
+        release_date = datetime.now(timezone.utc).date().isoformat()
     if not release_date or not _valid_date(release_date, max_release_age_days):
         errors.append(f'release_date must be within {max_release_age_days} days (YYYY-MM-DD)')
 
@@ -141,6 +149,12 @@ def validate_extraction(
     if errors:
         return None, errors
 
+    if is_signal:
+        source_url = str(extraction.get('source_url') or article.get('url') or '')
+        hash_basis = f"{agent_slug}|{signal_type}|{release_date}|{source_url}|{what_changed[:220]}"
+        signal_id = hashlib.sha1(hash_basis.encode()).hexdigest()[:10]
+        version_number = f"SIGNAL:{signal_type}:{release_date}:{signal_id}"
+
     extraction_confidence = extraction.get('extraction_confidence')
     if not isinstance(extraction_confidence, (int, float)):
         extraction_confidence = 0.56
@@ -151,6 +165,10 @@ def validate_extraction(
         extraction_confidence=float(extraction_confidence),
         scoring_mode=scoring_mode,
     )
+    clean_change_type = extraction.get('change_type')
+    if is_signal:
+        clean_change_type = 'minor' if signal_type == 'capability_update' else 'patch'
+
     clean = {
         **extraction,
         'agent_slug': agent_slug,
@@ -162,7 +180,7 @@ def validate_extraction(
         'pricing_info': extraction.get('pricing_info'),
         'source_url': extraction.get('source_url') or article.get('url'),
         'importance_score': extraction.get('importance_score'),
-        'change_type': extraction.get('change_type'),
+        'change_type': clean_change_type,
         'extraction_confidence': extraction.get('extraction_confidence'),
         'editor_note': extraction.get('editor_note'),
         'scoring_mode': score_meta['mode'],
@@ -203,6 +221,11 @@ def validate_extraction(
         quality_flags.append('low_confidence')
     if clean['importance_score'] >= 8:
         quality_flags.append('high_impact')
+    if is_signal:
+        quality_flags.extend([
+            'non_version_signal',
+            f'signal_type:{signal_type}',
+        ])
     clean['quality_flags'] = quality_flags
 
     trust_impact = 1.1 if is_official else 0.85
@@ -222,6 +245,15 @@ def validate_extraction(
         'calibratedScores': score_meta['calibrated_scores'],
         'scoreAdjustments': score_meta['score_adjustments'],
     }
+    if is_signal:
+        clean['impact_factors'].update({
+            'recordLane': 'signal',
+            'signalType': signal_type,
+            'signalTitle': str(extraction.get('title') or '').strip() or clean['what_changed'][:80],
+        })
+        existing_note = str(clean.get('editor_note') or '').strip()
+        signal_note = f"signal_lane({signal_type})"
+        clean['editor_note'] = f"{existing_note} | {signal_note}".strip(' |')
 
     missing_scores = REQUIRED_CAPABILITIES - set(capabilities.keys())
     if missing_scores:
