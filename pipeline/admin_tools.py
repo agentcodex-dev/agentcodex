@@ -1,5 +1,7 @@
 import argparse
 import os
+import subprocess
+import sys
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from supabase import create_client
@@ -76,6 +78,54 @@ ONBOARDING_AGENTS = [
         'website_url': 'https://www.continue.dev',
         'is_verified': True,
     },
+    {
+        'name': 'Google Antigravity',
+        'slug': 'antigravity',
+        'provider': 'Google',
+        'category': ['Coding'],
+        'description': (
+            'Google Antigravity is an agent-first development platform for '
+            'building, orchestrating, and running autonomous software agents.'
+        ),
+        'website_url': 'https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/',
+        'is_verified': True,
+    },
+    {
+        'name': 'OpenHands',
+        'slug': 'openhands',
+        'provider': 'OpenHands',
+        'category': ['Coding', 'Open Source'],
+        'description': (
+            'OpenHands is an open-source AI-driven software development agent '
+            'with active release cadence and self-hosted deployment support.'
+        ),
+        'website_url': 'https://openhands.dev',
+        'is_verified': True,
+    },
+    {
+        'name': 'DeepSeek',
+        'slug': 'deepseek',
+        'provider': 'DeepSeek',
+        'category': ['Coding', 'Research'],
+        'description': (
+            'DeepSeek provides frontier reasoning and coding models with '
+            'public release updates and developer-facing API changelogs.'
+        ),
+        'website_url': 'https://api-docs.deepseek.com/updates/',
+        'is_verified': True,
+    },
+    {
+        'name': 'Qwen',
+        'slug': 'qwen',
+        'provider': 'Alibaba Cloud',
+        'category': ['Coding', 'Research', 'Open Source'],
+        'description': (
+            'Qwen is Alibaba Cloud’s open and commercial model ecosystem, '
+            'including coding- and agent-oriented releases across the Qwen stack.'
+        ),
+        'website_url': 'https://qwenlm.github.io/blog/',
+        'is_verified': True,
+    },
 ]
 
 
@@ -97,9 +147,15 @@ def list_agent_slugs(limit: int = 100):
     return [row['slug'] for row in (result.data or [])]
 
 
-def seed_onboarding_agents():
+def seed_onboarding_agents(
+    run_backfill: bool = True,
+    backfill_days: int = 90,
+    max_links: int = 8,
+    max_versions_per_article: int = 12,
+):
     created = 0
     existing = 0
+    created_slugs = []
 
     for agent in ONBOARDING_AGENTS:
         found = get_agent(agent['slug'])
@@ -111,11 +167,37 @@ def seed_onboarding_agents():
         result = supabase.table('agents').insert(agent).execute()
         if result.data:
             created += 1
+            created_slugs.append(agent['slug'])
             print(f"Created: {agent['slug']}")
         else:
             print(f"Failed: {agent['slug']}")
 
     print(f"Done. Created {created}, already existed {existing}.")
+    if not run_backfill:
+        return
+    if not created_slugs:
+        print("No newly created agents for backfill.")
+        return
+
+    command = [
+        sys.executable,
+        'pipeline/main.py',
+        '--backfill',
+        '--agents',
+        ','.join(created_slugs),
+        '--backfill-days',
+        str(max(1, backfill_days)),
+        '--max-links',
+        str(max(1, max_links)),
+        '--max-versions-per-article',
+        str(max(1, max_versions_per_article)),
+        '--scoring-mode',
+        'calibrated',
+    ]
+    print("\nRunning seeded backfill")
+    print("──────────────────────")
+    print("Command:", ' '.join(command))
+    subprocess.run(command, check=True)
 
 
 def create_test_draft(agent_slug: str):
@@ -417,10 +499,19 @@ def main():
     parser.add_argument('--scoring-mode', default='calibrated', choices=['legacy', 'calibrated'])
     parser.add_argument('--strategy', default='sanitize', choices=['sanitize', 'calibrated'])
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--no-backfill', action='store_true')
+    parser.add_argument('--backfill-days', type=int, default=90)
+    parser.add_argument('--max-links', type=int, default=8)
+    parser.add_argument('--max-versions-per-article', type=int, default=12)
     args = parser.parse_args()
 
     if args.command == 'seed-onboarding-agents':
-        seed_onboarding_agents()
+        seed_onboarding_agents(
+            run_backfill=not args.no_backfill,
+            backfill_days=max(1, args.backfill_days),
+            max_links=max(1, args.max_links),
+            max_versions_per_article=max(1, args.max_versions_per_article),
+        )
     elif args.command == 'create-test-draft':
         create_test_draft(args.agent_slug)
     elif args.command == 'delete-test-drafts':

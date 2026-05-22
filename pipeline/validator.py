@@ -22,6 +22,27 @@ OFFICIAL_DOMAINS = {
     'cursor': ['cursor.com'],
     'github-copilot': ['github.com', 'github.blog'],
     'gemini': ['google.com', 'deepmind.google'],
+    'llama': ['meta.com', 'fb.com', 'facebook.com'],
+    'perplexity': ['perplexity.ai'],
+    'devin': ['cognition.ai'],
+    'bolt-new': ['stackblitz.com'],
+    'windsurf': ['codeium.com'],
+    'mistral': ['mistral.ai'],
+    'amazon-q': ['amazon.com', 'aws.amazon.com'],
+    'grok': ['x.ai', 'grok.com'],
+    'v0': ['v0.dev', 'vercel.com'],
+    'replit-agent': ['replit.com'],
+    'cline': ['github.com', 'cline.bot'],
+    'midjourney': ['midjourney.com'],
+    'stable-diffusion': ['stability.ai'],
+    'suno': ['suno.com'],
+    'aider': ['github.com', 'aider.chat'],
+    'roo-code': ['github.com'],
+    'continue': ['continue.dev', 'github.com'],
+    'antigravity': ['antigravity.google', 'google.com', 'developers.googleblog.com', 'blog.google'],
+    'openhands': ['github.com', 'openhands.dev'],
+    'deepseek': ['deepseek.com', 'api-docs.deepseek.com'],
+    'qwen': ['qwen.ai', 'qwenlm.github.io', 'qwenlm.ai', 'github.com', 'alibabacloud.com'],
 }
 
 
@@ -121,7 +142,7 @@ def validate_extraction(
 
     extraction_confidence = extraction.get('extraction_confidence')
     if not isinstance(extraction_confidence, (int, float)):
-        extraction_confidence = 0.7
+        extraction_confidence = 0.56
 
     capabilities, score_meta = apply_scoring_mode(
         capabilities,
@@ -157,9 +178,22 @@ def validate_extraction(
 
     confidence = clean['extraction_confidence']
     if not isinstance(confidence, (int, float)):
-        clean['extraction_confidence'] = 0.7
+        measured_confidence = 0.56
     else:
-        clean['extraction_confidence'] = max(0.0, min(1.0, float(confidence)))
+        measured_confidence = max(0.0, min(1.0, float(confidence)))
+
+    # Apply lightweight confidence calibration so values reflect evidence quality.
+    has_summary = bool(clean['what_changed'] and len(clean['what_changed'].strip()) >= 30)
+    has_caps = isinstance(clean['capabilities'], dict) and len(clean['capabilities']) >= 4
+    has_source = bool(clean.get('source_url'))
+    has_impact_fields = isinstance(clean.get('importance_score'), int) and bool(clean.get('change_type'))
+    completeness = sum([has_summary, has_caps, has_source, has_impact_fields]) / 4.0
+    source_factor = 0.12 if is_official else (-0.06 if has_source else -0.12)
+    completeness_factor = (completeness - 0.5) * 0.26
+    calibrated_confidence = measured_confidence + source_factor + completeness_factor
+    if not has_summary:
+        calibrated_confidence -= 0.08
+    clean['extraction_confidence'] = max(0.2, min(0.98, round(calibrated_confidence, 2)))
 
     quality_flags = []
     if not is_official:

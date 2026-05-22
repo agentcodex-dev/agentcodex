@@ -2,15 +2,17 @@ import re
 import feedparser
 import requests
 import calendar
+import hashlib
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Set
 from urllib.parse import urlparse
 from sources import SOURCES
-from deduplicator import is_url_seen
+from deduplicator import is_url_seen, is_content_seen
 from rate_limiter import RateLimiter, env_interval
 
 MAX_ARTICLE_AGE_DAYS = 30
 JINA_LIMITER = RateLimiter(env_interval('PIPELINE_JINA_INTERVAL_SECONDS', 0.5))
+SOURCE_MODES = {'rss', 'listing_links', 'listing_snapshot', 'hybrid'}
 
 
 # ─────────────────────────────────────
@@ -104,19 +106,28 @@ def _jina_get(url: str) -> str:
     return ''
 
 
-def _extract_article_urls(listing_text: str, base_url: str, limit: int = 5) -> list[str]:
+def _extract_article_urls(
+    listing_text: str,
+    base_url: str,
+    limit: int = 5,
+    allowed_hosts: Optional[Set[str]] = None,
+) -> list[str]:
     """
     Parse markdown links from a Jina-rendered listing page.
     Returns individual article URLs that are one level deeper than base_url.
     """
     parsed_base = urlparse(base_url)
-    base_domain = parsed_base.netloc
+    base_domain = parsed_base.netloc.lower()
     base_path = parsed_base.path.rstrip('/')
+    host_allowlist = {base_domain}
+    if allowed_hosts:
+        host_allowlist.update(host.lower() for host in allowed_hosts)
 
     # Jina renders links as [title](url)
     raw_links = re.findall(r'\[[^\]]{5,120}\]\((https?://[^\)\s]{10,200})\)', listing_text)
 
-    skip_terms = ('/tag/', '/category/', '/author/', '/page/', '/search', '/feed', '.xml', '.rss', '/cdn-cgi/')
+    skip_terms = ('/tag/', '/category/', '/author/', '/page/', '/search', '/feed', '.xml', '.rss', '/cdn-cgi/', '/assets/')
+    skip_extensions = ('.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif', '.ico', '.pdf', '.zip', '.tar', '.gz', '.mp4')
 
     seen: set[str] = set()
     results: list[str] = []
@@ -124,16 +135,21 @@ def _extract_article_urls(listing_text: str, base_url: str, limit: int = 5) -> l
     for url in raw_links:
         parsed = urlparse(url)
 
-        # Must be the same domain
-        if parsed.netloc != base_domain:
+        host = parsed.netloc.lower()
+        # Must be in allowed domains
+        if host not in host_allowlist:
             continue
 
-        # Must be deeper than the listing page (e.g. /news → /news/slug)
-        if not parsed.path.startswith(base_path + '/'):
-            continue
+        # For strict listing paths keep one-level-deeper rule, otherwise allow same-host deep paths.
+        if base_path and base_path != '/':
+            if not parsed.path.startswith(base_path + '/') and '/research' not in parsed.path.lower():
+                continue
 
         # Skip navigation, tag, author pages
-        if any(t in parsed.path.lower() for t in skip_terms):
+        path_lower = parsed.path.lower()
+        if any(t in path_lower for t in skip_terms):
+            continue
+        if path_lower.endswith(skip_extensions):
             continue
 
         # Strip fragment/query for deduplication
@@ -148,6 +164,21 @@ def _extract_article_urls(listing_text: str, base_url: str, limit: int = 5) -> l
             break
 
     return results
+
+
+def _extract_canonical_source_url(listing_text: str, fallback_url: str) -> str:
+    # Jina pages frequently include a stable line: "URL Source: <url>"
+    match = re.search(r'URL Source:\s*(https?://\S+)', listing_text)
+    if not match:
+        return fallback_url
+    return match.group(1).rstrip(').,')
+
+
+def _listing_snapshot_hash(source: dict, listing_text: str) -> str:
+    normalized = re.sub(r'\s+', ' ', listing_text.strip().lower())
+    payload = f"{source.get('name', '')}|{source.get('url', '')}|{normalized[:4000]}"
+    digest = hashlib.sha256(payload.encode()).hexdigest()
+    return f"https://agentcodex.snapshot/{source.get('name','source').lower().replace(' ', '-')}/{digest}"
 
 
 def _title_from_markdown(text: str) -> str:
@@ -185,9 +216,22 @@ def fetch_jina(
     if not listing_text:
         return articles
 
-    article_urls = _extract_article_urls(listing_text, listing_url, limit=max_links)
+    mode = source.get('mode', 'listing_links')
+    if mode not in SOURCE_MODES:
+        mode = 'listing_links'
+    canonical_url = _extract_canonical_source_url(listing_text, listing_url)
+    allowed_hosts = set(source.get('canonical_hosts', []))
+    allowed_hosts.add(urlparse(canonical_url).netloc.lower())
+    article_urls = _extract_article_urls(
+        listing_text,
+        listing_url,
+        limit=max_links,
+        allowed_hosts=allowed_hosts,
+    )
+    always_fetch_listing = bool(source.get('always_fetch_listing'))
+    treat_as_snapshot = mode in {'listing_snapshot', 'hybrid'} or always_fetch_listing
 
-    if article_urls:
+    if mode != 'listing_snapshot' and article_urls:
         print(f"  Found {len(article_urls)} article links — fetching individually")
         for url in article_urls:
             if not skip_url_dedupe and is_url_seen(url):
@@ -219,8 +263,8 @@ def fetch_jina(
                 'method': 'jina'
             })
     else:
-        # Fallback for single-page changelogs (e.g. cursor.com/changelog, v0.dev/changelog)
-        if not skip_url_dedupe and is_url_seen(listing_url):
+        # Fallback for single-page changelogs and dynamic listing hubs.
+        if (not treat_as_snapshot) and (not always_fetch_listing) and (not skip_url_dedupe) and is_url_seen(listing_url):
             print(f"  ⏭️  Listing URL already seen: {listing_url[:70]}")
             if run_logger:
                 run_logger.increment('url_duplicates')
@@ -235,12 +279,30 @@ def fetch_jina(
                 )
             return articles
 
+        if treat_as_snapshot and not skip_url_dedupe:
+            snapshot_article = {
+                'source_name': source['name'],
+                'url': _listing_snapshot_hash(source, listing_text),
+                'title': f"{source['name']} - Latest Updates",
+                'content': listing_text[:5000],
+            }
+            if is_content_seen(snapshot_article):
+                print("  ⏭️  Listing snapshot unchanged — skipping")
+                if run_logger:
+                    run_logger.increment('listing_snapshot_skipped')
+                    run_logger.event(
+                        {'source_name': source['name'], 'url': listing_url, 'title': f"{source['name']} snapshot"},
+                        'scrape',
+                        'listing_snapshot_duplicate',
+                    )
+                return articles
+
         print(f"  No article links found — using listing page content")
         articles.append({
             'source_name': source['name'],
             'agent_slugs': source['agent_slugs'],
             'title': f"{source['name']} - Latest Updates",
-            'url': listing_url,
+            'url': canonical_url,
             'content': listing_text[:5000],
             'published': datetime.now(timezone.utc).isoformat(),
             'method': 'jina'
@@ -259,6 +321,7 @@ def scrape_all(
     max_links: int = 5,
     max_article_age_days: int = MAX_ARTICLE_AGE_DAYS,
     skip_url_dedupe: bool = False,
+    source_mode_overrides: Optional[dict] = None,
 ) -> list[dict]:
     """Scrape all sources and return articles."""
     all_articles = []
@@ -270,11 +333,16 @@ def scrape_all(
             if not any(slug in target_agent_slugs for slug in source['agent_slugs']):
                 continue
 
-        print(f"Fetching {source['name']} via {source['method']}...")
+        source_for_run = dict(source)
+        if source_mode_overrides:
+            for slug in source_for_run.get('agent_slugs', []):
+                if slug in source_mode_overrides:
+                    source_for_run['mode'] = source_mode_overrides[slug]
+        print(f"Fetching {source_for_run['name']} via {source_for_run['method']}...")
 
-        if source['method'] == 'rss':
+        if source_for_run['method'] == 'rss':
             articles = fetch_rss(
-                source,
+                source_for_run,
                 run_logger=run_logger,
                 max_links=max_links,
                 max_article_age_days=max_article_age_days,
@@ -282,7 +350,7 @@ def scrape_all(
             )
         else:
             articles = fetch_jina(
-                source,
+                source_for_run,
                 run_logger=run_logger,
                 max_links=max_links,
                 skip_url_dedupe=skip_url_dedupe,

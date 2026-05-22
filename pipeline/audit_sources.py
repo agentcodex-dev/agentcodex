@@ -28,6 +28,10 @@ OFFICIAL_DOMAIN_RULES = {
     'aider': {'github.com', 'aider.chat'},
     'roo-code': {'github.com'},
     'continue': {'continue.dev', 'github.com'},
+    'antigravity': {'antigravity.google', 'google.com', 'developers.googleblog.com', 'blog.google'},
+    'openhands': {'github.com', 'openhands.dev'},
+    'deepseek': {'deepseek.com', 'api-docs.deepseek.com'},
+    'qwen': {'qwen.ai', 'qwenlm.github.io', 'qwenlm.ai', 'github.com', 'alibabacloud.com'},
 }
 
 
@@ -56,6 +60,10 @@ PREFERRED_SOURCE_HINTS = {
     'aider': 'https://github.com/Aider-AI/aider/releases',
     'roo-code': 'https://github.com/RooVetGit/Roo-Code/releases',
     'continue': 'https://github.com/continuedev/continue/releases',
+    'antigravity': 'https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/',
+    'openhands': 'https://github.com/OpenHands/OpenHands/releases',
+    'deepseek': 'https://api-docs.deepseek.com/updates/',
+    'qwen': 'https://qwen.ai/research',
 }
 
 SPECIFICITY_RULES = {
@@ -69,6 +77,18 @@ SPECIFICITY_RULES = {
     },
     'gemini': {
         'recommended_path_tokens': ['/ai', '/gemini', '/news', '/blog'],
+        'strict': False,
+    },
+    'antigravity': {
+        'recommended_path_tokens': ['/blog', '/antigravity', '/developer', '/ai-studio', '/gemini'],
+        'strict': False,
+    },
+    'deepseek': {
+        'recommended_path_tokens': ['/updates', '/news', '/release'],
+        'strict': False,
+    },
+    'qwen': {
+        'recommended_path_tokens': ['/research', '/blog', '/qwen', '/release', '/code'],
         'strict': False,
     },
     'llama': {

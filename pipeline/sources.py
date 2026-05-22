@@ -19,6 +19,31 @@ SOURCES = [
         'url': 'https://deepmind.google/blog/rss.xml',
     },
     {
+        'name': 'Google Antigravity',
+        'agent_slugs': ['antigravity'],
+        'method': 'jina',
+        'url': 'https://antigravity.google/blog',
+        'mode': 'listing_snapshot',
+        'canonical_hosts': ['antigravity.google'],
+        'always_fetch_listing': True,
+    },
+    {
+        'name': 'DeepSeek',
+        'agent_slugs': ['deepseek'],
+        'method': 'jina',
+        'url': 'https://api-docs.deepseek.com/updates/',
+        'mode': 'listing_snapshot',
+        'canonical_hosts': ['api-docs.deepseek.com', 'deepseek.com'],
+    },
+    {
+        'name': 'Qwen',
+        'agent_slugs': ['qwen'],
+        'method': 'jina',
+        'url': 'https://qwen.ai/research',
+        'mode': 'hybrid',
+        'canonical_hosts': ['qwen.ai', 'qwenlm.github.io', 'qwenlm.ai'],
+    },
+    {
         'name': 'Meta AI',
         'agent_slugs': ['llama'],
         'method': 'rss',
@@ -153,5 +178,11 @@ SOURCES = [
         'agent_slugs': ['continue'],
         'method': 'jina',
         'url': 'https://github.com/continuedev/continue/releases',
+    },
+    {
+        'name': 'OpenHands',
+        'agent_slugs': ['openhands'],
+        'method': 'jina',
+        'url': 'https://github.com/OpenHands/OpenHands/releases',
     },
 ]

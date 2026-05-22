@@ -33,6 +33,12 @@ def parse_args():
         help='Max release/article age window for validation and RSS date cutoff',
     )
     parser.add_argument(
+        '--backfill-days',
+        type=int,
+        default=90,
+        help='Backfill mode: release/article age window used for seeded historical ingestion',
+    )
+    parser.add_argument(
         '--max-versions-per-article',
         type=int,
         default=8,
@@ -45,7 +51,29 @@ def parse_args():
         default='legacy',
         help='Score processing mode: keep current behavior (legacy) or deterministic calibration (calibrated)',
     )
+    parser.add_argument(
+        '--source-mode',
+        default='',
+        help='Optional source mode overrides, e.g. antigravity=listing_snapshot,qwen=hybrid',
+    )
     return parser.parse_args()
+
+
+def parse_source_mode_overrides(value: str) -> dict:
+    if not value.strip():
+        return {}
+    overrides = {}
+    allowed_modes = {'rss', 'listing_links', 'listing_snapshot', 'hybrid'}
+    for chunk in value.split(','):
+        item = chunk.strip()
+        if not item or '=' not in item:
+            continue
+        slug, mode = item.split('=', 1)
+        slug = slug.strip()
+        mode = mode.strip()
+        if slug and mode in allowed_modes:
+            overrides[slug] = mode
+    return overrides
 
 
 def run_pipeline():
@@ -60,6 +88,8 @@ def run_pipeline():
         slug.strip() for slug in args.agents.split(',') if slug.strip()
     } or None
     is_backfill = args.backfill
+    source_mode_overrides = parse_source_mode_overrides(args.source_mode)
+    max_age_days = max(1, args.backfill_days if is_backfill else args.max_age_days)
 
     run_logger = PipelineRunLogger()
     run_logger.start()
@@ -86,8 +116,9 @@ def run_pipeline():
             run_logger=run_logger,
             target_agent_slugs=target_agent_slugs,
             max_links=max(1, args.max_links),
-            max_article_age_days=max(1, args.max_age_days),
-            skip_url_dedupe=is_backfill,
+            max_article_age_days=max_age_days,
+            skip_url_dedupe=False,
+            source_mode_overrides=source_mode_overrides or None,
         )
         run_logger.increment('articles_scraped', len(articles))
 
@@ -104,8 +135,8 @@ def run_pipeline():
         versions_found = extract_all(
             articles,
             run_logger=run_logger,
-            skip_content_dedupe=is_backfill,
-            max_release_age_days=max(1, args.max_age_days),
+            skip_content_dedupe=False,
+            max_release_age_days=max_age_days,
             backfill_mode=is_backfill,
             max_versions_per_article=max(1, args.max_versions_per_article),
             scoring_mode=args.scoring_mode,
@@ -123,10 +154,22 @@ def run_pipeline():
         # Step 3 - Save to Supabase as drafts
         print("\nSTEP 3 - Saving Drafts to Supabase")
         print("-" * 30)
+        if is_backfill:
+            for version in versions_found:
+                impact = version.get('impact_factors') if isinstance(version.get('impact_factors'), dict) else {}
+                impact.update({
+                    'backfillRun': True,
+                    'backfillWindowDays': max_age_days,
+                })
+                version['impact_factors'] = impact
+                existing_note = str(version.get('editor_note') or '').strip()
+                tag = f"backfill({max_age_days}d)"
+                version['editor_note'] = f"{existing_note} | {tag}".strip(' |')
+
         results = save_all_drafts(
             versions_found,
             run_logger=run_logger,
-            max_release_age_days=max(1, args.max_age_days),
+            max_release_age_days=max_age_days,
             dry_run=args.dry_run,
         )
 
@@ -152,10 +195,13 @@ def run_pipeline():
                 'backfill': is_backfill,
                 'target_agents': sorted(target_agent_slugs) if target_agent_slugs else [],
                 'max_links': max(1, args.max_links),
-                'max_age_days': max(1, args.max_age_days),
+                'max_age_days': max_age_days,
+                'backfill_days': max(1, args.backfill_days),
                 'max_versions_per_article': max(1, args.max_versions_per_article),
                 'dry_run': args.dry_run,
                 'scoring_mode': args.scoring_mode,
+                'source_mode_overrides': source_mode_overrides,
+                'by_agent': results.get('by_agent', {}),
             }
         )
 

@@ -154,6 +154,7 @@ def save_all_drafts(
         'saved': 0,
         'skipped': 0,
         'failed': 0,
+        'by_agent': {},
     }
 
     print(f"\nSaving {len(extractions)} extractions to Supabase...\n")
@@ -165,11 +166,17 @@ def save_all_drafts(
                 f"{extraction.get('agent_slug')} {extraction.get('version_number')}"
             )
             results['saved'] += 1
+            agent_slug = extraction.get('agent_slug', 'unknown')
+            bucket = results['by_agent'].setdefault(agent_slug, {'saved': 0, 'skipped': 0, 'failed': 0})
+            bucket['saved'] += 1
             continue
 
+        agent_slug = extraction.get('agent_slug', 'unknown')
+        bucket = results['by_agent'].setdefault(agent_slug, {'saved': 0, 'skipped': 0, 'failed': 0})
         success = save_draft(extraction, max_release_age_days=max_release_age_days)
         if success:
             results['saved'] += 1
+            bucket['saved'] += 1
             if run_logger:
                 run_logger.increment('saved')
         elif version_exists(
@@ -177,12 +184,23 @@ def save_all_drafts(
             extraction.get('version_number', '')
         ):
             results['skipped'] += 1
+            bucket['skipped'] += 1
             if run_logger:
                 run_logger.increment('skipped')
         else:
             results['failed'] += 1
+            bucket['failed'] += 1
             if run_logger:
                 run_logger.increment('failed')
+
+    if results['by_agent']:
+        print("\nPer-agent save summary")
+        print("──────────────────────")
+        for slug, bucket in sorted(results['by_agent'].items()):
+            print(
+                f"{slug}: saved={bucket['saved']} "
+                f"skipped={bucket['skipped']} failed={bucket['failed']}"
+            )
 
     return results
 

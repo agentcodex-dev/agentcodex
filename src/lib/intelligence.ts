@@ -43,6 +43,10 @@ const OFFICIAL_DOMAINS: Record<string, string[]> = {
   aider: ['github.com', 'aider.chat'],
   'roo-code': ['github.com'],
   continue: ['continue.dev', 'github.com'],
+  antigravity: ['antigravity.google', 'google.com', 'developers.googleblog.com', 'blog.google'],
+  openhands: ['github.com', 'openhands.dev'],
+  deepseek: ['deepseek.com', 'api-docs.deepseek.com'],
+  qwen: ['qwen.ai', 'qwenlm.github.io', 'qwenlm.ai', 'github.com', 'alibabacloud.com'],
 }
 
 const MAJOR_KEYWORDS = [
@@ -88,18 +92,27 @@ export function deriveImportanceScore(totalDelta: number, whatChanged: string): 
 
 export function deriveQualitySignal(agent: Agent, version: AgentVersion): QualitySignal {
   const official = isOfficialSource(agent.slug, version.source_url)
-  let confidence = typeof version.extraction_confidence === 'number'
+  const measuredConfidence = typeof version.extraction_confidence === 'number'
     ? version.extraction_confidence
-    : 0.6
+    : 0.56
+  const boundedMeasured = Math.max(0, Math.min(1, measuredConfidence))
+  const hasSummary = Boolean(version.what_changed && version.what_changed.trim().length >= 30)
+  const hasCapabilities = Boolean(version.capabilities && Object.keys(version.capabilities).length >= 4)
+  const hasSourceUrl = Boolean(version.source_url)
+  const hasImpactFields = typeof version.importance_score === 'number' && Boolean(version.change_type)
+  const completenessScore = [hasSummary, hasCapabilities, hasSourceUrl, hasImpactFields].filter(Boolean).length / 4
 
-  if (official) confidence = Math.min(1, confidence + 0.2)
-  if (!version.what_changed) confidence = Math.max(0.3, confidence - 0.2)
+  // Blend measured confidence with source/completeness so scores don't collapse to one bucket.
+  const sourceFactor = official ? 0.12 : hasSourceUrl ? -0.06 : -0.12
+  const completenessFactor = (completenessScore - 0.5) * 0.26
+  let confidence = boundedMeasured + sourceFactor + completenessFactor
+  if (!hasSummary) confidence -= 0.08
 
   const confidenceLabel = confidence >= 0.8 ? 'High' : confidence >= 0.6 ? 'Medium' : 'Low'
   return {
     sourceOfficial: official,
     sourceTier: official ? 'official' : version.source_url ? 'secondary' : 'unknown',
-    extractionConfidence: Number(confidence.toFixed(2)),
+    extractionConfidence: Number(Math.max(0.2, Math.min(0.98, confidence)).toFixed(2)),
     confidenceLabel,
   }
 }
