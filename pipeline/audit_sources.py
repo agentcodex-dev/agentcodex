@@ -32,6 +32,7 @@ OFFICIAL_DOMAIN_RULES = {
     'openhands': {'github.com', 'openhands.dev'},
     'deepseek': {'deepseek.com', 'api-docs.deepseek.com'},
     'qwen': {'qwen.ai', 'qwenlm.github.io', 'qwenlm.ai', 'github.com', 'alibabacloud.com'},
+    'cohere': {'cohere.com', 'docs.cohere.com'},
 }
 
 
@@ -64,6 +65,7 @@ PREFERRED_SOURCE_HINTS = {
     'openhands': 'https://github.com/OpenHands/OpenHands/releases',
     'deepseek': 'https://api-docs.deepseek.com/updates/',
     'qwen': 'https://qwen.ai/research',
+    'cohere': 'https://docs.cohere.com/changelog',
 }
 
 SPECIFICITY_RULES = {
@@ -89,6 +91,10 @@ SPECIFICITY_RULES = {
     },
     'qwen': {
         'recommended_path_tokens': ['/research', '/blog', '/qwen', '/release', '/code'],
+        'strict': False,
+    },
+    'cohere': {
+        'recommended_path_tokens': ['/changelog', '/release-notes', '/models-overview'],
         'strict': False,
     },
     'llama': {

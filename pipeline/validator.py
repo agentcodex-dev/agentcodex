@@ -43,6 +43,7 @@ OFFICIAL_DOMAINS = {
     'openhands': ['github.com', 'openhands.dev'],
     'deepseek': ['deepseek.com', 'api-docs.deepseek.com'],
     'qwen': ['qwen.ai', 'qwenlm.github.io', 'qwenlm.ai', 'github.com', 'alibabacloud.com'],
+    'cohere': ['cohere.com', 'docs.cohere.com'],
 }
 
 

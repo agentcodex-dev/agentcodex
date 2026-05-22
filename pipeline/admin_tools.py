@@ -123,7 +123,19 @@ ONBOARDING_AGENTS = [
             'Qwen is Alibaba Cloud’s open and commercial model ecosystem, '
             'including coding- and agent-oriented releases across the Qwen stack.'
         ),
-        'website_url': 'https://qwenlm.github.io/blog/',
+        'website_url': 'https://qwen.ai/research',
+        'is_verified': True,
+    },
+    {
+        'name': 'Cohere',
+        'slug': 'cohere',
+        'provider': 'Cohere',
+        'category': ['Coding', 'Research'],
+        'description': (
+            'Cohere provides enterprise-oriented language models and release '
+            'updates for command, retrieval, and agentic AI workflows.'
+        ),
+        'website_url': 'https://docs.cohere.com/changelog',
         'is_verified': True,
     },
 ]

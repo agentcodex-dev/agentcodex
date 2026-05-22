@@ -44,6 +44,22 @@ SOURCES = [
         'canonical_hosts': ['qwen.ai', 'qwenlm.github.io', 'qwenlm.ai'],
     },
     {
+        'name': 'Cohere Changelog',
+        'agent_slugs': ['cohere'],
+        'method': 'jina',
+        'url': 'https://docs.cohere.com/changelog',
+        'mode': 'hybrid',
+        'canonical_hosts': ['docs.cohere.com', 'cohere.com'],
+    },
+    {
+        'name': 'Cohere Models Overview',
+        'agent_slugs': ['cohere'],
+        'method': 'jina',
+        'url': 'https://cohere.com/models-overview',
+        'mode': 'listing_snapshot',
+        'canonical_hosts': ['cohere.com'],
+    },
+    {
         'name': 'Meta AI',
         'agent_slugs': ['llama'],
         'method': 'rss',
