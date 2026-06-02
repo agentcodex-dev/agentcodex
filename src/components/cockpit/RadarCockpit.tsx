@@ -26,15 +26,12 @@ export default function RadarCockpit({
   const pulse = useMemo(
     () => radar.cockpit.pulse
       .filter((release) => categoryMatches(release, selectedCategory))
-      .sort((a, b) => {
-        if (b.importanceScore !== a.importanceScore) return b.importanceScore - a.importanceScore
-        return a.ageMinutes - b.ageMinutes
-      }),
+      .sort((a, b) => a.ageMinutes - b.ageMinutes),
     [radar.cockpit.pulse, selectedCategory]
   )
   const [selectedId, setSelectedId] = useState<string | null>(pulse[0]?.id || null)
   const [agentQuery, setAgentQuery] = useState('')
-  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc')
+  const [sortMode, setSortMode] = useState<'newest' | 'importance'>('newest')
   const visiblePulse = useMemo(() => {
     const query = agentQuery.trim().toLowerCase()
     return pulse
@@ -49,13 +46,12 @@ export default function RadarCockpit({
         ].some((value) => value?.toLowerCase().includes(query))
       })
       .sort((a, b) => {
-        const importanceSort = sortDirection === 'desc'
-          ? b.importanceScore - a.importanceScore
-          : a.importanceScore - b.importanceScore
-        if (importanceSort !== 0) return importanceSort
+        if (sortMode === 'importance' && b.importanceScore !== a.importanceScore) {
+          return b.importanceScore - a.importanceScore
+        }
         return a.ageMinutes - b.ageMinutes
       })
-  }, [agentQuery, pulse, sortDirection])
+  }, [agentQuery, pulse, sortMode])
   const selectedRelease = selectedId
     ? visiblePulse.find((release) => release.id === selectedId) || visiblePulse[0] || null
     : null
@@ -106,9 +102,9 @@ export default function RadarCockpit({
           <PulseTable
             releases={visiblePulse}
             searchValue={agentQuery}
-            sortDirection={sortDirection}
+            sortMode={sortMode}
             onSearchChange={setAgentQuery}
-            onToggleSort={() => setSortDirection((current) => current === 'desc' ? 'asc' : 'desc')}
+            onToggleSort={() => setSortMode((current) => current === 'newest' ? 'importance' : 'newest')}
             selectedId={selectedRelease?.id}
             onSelect={(release) => setSelectedId(release.id)}
           />

@@ -7,6 +7,8 @@ import RadarStatCards from '@/components/RadarStatCards'
 import LatestReleaseFeed from '@/components/LatestReleaseFeed'
 import { getRadarData } from '@/lib/radar'
 
+export const revalidate = 300
+
 export default async function Home() {
   const radar = await getRadarData()
   const trackedProviders = new Set(radar.agents.map((agent) => agent.provider)).size

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@supabase/supabase-js'
 import { deriveChangeType, deriveImportanceScore } from '@/lib/intelligence'
 
@@ -31,6 +32,11 @@ function clampConfidence(value?: number | null) {
   return Math.max(0, Math.min(1, Number(value.toFixed(3))))
 }
 
+function refreshPublishedSurfaces() {
+  revalidatePath('/')
+  revalidatePath('/categories')
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { id, ids, password, draft } = await request.json() as ApprovePayload
@@ -57,6 +63,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      refreshPublishedSurfaces()
       return NextResponse.json({ success: true, approved: ids.length })
     }
 
@@ -109,6 +116,7 @@ export async function POST(request: NextRequest) {
         })
     }
 
+    refreshPublishedSurfaces()
     return NextResponse.json({ success: true })
 
   } catch {

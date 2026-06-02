@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import { ArrowDown, ArrowUp, ExternalLink, Search, Shield, SlidersHorizontal, Star } from 'lucide-react'
+import { ArrowDown, Clock3, ExternalLink, Search, Shield, SlidersHorizontal, Star } from 'lucide-react'
 import { RadarPulseRelease } from '@/lib/radar'
 import MiniSparkline from '@/components/cockpit/MiniSparkline'
 
 type Props = {
   releases: RadarPulseRelease[]
   searchValue: string
-  sortDirection: 'desc' | 'asc'
+  sortMode: 'newest' | 'importance'
   onSearchChange: (value: string) => void
   onToggleSort: () => void
   selectedId?: string
@@ -30,20 +30,20 @@ function SignalDot({ tone }: { tone: RadarPulseRelease['capabilityTone'] }) {
 export default function PulseTable({
   releases,
   searchValue,
-  sortDirection,
+  sortMode,
   onSearchChange,
   onToggleSort,
   selectedId,
   onSelect,
 }: Props) {
-  const SortIcon = sortDirection === 'desc' ? ArrowDown : ArrowUp
+  const SortIcon = sortMode === 'newest' ? Clock3 : ArrowDown
 
   if (releases.length === 0) {
     return (
       <section className="acx-cockpit-panel overflow-hidden">
         <PulseControls
           searchValue={searchValue}
-          sortDirection={sortDirection}
+          sortMode={sortMode}
           onSearchChange={onSearchChange}
           onToggleSort={onToggleSort}
         />
@@ -61,7 +61,7 @@ export default function PulseTable({
     <section className="acx-cockpit-panel overflow-hidden">
       <PulseControls
         searchValue={searchValue}
-        sortDirection={sortDirection}
+        sortMode={sortMode}
         onSearchChange={onSearchChange}
         onToggleSort={onToggleSort}
       />
@@ -80,7 +80,7 @@ export default function PulseTable({
                   type="button"
                   onClick={onToggleSort}
                   className="inline-flex items-center gap-1 transition-colors hover:text-sky-300"
-                  aria-label={`Sort importance ${sortDirection === 'desc' ? 'ascending' : 'descending'}`}
+                  aria-label={sortMode === 'newest' ? 'Sort by importance' : 'Sort newest first'}
                 >
                   Importance
                   <SortIcon size={12} />
@@ -227,16 +227,16 @@ export default function PulseTable({
 
 function PulseControls({
   searchValue,
-  sortDirection,
+  sortMode,
   onSearchChange,
   onToggleSort,
 }: {
   searchValue: string
-  sortDirection: 'desc' | 'asc'
+  sortMode: 'newest' | 'importance'
   onSearchChange: (value: string) => void
   onToggleSort: () => void
 }) {
-  const SortIcon = sortDirection === 'desc' ? ArrowDown : ArrowUp
+  const SortIcon = sortMode === 'newest' ? Clock3 : ArrowDown
 
   return (
     <div className="flex flex-col gap-3 border-b border-slate-800 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
@@ -269,7 +269,7 @@ function PulseControls({
             className="inline-flex items-center gap-2 rounded-md border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs text-slate-300 transition-colors hover:border-sky-500 hover:text-sky-200"
           >
             <SortIcon size={14} />
-            Importance {sortDirection === 'desc' ? 'High-Low' : 'Low-High'}
+            {sortMode === 'newest' ? 'Newest First' : 'Importance High-Low'}
           </button>
           <button
             type="button"
