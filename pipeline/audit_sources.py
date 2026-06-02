@@ -33,6 +33,7 @@ OFFICIAL_DOMAIN_RULES = {
     'deepseek': {'deepseek.com', 'api-docs.deepseek.com'},
     'qwen': {'qwen.ai', 'qwenlm.github.io', 'qwenlm.ai', 'github.com', 'alibabacloud.com'},
     'cohere': {'cohere.com', 'docs.cohere.com'},
+    'microsoft-mai': {'microsoft.ai', 'microsoft.com', 'news.microsoft.com', 'blogs.microsoft.com', 'techcommunity.microsoft.com', 'azure.microsoft.com'},
 }
 
 
@@ -66,6 +67,7 @@ PREFERRED_SOURCE_HINTS = {
     'deepseek': 'https://api-docs.deepseek.com/updates/',
     'qwen': 'https://qwen.ai/research',
     'cohere': 'https://docs.cohere.com/changelog',
+    'microsoft-mai': 'https://microsoft.ai/news/',
 }
 
 SPECIFICITY_RULES = {
@@ -95,6 +97,10 @@ SPECIFICITY_RULES = {
     },
     'cohere': {
         'recommended_path_tokens': ['/changelog', '/release-notes', '/models-overview'],
+        'strict': False,
+    },
+    'microsoft-mai': {
+        'recommended_path_tokens': ['/news', '/models', '/mai', '/foundry', '/build'],
         'strict': False,
     },
     'llama': {

@@ -46,6 +46,7 @@ OFFICIAL_DOMAINS = {
     'deepseek': ['deepseek.com', 'api-docs.deepseek.com'],
     'qwen': ['qwen.ai', 'qwenlm.github.io', 'qwenlm.ai', 'github.com', 'alibabacloud.com'],
     'cohere': ['cohere.com', 'docs.cohere.com'],
+    'microsoft-mai': ['microsoft.ai', 'microsoft.com', 'news.microsoft.com', 'blogs.microsoft.com', 'techcommunity.microsoft.com', 'azure.microsoft.com'],
 }
 
 

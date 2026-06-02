@@ -138,6 +138,18 @@ ONBOARDING_AGENTS = [
         'website_url': 'https://docs.cohere.com/changelog',
         'is_verified': True,
     },
+    {
+        'name': 'Microsoft MAI',
+        'slug': 'microsoft-mai',
+        'provider': 'Microsoft AI',
+        'category': ['Coding', 'Research', 'Multimodal'],
+        'description': (
+            'Microsoft MAI is Microsoft AI’s first-party model ecosystem, '
+            'including reasoning, coding, image, voice, and transcription models.'
+        ),
+        'website_url': 'https://microsoft.ai/news/',
+        'is_verified': True,
+    },
 ]
 
 

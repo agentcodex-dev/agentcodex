@@ -66,6 +66,16 @@ SOURCES = [
         'canonical_hosts': ['cohere.com'],
     },
     {
+        'name': 'Microsoft MAI',
+        'agent_slugs': ['microsoft-mai'],
+        'method': 'jina',
+        'url': 'https://microsoft.ai/news/',
+        'mode': 'hybrid',
+        'canonical_hosts': ['microsoft.ai', 'news.microsoft.com', 'blogs.microsoft.com', 'techcommunity.microsoft.com'],
+        'include_patterns': [r'/news/', r'/models?', r'/mai', r'/foundry', r'/copilot', r'/build'],
+        'exclude_patterns': [r'/search', r'/tag/', r'/category/(?!models)', r'/assets/', r'health', r'\.(png|jpg|jpeg|svg|webp|gif|pdf)$'],
+    },
+    {
         'name': 'Meta AI',
         'agent_slugs': ['llama'],
         'method': 'rss',

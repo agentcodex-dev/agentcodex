@@ -126,7 +126,7 @@ def _extract_article_urls(
         host_allowlist.update(host.lower() for host in allowed_hosts)
 
     # Jina renders links as [title](url)
-    raw_links = re.findall(r'\[[^\]]{5,120}\]\((https?://[^\)\s]{10,200})\)', listing_text)
+    raw_links = re.findall(r'\[([^\]]{5,120})\]\((https?://[^\)\s]{10,200})\)', listing_text)
 
     skip_terms = ('/tag/', '/category/', '/author/', '/page/', '/search', '/feed', '.xml', '.rss', '/cdn-cgi/', '/assets/')
     skip_extensions = ('.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif', '.ico', '.pdf', '.zip', '.tar', '.gz', '.mp4')
@@ -141,8 +141,9 @@ def _extract_article_urls(
     candidates: list[tuple[int, str]] = []
     seen: set[str] = set()
 
-    for url in raw_links:
+    for title, url in raw_links:
         parsed = urlparse(url)
+        title_lower = title.lower()
 
         host = parsed.netloc.lower()
         # Must be in allowed domains
@@ -160,7 +161,7 @@ def _extract_article_urls(
             continue
         if path_lower.endswith(skip_extensions):
             continue
-        if exclude_rx and any(rx.search(url) or rx.search(path_lower) for rx in exclude_rx):
+        if exclude_rx and any(rx.search(url) or rx.search(path_lower) or rx.search(title_lower) for rx in exclude_rx):
             continue
 
         # Strip fragment/query for deduplication
@@ -169,9 +170,9 @@ def _extract_article_urls(
             continue
 
         score = 0
-        if include_rx and any(rx.search(clean) or rx.search(path_lower) for rx in include_rx):
+        if include_rx and any(rx.search(clean) or rx.search(path_lower) or rx.search(title_lower) for rx in include_rx):
             score += 8
-        score += sum(2 for token in release_terms if token in path_lower)
+        score += sum(2 for token in release_terms if token in path_lower or token in title_lower)
         if '/docs' in path_lower or '/api' in path_lower:
             score -= 3
         if '/news' in path_lower or '/blog' in path_lower or '/research' in path_lower:
