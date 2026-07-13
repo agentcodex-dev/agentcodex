@@ -5,6 +5,7 @@ SOURCES = [
         'agent_slugs': ['chatgpt'],
         'method': 'rss',
         'url': 'https://openai.com/news/rss.xml',
+        'max_links': 12,
     },
     {
         'name': 'GitHub',

@@ -359,13 +359,14 @@ def scrape_all(
             for slug in source_for_run.get('agent_slugs', []):
                 if slug in source_mode_overrides:
                     source_for_run['mode'] = source_mode_overrides[slug]
+        source_max_links = max(1, int(source_for_run.get('max_links', max_links)))
         print(f"Fetching {source_for_run['name']} via {source_for_run['method']}...")
 
         if source_for_run['method'] == 'rss':
             articles = fetch_rss(
                 source_for_run,
                 run_logger=run_logger,
-                max_links=max_links,
+                max_links=source_max_links,
                 max_article_age_days=max_article_age_days,
                 skip_url_dedupe=skip_url_dedupe,
             )
@@ -373,7 +374,7 @@ def scrape_all(
             articles = fetch_jina(
                 source_for_run,
                 run_logger=run_logger,
-                max_links=max_links,
+                max_links=source_max_links,
                 skip_url_dedupe=skip_url_dedupe,
             )
 
